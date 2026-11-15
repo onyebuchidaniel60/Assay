@@ -61,6 +61,19 @@
 - **Decision:** stopped at the human gate per the 10-minute rule; no alternative faucet, asset substitution or bypass attempted.
 - **Next exact action:** operator must be available to complete a fresh testnet email code within its 10-minute TTL, or provide an authorized browser/passkey path for the testnet login.
 
+### Kite testnet session and smoke-test outcome
+
+- **Testnet user_id:** `user_01a1dfab-06b7-7b42-b03c-111a2805c175` (separate from production user `user_01a1df77-dc2c-7901-8f21-a9b3942578fc`).
+- **Wallet before faucet:** `0 PIEUSD` on Kite testnet; after faucet: `100 PIEUSD` (tx `0xdc7b6c16bd67bc84c4f524d6c169d9d5ff69328a29a681b4e8c0fb9ceb708d71`).
+- **Session ID:** `agent_session_01a1dfc3-794e-70cb-bde8-90c6315736cf`.
+- **Session policy:** `5 PIEUSD` per transaction, `20 PIEUSD` total, `24h` TTL; asset `PIEUSD`; expiry `2026-11-16T15:11:32.17177Z`; status `active`.
+- **First approved session:** `agent_session_01a1dfbc-d772-7e39-bf11-2ca1c9f9ebd3` also exists remotely but was not usable locally because the runtime key/agent state was created afterwards. It was not used for a payment.
+- **Test x402 call:** one POST to `https://passport.dev.gokite.ai/x402/test` with idempotency key `assay-kite-smoke-1457e791-3c4f-45f9-ade5-16e0749b117c` returned exit `1` with `internal error` / `status: error`. No receipt was returned.
+- **Reconciliation check:** `kpass activity --limit 20` shows only the two session approvals and agent registration; no payment event. Both sessions show `spent_total: 0`. No charge is evidenced.
+- **Over-cap rejection:** not executed yet because the test payment did not complete.
+- **Decision:** stopped on the provider error; did not retry blindly or fabricate a receipt.
+- **Next exact action:** determine whether the `internal error` is transient/provider-side or caused by the test endpoint request shape; if retrying, use the same idempotency key only after operator approval and confirm no charge remains. Then run the over-cap rejection path.
+
 ## Build log entry template
 
 For every checkpoint add:

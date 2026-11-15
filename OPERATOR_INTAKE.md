@@ -210,7 +210,7 @@ Additional observations:
 | Integration | Required? | Status | Authorization boundary |
 |---|---:|---|---|
 | Reppo Evaluation API | No | `DISABLED` | No key/quota/terms; enable only with synthetic/de-identified data and verified access |
-| Kite Passport / x402 | No | `DISABLED` | No account/CLI/testnet/session; spend cap `$0`; no wallet funding or payment |
+| Kite Passport / x402 | No | `ENABLED (TESTNET)` | Testnet user `user_01a1dfab-06b7-7b42-b03c-111a2805c175`; session `agent_session_01a1dfc3-794e-70cb-bde8-90c6315736cf`; 5 PIEUSD per tx, 20 PIEUSD total, expiry `2026-11-16T15:11:32.17177Z`; wallet funded 100 PIEUSD. Payment smoke test blocked by provider internal error; no receipt. |
 | Google Gemini TTS | No | `NOT CONFIGURED` | Check current free tier in Phase 8; no billing activation; local licensed fallback permitted |
 | Custom domain | No | `NOT SUPPLIED` | Use provider preview URLs; exact CORS after deployment |
 
@@ -260,7 +260,7 @@ Additional observations:
 | Render | API and Presidio service access verified; free-tier fit confirmed | **BLOCKED** |
 | Presidio | Deployment blocker resolved and recorded | **RESOLVED** |
 | Reppo | Disabled or enabled with verified access and synthetic-only payload policy | **DISABLED** |
-| Kite | Disabled or enabled with exact spend cap/asset/session | **DISABLED** |
+| Kite | Disabled or enabled with exact spend cap/asset/session | **ENABLED (TESTNET) — payment smoke test blocked** |
 | Budget | Numeric ceiling and billing boundary recorded | **$0 new spend; no paid authority** |
 | Production | Explicit authority recorded or staging-only constraint honored | **NOT AUTHORIZED** |
 | Demo | Audience, pronunciation, redactions and output location set | **DEFAULTS RECORDED** |
@@ -281,7 +281,7 @@ Additional observations:
 8. **Render:** provide service access or authorize creation of free API and Presidio services; confirm the reduced Presidio mode and 512 MB constraint.
 9. **Budget:** raise the ceiling only if a paid service is required. Otherwise confirm free-tier-only operation and no top-ups/payments.
 10. **Production:** confirm production remains **NOT AUTHORIZED**.
-11. **Optional integrations:** confirm Reppo and Kite remain disabled unless separately enabled with exact credentials and, for Kite, an exact spend cap/asset/service/session.
+11. **Optional integrations:** Reppo remains disabled. Kite testnet is enabled with session `agent_session_01a1dfc3-794e-70cb-bde8-90c6315736cf` (5/20 PIEUSD, 24h); resolve the provider internal error before relying on the x402 path in the Assay workflow.
 12. **Secrets:** deliver values only through a secure out-of-band channel — never in chat, Git, logs or `NEXT_PUBLIC_*` variables.
 
 **No Phase 1 work — no monorepo scaffold, no application code, no deployment — may begin until the critical blockers above are resolved.**
