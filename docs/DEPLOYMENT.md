@@ -19,12 +19,14 @@
 
 ## Current preview
 
-- **URL:** `https://assay-guyo5yh6z-uhhh2.vercel.app`
-- **Commit:** the Phase 1 shell commit (`5deaa51…`); the Phase 3/4 authenticated UI is local until Phase 5.
+- **URL:** `https://assay-uhhh2.vercel.app` (aliases the protected deployment `https://assay-h7uyd6mg5-uhhh2.vercel.app`).
+- **Commit:** `042cb90` (Phase 3/4 feature commit; later UI/docs commits may be newer).
 - **Protection:** Vercel Authentication.
-- **State:** Phase 1 shell only; it is not the current authenticated workspace.
-- **Local verified state:** API `http://localhost:3001`, web `http://localhost:3000`, 18/18 Playwright desktop/mobile, full run lifecycle and manager approval.
-- **Phase 5 target:** Render API + Presidio, Vercel preview with `API_PUBLIC_URL` pointing at Render, Neon demo project, sign-up disabled, exact commit/URL recorded here and in `AI_HANDOFF.md`.
+- **API:** `https://assay-api-7hy0.onrender.com` (Render free web service, health `/health/ready`).
+- **Presidio:** `https://assay-presidio.onrender.com` (Render free Python service, `REDUCED_PII_MODE`).
+- **State:** authenticated Phase 5 preview; analyst/manager/auditor journeys backed by Neon and the live providers. Synthetic data only.
+- **Verification:** deployed sign-in/session, dashboard/borrowers/runs with BOR-004/005, role 401/403 checks, manager DTO without raw amounts, upload magic-byte rejection, audit tamper detection, concurrent approval, Kite policy denial/provider block and demo-shred denial. See `docs/BUILD_LOG.md`.
+- **Known latency:** attested extraction runs as a background job and can take 75 s–4.5 min under provider load; the UI auto-refreshes.
 
 ## Preview deployment order
 

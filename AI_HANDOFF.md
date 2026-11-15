@@ -1,8 +1,9 @@
 # Assay — AI Handoff / Build State
 
-**Status:** Phases 1–4 implemented and tested locally against Neon. Phase 5 deployment/regression gate is next.  
+**Status:** Phases 1–5 implemented; authenticated preview deployed to Vercel with Render API/Presidio and Neon. Phase 6 visual refinement/demo is next, with remaining Phase 9 hardening checks.  
 **Repository:** `https://github.com/onyebuchidaniel60/Assay` — public, default branch `main`.  
-**Preview URL:** `https://assay-guyo5yh6z-uhhh2.vercel.app` — protected Phase 1 shell only; authenticated Phase 4 preview not yet deployed.  
+**Preview URL:** `https://assay-uhhh2.vercel.app` — protected, authenticated Phase 5 preview backed by the Render API. Legacy `https://assay-guyo5yh6z-uhhh2.vercel.app` points to the earlier deployment.
+**Render API:** `https://assay-api-7hy0.onrender.com`. **Render Presidio:** `https://assay-presidio.onrender.com`.  
 **Production release authority:** Authorized by the operator, but release remains gated on the full Phase 5/9 test and security matrix. No production deployment is claimed.  
 **Data boundary:** Synthetic data only; no real borrower, lender or production records.  
 **New spend authority:** `$0` beyond existing NEAR AI and SERV credits.
@@ -66,14 +67,22 @@
 - Borrowers BOR-004 and BOR-005 exist. Both runs are manager-approved; BOR-004 baseline and stress cases compliant; BOR-005 baseline compliant with two acknowledged stress breaches.
 - Old BOR-001/2/3 test runs were deleted before the final schema/workflow checks. No real data was involved.
 
-## Next exact task — Phase 5
+## Phase 5 — deployed preview verified
 
-1. Deploy Fastify and Presidio to Render; record exact service URLs, deployed commit and environment-variable names (never values).
-2. Point `API_PUBLIC_URL` on Vercel at the Render API; keep Git-triggered production releases disabled; deploy a protected preview.
-3. Verify the authenticated preview end-to-end with analyst/manager/auditor accounts, including upload, job polling, extraction attestation, proof, approval and audit verification.
-4. Run the Phase 5/9 regression and security matrix: IDOR matrix, role forgery, XSS, SQL injection, upload validation, prompt injection, CORS, token expiry, secret scanning, log redaction, concurrent approval, audit tampering, proof mutation, production-mode shred denial and Kite duplicate-payment policy.
-5. Update `AI_HANDOFF.md`, `docs/BUILD_LOG.md`, `docs/DEPLOYMENT.md` and `docs/TESTING.md`, commit and push.
-6. Then attempt Phase 6 `npx skills add benjitaylor/skills --skill stageshow`, apply only trustworthy guidance, refine visuals and produce the demo video under `artifacts/demo/`.
+- Render API and Presidio are live; exact URLs are above. Environment-variable names are recorded in `docs/BUILD_LOG.md`; values remain in the Render secret store and `.env.local`.
+- Vercel preview `https://assay-uhhh2.vercel.app` is protected and authenticated; it reads the Render API server-side with the Neon Auth cookie.
+- Deployed checks passed: sign-in/session, real runs in the UI, 401/403 role boundaries, manager DTO without raw amounts, upload magic-byte rejection, Kite over-cap/provider-blocked, demo-shred denial, CORS denial, audit tamper `VALID → INVALID → VALID`, concurrent approval `201 + 409`.
+- Public sign-up is disabled at Neon Auth.
+- Known latency: attested extraction is background and can take 75 s–4.5 min under provider load; the UI auto-refreshes.
+
+## Next exact task — Phase 6 and remaining gate
+
+1. Attempt `npx skills add benjitaylor/skills --skill stageshow`; inspect and apply only trustworthy, non-conflicting guidance.
+2. Refine the authenticated UI against the supplied reference direction, preserving role-shaped data boundaries and accessible states.
+3. Create a final pending demo run (BOR-007) so the manager queue has a live item; keep BOR-004/005/006 as approved history.
+4. Produce the <=180 s demo video with real Playwright capture, free/local TTS, captions and FFmpeg; save under `artifacts/demo/`.
+5. Complete remaining Phase 9 checks: proof-mutation test, full IDOR matrix, XSS/SQL-injection/prompt-injection probes, token expiry, secret scanning in CI, log-redaction review, production-mode shred and Kite duplicate-payment policy.
+6. Redeploy the final preview, record the exact commit/URL, update docs and push.
 
 ## Authorization boundaries
 

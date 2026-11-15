@@ -167,7 +167,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
             <div className="ml-auto flex items-center gap-2">
               <span className="hidden rounded-full border border-line bg-paper px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted sm:inline">
-                Preview shell
+                Live preview
               </span>
               <Link
                 href="/integrations"

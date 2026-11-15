@@ -172,6 +172,30 @@
 - **Preview:** the protected Vercel Phase 1 shell remains online but is not the Phase 4 authenticated preview. Render deployment is deferred to Phase 5 (Option B); the local API runs against Neon.
 - **Next exact task:** Phase 5 — deploy the API and Presidio to Render, point the Vercel preview at the API, record the exact URLs/commit, then run the full Phase 5/9 regression and security matrix before Phase 6 visual refinement and the demo video.
 
+## 15 November 2026 — Phase 5 Render/Vercel preview and security gate
+
+- **Phase:** 5 — deployment, authenticated preview and regression/security checks.
+- **Render API:** `https://assay-api-7hy0.onrender.com` (`srv-dbt25961egvs73f715tg`, free plan, Oregon, health check `/health/ready`). Deployed commit `042cb90`. Build: pnpm install + package builds + API build; start: `pnpm --filter @assay/api start`. Environment variables were set from the local secret store through the Render API; only names are recorded in the repo. `NODE_VERSION=24.22.1`, `APP_ENV=preview`, worker enabled, Kite testnet enabled, Reppo disabled.
+- **Render Presidio:** `https://assay-presidio.onrender.com` (`srv-dbt245jbc2fs73ct9u50`, free plan, Python 3.12.7). `en_core_web_sm` installed during build; `/health` reports `REDUCED_PII_MODE`; live `/tokenize` returned organization/reference/account/email tokens.
+- **First Render build failure:** `corepack enable` attempted to unlink the read-only `/usr/bin/pnpm` (`EROFS`). Fixed by removing `corepack enable` and using the image-provided pnpm; redeploy went live.
+- **Vercel preview:** `https://assay-uhhh2.vercel.app` aliases deployment `https://assay-h7uyd6mg5-uhhh2.vercel.app`; protected by Vercel Authentication. Preview env names: `APP_ENV`, `API_PUBLIC_URL`, `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_APP_URL`, `NEON_AUTH_BASE_URL`, `NEON_AUTH_COOKIE_SECRET` (secret). The new deployment reads live Render API data through the authenticated server-side proxy.
+- **Neon Auth origin/signup:** trusted origins updated to the local origin, stable preview aliases and the deployment URL. `disableSignUp=true`; direct probe returned `400 EMAIL_PASSWORD_SIGN_UP_DISABLED`. A direct sign-in through the Vercel proxy returned 200 and the session endpoint returned the analyst user.
+- **Deployed UI verification:** authenticated `/dashboard`, `/borrowers` and `/analysis-runs` rendered BOR-004 and BOR-005 from the Render API. Manager/auditor role checks and the analyst evidence view are served from the same deployment.
+- **Security checks on the deployed API:**
+  - unauthenticated `/v1/borrowers` → 401;
+  - analyst `/v1/approvals/queue` → 403;
+  - auditor document preview → 403;
+  - manager report contains no `totalDebtMinor`/raw amounts;
+  - Kite over-cap → `422 SESSION_RULE_EXCEEDED`; valid local policy → `503 PROVIDER_BLOCKED` with no payment;
+  - demo shred in preview → 403;
+  - wrong PDF magic bytes → `422 MAGIC_BYTES`;
+  - CORS evil origin receives no allow header (handler now returns `callback(null,false)`; redeployed after the check).
+  - audit tamper: first event metadata altered → chain `INVALID` at sequence 1; restored → `VALID` with the same head hash `9ea66ed9…`.
+  - concurrent approval: two simultaneous manager decisions with different idempotency keys produced one `201 APPROVE` and one `409 ANALYSIS_STATE_CONFLICT`; final status `APPROVED`.
+- **Known constraint:** NEAR AI attested extraction can take 75 seconds to several minutes under provider load. It runs as a background Postgres job with a `202` response and an auto-refreshing UI; no provider call blocks the HTTP request. The demo should show the resulting state or a clearly labelled time-lapse, not a fabricated instant response.
+- **Tests:** root typecheck/build pass; unit suites unchanged at domain 18/18, crypto 4/4, contracts 6/6, document 8/8, proof 3/3, AI 10/10, API 4/4; local Playwright 18/18.
+- **Next:** Phase 6 visual refinement (`stageshow` attempt), final demo-data setup, demo video, and the remaining Phase 9 checks (production-mode shred, proof mutation, full IDOR matrix, secret scan in CI).
+
 ## Build log entry template
 
 For every checkpoint add:

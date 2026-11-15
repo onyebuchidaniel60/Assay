@@ -53,7 +53,7 @@ export function buildServer(options: { env?: NodeJS.ProcessEnv } = {}): FastifyI
         callback(null, true);
         return;
       }
-      callback(new Error("Origin is not allowed"), false);
+      callback(null, false);
     },
     credentials: true,
     methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
