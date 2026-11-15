@@ -98,7 +98,7 @@
   - `pnpm build` → passed; Next.js built 16 routes.
   - `pnpm --filter @assay/web exec playwright test` → 10/10 passed (desktop + mobile).
 - **Reference:** operator-supplied `design/reference/assayref1–4.avif`; inspected and recorded in `REFERENCE_ASSETS.md`. Images remain untracked pending license text; not copied into UI.
-- **Release boundary:** an automatically triggered Production build appeared in Vercel after a push; it was removed with `vercel remove` to honor the Phase 5/9 release gate. No production deployment is claimed.
+- **Release boundary:** three unverified Production deployments appeared in Vercel during Phase 1 (CLI/Git trigger). They were removed with `vercel remove` to honor the Phase 5/9 gate. The remaining deployment is the protected Preview `https://assay-guyo5yh6z-uhhh2.vercel.app`. No production deployment is claimed.
 - **Blocker:** Phase 2 provider/database credentials are absent from `.env.local` (only Kite keys present). See `OPERATOR_INTAKE.md` §0.7 and `AI_HANDOFF.md`. No live provider/database/auth work can be honestly completed until they are restored.
 - **Next exact task:** restore credentials and confirm auth/storage provider; run Phase 2 migrations/auth/storage/audit/PII foundations; then Phase 3 adapters.
 
