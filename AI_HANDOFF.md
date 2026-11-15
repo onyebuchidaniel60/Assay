@@ -54,7 +54,7 @@
 | Render | `BLOCKED` | No account/service access; free-tier limits documented |
 | Presidio | `RESOLVED (DESIGN)` | `REDUCED_PII_MODE` selected; Phase 2 RSS validation required |
 | Reppo | `DISABLED` | Optional; no key/authorization; synthetic-only if enabled |
-| Kite | `DISABLED` | Optional; spend cap `$0`; no wallet/session |
+| Kite | `SETUP BLOCKED` | Production Passport login succeeded; testnet login codes expired twice; no wallet funding, session or payment. Spend cap remains `$0`. |
 | Google TTS | `NOT CONFIGURED` | Free-tier check deferred to Phase 8; no billing |
 
 ## Authority and defaults

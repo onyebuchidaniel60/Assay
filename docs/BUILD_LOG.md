@@ -39,6 +39,28 @@
 - **Authorization boundary:** no application code, monorepo scaffold, deployment, paid provisioning or production action. Stop before Phase 1.
 - **Next exact task:** operator resolves `OPERATOR_INTAKE.md` §4; then Phase 1 shell and safe preview.
 
+## 15 November 2026 — Kite Passport CLI and skills setup
+
+- **Phase:** Phase 0 extension — Kite Passport / x402 setup (operator-authorized).
+- **kpass:** `6.13.5` (minimum required `6.8.9`; passed).
+- **Bundle:** `114`; **skills package:** `3.6.11`.
+- **Installed paths:** `~/.kpass/bin/kpass`, `~/.kpass/bin/ksearch`.
+- **Skills installed for OpenCode:** `authenticate-user`, `request-session`, `form-session-delegation`, `x402-execute`, `wallet-send`, `manage-agents` under `~/.agents/skills/`.
+- **Account state:** no Kite account created yet; no funds moved; no session created; no payment made.
+- **Browser login probe:** `kpass login --output json` returned exit `9` — `No browser can be opened here (ssh)`. The CLI documents the email-code fallback. Awaiting operator email address for `kpass login init`.
+- **Next:** human gate #1 — operator supplies the Passport email; complete the email-code login, then verify authentication before faucet/session steps.
+- **Safety:** no secret values, codes, wallet material or session credentials recorded.
+
+### Kite setup pause — testnet authentication gate
+
+- **Production Passport authentication:** success for `onyebuchidaniel60@gmail.com`; user ID `user_01a1df77-dc2c-7901-8f21-a9b3942578fc`; production session active.
+- **Production faucet:** `kpass faucet drop --token PIEUSD` returned exit 2: `Faucet is only available on staging/testnet environments. It is disabled on production.`
+- **Testnet backend:** `https://passport.dev.gokite.ai` is healthy (`backend_env: dev`) but has no valid user session; the production JWT is rejected there.
+- **Testnet email-code attempts:** two codes were requested; both returned `code_expired` because the operator gate exceeded the code TTL before verification. No code values were recorded.
+- **Wallet:** not funded. **Session:** not created. **Payment:** none.
+- **Decision:** stopped at the human gate per the 10-minute rule; no alternative faucet, asset substitution or bypass attempted.
+- **Next exact action:** operator must be available to complete a fresh testnet email code within its 10-minute TTL, or provide an authorized browser/passkey path for the testnet login.
+
 ## Build log entry template
 
 For every checkpoint add:
