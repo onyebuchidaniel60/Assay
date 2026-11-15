@@ -44,6 +44,23 @@ type AnalystReport = {
     failureCode: string | null;
     termsVersion: number | null;
     financialInputsHash: string | null;
+    servTraceId?: string | null;
+    providerTrace?: {
+      nearai?: {
+        model?: string;
+        requestId?: string;
+        attestation?: {
+          verified?: boolean;
+          tdxStatus?: string;
+          nvidiaVerdict?: boolean;
+          reportSha256?: string;
+          verifiedAt?: string;
+          signingAddress?: string;
+        };
+      };
+      serv?: { model?: string; traceId?: string; branch?: string; agreement?: string };
+      calculation?: { verification?: string; serv?: { agreement?: string } };
+    };
     version: number;
     createdAt: string;
     updatedAt: string;
@@ -435,6 +452,40 @@ export default async function AnalysisRunPage({
                     <FileSearch className="size-3.5" /> Calculate baseline and stress cases
                   </button>
                 </form>
+              </section>
+            ) : null}
+
+            {analystReport.run.providerTrace?.nearai?.attestation ? (
+              <section className="rounded-3xl border border-line bg-paper p-5 sm:p-7">
+                <div className="flex flex-wrap items-end justify-between gap-4">
+                  <div>
+                    <SectionLabel>Layer 2 evidence</SectionLabel>
+                    <h2 className="mt-2 text-2xl font-semibold tracking-tight">Confidential inference attestation</h2>
+                  </div>
+                  <StatusBadge tone={analystReport.run.providerTrace.nearai.attestation.verified ? "proof" : "danger"}>
+                    {analystReport.run.providerTrace.nearai.attestation.verified ? "ATTESTATION VERIFIED" : "NOT VERIFIED"}
+                  </StatusBadge>
+                </div>
+                <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                  {[
+                    ["Model", analystReport.run.providerTrace.nearai.model ?? "—"],
+                    ["Intel TDX", analystReport.run.providerTrace.nearai.attestation.tdxStatus ?? "—"],
+                    ["NVIDIA NRAS", analystReport.run.providerTrace.nearai.attestation.nvidiaVerdict ? "true" : "false"],
+                    ["SERV branch", analystReport.run.providerTrace.serv?.branch ?? analystReport.run.providerTrace.calculation?.serv?.agreement ?? "—"],
+                  ].map(([label, value]) => (
+                    <div key={label} className="rounded-2xl border border-line bg-white/40 p-4">
+                      <p className="text-[10px] uppercase tracking-[0.14em] text-muted">{label}</p>
+                      <p className="mt-2 break-all font-mono text-xs font-semibold">{value}</p>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-4 break-all font-mono text-[10px] text-muted">
+                  Report SHA-256 {analystReport.run.providerTrace.nearai.attestation.reportSha256 ?? "—"}
+                </p>
+                <p className="mt-1 text-xs text-muted">
+                  Fresh nonce-bound TDX/NRAS evidence and an ECDSA response signature are required for every extraction; a
+                  failure blocks terms and leaves a visible failed state.
+                </p>
               </section>
             ) : null}
 

@@ -1633,6 +1633,8 @@ function serializeRunAnalyst(run: RunRow) {
     failureCode: run.failureCode,
     termsVersion: run.termsVersion,
     financialInputsHash: run.financialInputsHash,
+    servTraceId: run.servTraceId,
+    providerTrace: run.providerTrace,
     version: run.version,
     createdAt: run.createdAt.toISOString(),
     updatedAt: run.updatedAt.toISOString(),
