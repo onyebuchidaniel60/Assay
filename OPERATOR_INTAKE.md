@@ -210,7 +210,7 @@ Additional observations:
 | Integration | Required? | Status | Authorization boundary |
 |---|---:|---|---|
 | Reppo Evaluation API | No | `DISABLED` | No key/quota/terms; enable only with synthetic/de-identified data and verified access |
-| Kite Passport / x402 | No | `ENABLED (TESTNET)` | Testnet user `user_01a1dfab-06b7-7b42-b03c-111a2805c175`; session `agent_session_01a1dfc3-794e-70cb-bde8-90c6315736cf`; 5 PIEUSD per tx, 20 PIEUSD total, expiry `2026-11-16T15:11:32.17177Z`; wallet funded 100 PIEUSD. Payment smoke test blocked by provider internal error; no receipt. |
+| Kite Passport / x402 | No | `ENABLED (TESTNET) — payment provider-blocked` | Testnet user `user_01a1dfab-06b7-7b42-b03c-111a2805c175`; session `agent_session_01a1dfc3-794e-70cb-bde8-90c6315736cf`; 5 PIEUSD per tx, 20 PIEUSD total, expiry `2026-11-16T15:11:32.17177Z`; wallet funded 100 PIEUSD. Same-key payment retry returned provider `internal error`; no receipt. Over-cap test returned `session_rule_exceeded` (exit 6) with no payment. |
 | Google Gemini TTS | No | `NOT CONFIGURED` | Check current free tier in Phase 8; no billing activation; local licensed fallback permitted |
 | Custom domain | No | `NOT SUPPLIED` | Use provider preview URLs; exact CORS after deployment |
 

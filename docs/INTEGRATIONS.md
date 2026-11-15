@@ -38,7 +38,18 @@ Current public Evaluation API documentation advertises bearer authentication, `P
 
 ## Kite Passport / x402 — optional
 
-Kite documentation describes passkey-approved spending sessions with a per-payment cap, total budget and expiry, and payment for x402 services. Confirm current CLI/SDK commands, testnet, supported assets and catalog services. The deterministic Assay policy engine must check service allowlist, asset, per-payment cap, total remaining budget, session expiry and idempotency. No wallet funding or testnet spend without explicit operator authorization. Disabled by default with a `$0` spend cap.
+Kite documentation describes passkey-approved spending sessions with a per-payment cap, total budget and expiry, and payment for x402 services. Confirm current CLI/SDK commands, testnet, supported assets and catalog services. The deterministic Assay policy engine must check service allowlist, asset, per-payment cap, total remaining budget, session expiry and idempotency. No wallet funding or testnet spend without explicit operator authorization.
+
+### Testnet integration state — 15 November 2026
+
+- Testnet user: `user_01a1dfab-06b7-7b42-b03c-111a2805c175`.
+- Testnet wallet funded with `100 PIEUSD` from the faucet.
+- Active session: `agent_session_01a1dfc3-794e-70cb-bde8-90c6315736cf`.
+- Delegation: `5 PIEUSD` per transaction, `20 PIEUSD` total, `24h` TTL, asset `PIEUSD`; expires `2026-11-16T15:11:32.17177Z`.
+- The Phase 3 adapter must use this approved session (or a newly approved successor) and enforce the same caps in the deterministic policy engine before any payment call. It must never auto-approve a session or bypass the caps.
+- The x402 smoke payment is **provider-blocked**: two identical calls with idempotency key `assay-kite-smoke-1457e791-3c4f-45f9-ade5-16e0749b117c` returned `internal error`; no activity event, receipt or spend exists.
+- The over-cap policy test succeeded: a temporary `0.05 PIEUSD` session rejected a `0.1 PIEUSD` request with `session_rule_exceeded` (exit 6) and no payment event.
+- Do not represent the provider-blocked smoke payment as successful. Do not retry again without a provider change or new operator instruction.
 
 ## Presidio — mandatory reduced mode on Render free tier
 

@@ -68,11 +68,18 @@
 - **Session ID:** `agent_session_01a1dfc3-794e-70cb-bde8-90c6315736cf`.
 - **Session policy:** `5 PIEUSD` per transaction, `20 PIEUSD` total, `24h` TTL; asset `PIEUSD`; expiry `2026-11-16T15:11:32.17177Z`; status `active`.
 - **First approved session:** `agent_session_01a1dfbc-d772-7e39-bf11-2ca1c9f9ebd3` also exists remotely but was not usable locally because the runtime key/agent state was created afterwards. It was not used for a payment.
-- **Test x402 call:** one POST to `https://passport.dev.gokite.ai/x402/test` with idempotency key `assay-kite-smoke-1457e791-3c4f-45f9-ade5-16e0749b117c` returned exit `1` with `internal error` / `status: error`. No receipt was returned.
-- **Reconciliation check:** `kpass activity --limit 20` shows only the two session approvals and agent registration; no payment event. Both sessions show `spent_total: 0`. No charge is evidenced.
-- **Over-cap rejection:** not executed yet because the test payment did not complete.
-- **Decision:** stopped on the provider error; did not retry blindly or fabricate a receipt.
-- **Next exact action:** determine whether the `internal error` is transient/provider-side or caused by the test endpoint request shape; if retrying, use the same idempotency key only after operator approval and confirm no charge remains. Then run the over-cap rejection path.
+- **Test x402 call (first attempt):** one POST to `https://passport.dev.gokite.ai/x402/test` with idempotency key `assay-kite-smoke-1457e791-3c4f-45f9-ade5-16e0749b117c` returned exit `1` with `internal error` / `status: error`. No receipt was returned.
+- **Reconciliation before retry:** `kpass activity --limit 20` showed only the session approvals and agent registration; no payment event. Both sessions showed `spent_total: 0`. No charge was evidenced.
+- **Bounded retry:** the exact same call with the same idempotency key was retried once at `2026-11-15T15:29:37Z` and returned the same `internal error` / exit `1`. No third retry was attempted. The payment path is recorded as **provider-blocked**.
+- **Over-cap policy test:** the test merchant is fixed at `0.1 PIEUSD`, so a temporary `0.05 PIEUSD` per-transaction session was approved solely to exercise the deterministic cap:
+  - Session: `agent_session_01a1dfdd-9882-72d5-8a12-2f98a11e9a14` (0.05 per tx / 0.05 total, 1h).
+  - Request: POST `https://passport.dev.gokite.ai/x402/test` with idempotency key `assay-kite-overcap-3bf8d944-88dd-4bdd-9f5b-288a3bbd05b3`.
+  - Result: exit `6`, `error_code: "session_rule_exceeded"`, `error: "payment amount exceeds max_amount_per_tx"`.
+  - `activity` showed no payment event and the test session remained at `spent_total: 0`; rejection occurred before payment.
+- **Primary session restored:** `agent_session_01a1dfc3-794e-70cb-bde8-90c6315736cf` is current again with 5 PIEUSD per tx / 20 PIEUSD total / 24h; the 0.05 test session is not to be used by the adapter.
+- **Decision:** the payment smoke test is provider-blocked, but the session, funding, cap enforcement and policy rejection are verified. Do not retry the payment again without a provider change or new operator instruction.
+- **Phase 3 adapter statement:** when the Phase 3 adapter is built, it will use the active session `agent_session_01a1dfc3-794e-70cb-bde8-90c6315736cf` and enforce the 5 PIEUSD per-tx / 20 PIEUSD total caps in Assay's deterministic policy engine before any payment call. The adapter is not built yet because the monorepo/Phase 1 foundation does not exist; the provider-blocked test does not authorize bypassing the Phase 0/Phase 1 gates.
+- **Next exact action:** proceed with Phase 0/Phase 1 foundation when the outstanding critical inputs are resolved; then implement the Kite adapter against the active session with policy checks and honest provider failure states.
 
 ## Build log entry template
 

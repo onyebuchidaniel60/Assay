@@ -40,7 +40,7 @@
 7. **Vercel:** CLI access exists, but no Assay project and no explicit preview deployment permission.
 8. **Render:** no service/account access; API and Presidio services cannot be created or verified.
 9. **Budget:** `$0` new spend; no paid tier, top-up, wallet funding or unexpected charge is authorized.
-10. **Kite testnet smoke test:** testnet login, faucet and active session are complete, but the single x402 test payment returned provider `internal error`; activity shows no payment and session spend is `0`. The over-cap rejection test has not run. Do not retry blindly; resolve the provider error or authorize a same-key retry after reconciliation.
+10. **Kite testnet smoke test:** testnet login, faucet and active session are complete. The same-key payment retry returned provider `internal error` again; no payment event, receipt or spend exists. The over-cap test passed with `session_rule_exceeded` (exit 6) and no payment. The payment path is provider-blocked; do not retry again without a provider change or new operator instruction. The adapter is not built because the Phase 0/Phase 1 foundation remains blocked.
 
 ## Provider and integration status
 
@@ -55,7 +55,7 @@
 | Render | `BLOCKED` | No account/service access; free-tier limits documented |
 | Presidio | `RESOLVED (DESIGN)` | `REDUCED_PII_MODE` selected; Phase 2 RSS validation required |
 | Reppo | `DISABLED` | Optional; no key/authorization; synthetic-only if enabled |
-| Kite | `SETUP PARTIAL` | Testnet authenticated; wallet funded 100 PIEUSD; active session `agent_session_01a1dfc3-794e-70cb-bde8-90c6315736cf` (5/20 PIEUSD, expires `2026-11-16T15:11:32Z`). One test payment returned provider internal error; no receipt/charge. |
+| Kite | `ENABLED (TESTNET) — payment provider-blocked` | Testnet authenticated; wallet funded 100 PIEUSD; active session `agent_session_01a1dfc3-794e-70cb-bde8-90c6315736cf` (5/20 PIEUSD, expires `2026-11-16T15:11:32Z`). Same-key retry returned provider `internal error`; no receipt/charge. Over-cap test returned `session_rule_exceeded` (exit 6) with no payment. |
 | Google TTS | `NOT CONFIGURED` | Free-tier check deferred to Phase 8; no billing |
 
 ## Authority and defaults

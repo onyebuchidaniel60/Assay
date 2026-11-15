@@ -35,9 +35,21 @@ Do not add `DOLPHIN_BASE_URL`, `DOLPHIN_API_KEY`, `DOLPHIN_MODEL` or `DOLPHIN_PR
 
 - `NEARAI_ATTESTATION_REQUIRED=true` by default. Do not accept un-attested Layer 2 output.
 - `REPPO_ENABLED=false` until key, quota and synthetic-only payload contract are verified.
-- `KITE_ENABLED=false` until CLI/SDK, testnet, owner-approved session and exact spend ceiling are verified.
+- `KITE_ENABLED=true` for the authorized Kite testnet integration. Kite does not use an API key; authentication is via the passkey-approved wallet session.
 - `ENABLE_DEMO_SHRED=false` outside a controlled synthetic demo.
 - `PRESIDIO_MODE=REDUCED_PII_MODE` — Presidio Analyzer with the small spaCy model plus deterministic custom financial recognizers. This is not full-strength Presidio.
+
+### Kite testnet configuration
+
+- `KITE_PASSPORT_API=https://agentpassport.ai/api`
+- `KITE_TEST_X402_ENDPOINT=https://passport.dev.gokite.ai/x402/test`
+- `KITE_TESTNET_ASSET=PIEUSD`
+- `KITE_SESSION_ID=agent_session_01a1dfc3-794e-70cb-bde8-90c6315736cf`
+- `KITE_MAX_PER_PAYMENT_MINOR=500`
+- `KITE_MAX_TOTAL_MINOR=2000`
+- `KITE_SESSION_EXPIRY=2026-11-16T15:11:32.17177Z`
+
+The adapter must enforce `KITE_MAX_PER_PAYMENT_MINOR` and `KITE_MAX_TOTAL_MINOR` deterministically before calling Kite. The current session is an approved testnet grant; it is not a production payment authorization. No Kite API key or wallet material is stored in the repository.
 
 ## Environment separation
 
