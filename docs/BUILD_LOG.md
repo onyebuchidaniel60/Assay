@@ -112,11 +112,17 @@
 - **Controls:** maker-checker approval with self-approval denial, payload/dependency hash binding, expiry/version checks; append-only canonical audit events with SHA-256 chain and tamper detection.
 - **Kite policy:** deterministic per-tx/total/asset/expiry/idempotency checks; 6 PIEUSD over a 5 PIEUSD cap returns `session_rule_exceeded`; total/asset/expiry violations covered.
 - **Shared contracts:** strict Zod schemas for borrowers, facilities, recursive formula AST, covenant drafts, financial inputs, assessment/idempotency, approval decisions and Kite session/payment shapes.
+- **Proof package:** `packages/proof` adds a self-contained Circom fixed predicate for `debt * 10000 <= adjustedEbitda * thresholdBps`, with 64/32/96-bit range and comparison constraints.
+  - `pnpm --filter @assay/proof run compile` → 258 non-linear constraints, 7 linear constraints, 1 public input, 2 private inputs, 1 public output; `leverage.r1cs` and WASM generated.
+  - `pnpm --filter @assay/proof run setup` → local development ptau/Groth16 verification key generated (not a production trusted setup).
+  - `pnpm --filter @assay/proof run prove` → proof generated and verified; public signals `["1","35000"]` for the 3.20x compliant witness.
+  - The build artifacts are ignored under `packages/proof/build/`; the circuit source, scripts and JS predicate are committed.
 - **Tests:**
   - `pnpm --filter @assay/domain test` → 18/18 passed.
   - `pnpm --filter @assay/contracts test` → 6/6 passed.
+  - `pnpm --filter @assay/proof test` → 3/3 passed.
   - Root `pnpm typecheck` → passed.
-  - Root `pnpm test` → passed (domain 18, contracts 6, API 4).
+  - Root `pnpm test` → passed (domain 18, contracts 6, proof 3, API 4).
   - Root `pnpm build` → passed.
 - **Not implemented / not claimed:** database migrations, Supabase/Neon auth, private storage, job queue, live NEAR AI/OpenRouter/SERV adapters, Presidio service, ZK proof generation, API route integration and E2E application flows. These require the missing credentials and Phase 2 foundation.
 - **Blocker:** `.env.local` still contains only Kite variables; see `OPERATOR_INTAKE.md` §0.7. No live provider/database call was made.

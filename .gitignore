@@ -43,3 +43,6 @@ pids/
 # Generated artifacts that are environment-specific
 artifacts/demo/*.mp4.tmp
 .vercel
+
+# Proof build artifacts (generated locally)
+packages/proof/build/

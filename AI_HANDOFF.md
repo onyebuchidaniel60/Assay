@@ -36,7 +36,8 @@
 - Append-only canonical audit events use SHA-256 chaining; tamper detection is tested.
 - Kite policy rejects per-tx over-cap (`session_rule_exceeded`), total-budget, asset, expiry and missing-idempotency cases deterministically.
 - `packages/contracts` provides strict Zod schemas for borrower/facility, formula AST, covenant drafts, financial inputs, assessments, approvals and Kite sessions/payments.
-- Tests: domain 18/18, contracts 6/6, API 4/4; root typecheck/build pass.
+- `packages/proof` contains the fixed Circom leverage circuit, compile/setup/prove scripts and a JS predicate. The circuit compiled to 258 non-linear and 7 linear constraints; a local development-only Groth16 proof was generated and verified with public signals `["1","35000"]` for 3.20x. This is not a production trusted setup.
+- Tests: domain 18/18, contracts 6/6, proof 3/3, API 4/4; root typecheck/build pass.
 
 ## Verification evidence
 
@@ -44,8 +45,9 @@
 |---|---|
 | `pnpm install` | Passed |
 | `pnpm typecheck` | Passed |
-| `pnpm test` | Passed — domain 18/18, contracts 6/6, API 4/4; web no unit tests (passWithNoTests) |
-| `pnpm build` | Passed — Next.js 16 production build, 16 routes; API, domain and contracts builds |
+| `pnpm test` | Passed — domain 18/18, contracts 6/6, proof 3/3, API 4/4; web no unit tests (passWithNoTests) |
+| `pnpm build` | Passed — Next.js 16 production build, 16 routes; API, domain, contracts and proof checks |
+| `pnpm --filter @assay/proof run prove` | Proof generated and verified; public signals `["1","35000"]` (development-only setup) |
 | `pnpm --filter @assay/web exec playwright test` | Passed — 10/10 desktop + mobile shell tests |
 | `vercel --yes` | Preview deployment ready; URL recorded above |
 | `vercel curl <preview>/...` | 200 with expected titles for five routes |
