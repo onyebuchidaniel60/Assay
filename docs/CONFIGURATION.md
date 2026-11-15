@@ -1,6 +1,6 @@
 # Configuration
 
-Use `.env.example` as the canonical environment variable list. The complete variable matrix is in `MASTER_BLUEPRINT.md` §23.
+Use `.env.example` as the canonical environment variable list. The complete variable matrix is in `MASTER_BLUEPRINT.md` §23; the Phase 0 provider revision below overrides any historical Dolphin entries. `.env.example` will be created in Phase 1 with placeholders only.
 
 ## Client-safe values
 
@@ -9,21 +9,38 @@ Use `.env.example` as the canonical environment variable list. The complete vari
 - `NEXT_PUBLIC_APP_URL`
 - `API_PUBLIC_URL`
 
-The anon key is not a secret, but table/storage access still requires RLS and server authorization.
+The anon key is not a secret, but table/storage access still requires RLS and server authorization. Never place any provider API key in `NEXT_PUBLIC_*`.
 
 ## Server-only secrets
 
-`SUPABASE_SERVICE_ROLE_KEY`, `DATABASE_URL`, `SERV_REASONING_API_KEY`, `DOLPHIN_API_KEY`, `REPPO_API_KEY`, `PRESIDIO_SERVICE_TOKEN`, `DATA_KEK_BASE64`, `AUDIT_SIGNING_PRIVATE_KEY_BASE64` and any optional Kite credentials. Never prefix them with `NEXT_PUBLIC_`.
+`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `DATABASE_URL`, `SERV_REASONING_API_KEY`, `NEARAI_API_KEY`, `OPENROUTER_API_KEY`, `REPPO_API_KEY`, `PRESIDIO_SERVICE_TOKEN`, `DATA_KEK_BASE64`, `AUDIT_SIGNING_PRIVATE_KEY_BASE64` and any optional Kite credentials. Never prefix them with `NEXT_PUBLIC_`.
+
+## Model and provider configuration
+
+- `NEARAI_BASE_URL=https://cloud-api.near.ai/v1`
+- `NEARAI_API_KEY` — secret, server-only.
+- `NEARAI_MODEL=z-ai/glm-5.3-flash` — must be a TEE-verifiable model with `verifiable: true` and `attestationSupported: true` metadata.
+- `NEARAI_ATTESTATION_REQUIRED=true` — rejects extraction output without fresh Intel TDX/NVIDIA NRAS evidence bound to the request nonce.
+- `OPENROUTER_BASE_URL=https://openrouter.ai/api/v1`
+- `OPENROUTER_API_KEY` — secret, server-only.
+- `OPENROUTER_MODEL_JUDGEMENT=openai/gpt-5.4-mini`
+- `OPENROUTER_MODEL_GENERATION=deepseek/deepseek-v3.2`
+- `SERV_BASE_URL=https://inference-api.openserv.ai/v1`
+- `SERV_REASONING_API_KEY` — secret, server-only.
+- `SERV_MODEL` — non-secret catalog entry confirmed in the OpenServ account.
+
+Do not add `DOLPHIN_BASE_URL`, `DOLPHIN_API_KEY`, `DOLPHIN_MODEL` or `DOLPHIN_PRIVACY_TERMS_VERIFIED` to `.env.example`, application config or deployment settings. Dolphin is rejected.
 
 ## Provider flags
 
-- `DOLPHIN_PRIVACY_TERMS_VERIFIED=false` by default. Only set true after official @dphnAI endpoint/model/terms have been reviewed and documented.
+- `NEARAI_ATTESTATION_REQUIRED=true` by default. Do not accept un-attested Layer 2 output.
 - `REPPO_ENABLED=false` until key, quota and synthetic-only payload contract are verified.
 - `KITE_ENABLED=false` until CLI/SDK, testnet, owner-approved session and exact spend ceiling are verified.
 - `ENABLE_DEMO_SHRED=false` outside a controlled synthetic demo.
+- `PRESIDIO_MODE=REDUCED_PII_MODE` — Presidio Analyzer with the small spaCy model plus deterministic custom financial recognizers. This is not full-strength Presidio.
 
 ## Environment separation
 
 Use separate Supabase projects and service keys for local development, preview and any production environment. Do not reuse a production key in a preview deployment. Preview must never connect to production borrower records. Production is out of scope and unauthorized by default.
 
-The app validates the environment with Zod at startup. Logs may show variable names that are missing, never values.
+The app validates the environment with Zod at startup. Logs may show variable names that are missing, never values. Provider failures must be visible; never fabricate an inference, Reppo verdict or payment receipt.

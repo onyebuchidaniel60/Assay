@@ -18,6 +18,20 @@
 
 **Fresh-start rule:** The operator intends to remove the previous repository contents. The agent must not copy or depend on the old blueprint package, code or configuration. It may inspect Git metadata and repository access, but implementation starts from the clean state after intake.
 
+## Authoritative provider override — 15 November 2026
+
+This section supersedes every conflicting provider statement later in this historical blueprint.
+
+- **Dolphin is removed and rejected.** Its confidentiality mechanism is unverified: no TEE, no MPC and unverified zero-retention claims. No adapter, endpoint, model, key or privacy flag will be implemented. Historical Dolphin references below are retained only as historical context and must not be built.
+- **Layer 2 confidential inference is NEAR AI Cloud.** Base URL `https://cloud-api.near.ai/v1`; bearer auth via `NEARAI_API_KEY`. Use Intel TDX attestation and NVIDIA NRAS evidence with a client-supplied nonce. Select only models whose catalog metadata reports `verifiable: true` and `attestationSupported: true`. Send only tokenized credit-agreement text and structured financial figures; never token maps, borrower identities or raw documents.
+- **General inference is OpenRouter.** Base URL `https://openrouter.ai/api/v1`; bearer auth via `OPENROUTER_API_KEY`; configurable models `OPENROUTER_MODEL_JUDGEMENT` and `OPENROUTER_MODEL_GENERATION`. Only structured, already-extracted data may be sent.
+- **SERV is orchestration, not inference.** Its BRAID graph nodes call NEAR AI or OpenRouter under the routing rules; do not claim Shadow Agent, PromptGuard or graph-versioning execution without account/runtime evidence.
+- **Layer 2 wording:** allowed — “Sensitive inference is routed to NEAR AI Cloud's TEE-attested gateway. Each request can be verified against Intel TDX and NVIDIA NRAS attestation evidence.” Prohibited — “zero retention guaranteed”, “TEE protected” without attestation evidence, and “cryptographically proves the data was never logged”.
+- **Presidio deployment:** Render's free 512 MB service uses `REDUCED_PII_MODE` — Presidio Analyzer with the small spaCy model plus deterministic custom financial recognizers. Full `en_core_web_lg` is not deployed on the free tier; no paid upgrade is authorized.
+- **Environment variables:** do not add `DOLPHIN_BASE_URL`, `DOLPHIN_API_KEY`, `DOLPHIN_MODEL` or `DOLPHIN_PRIVACY_TERMS_VERIFIED` to `.env.example`, config schemas or deployment settings. Use the NEAR AI, OpenRouter and SERV variables defined in the Phase 0 intake and configuration docs.
+
+The rest of this document is the historical blueprint. Where it names Dolphin or an older provider, this override governs.
+
 ---
 
 # 1. Product definition
@@ -100,7 +114,7 @@ Assay MVP does **not**:
 4. Server-side encrypted file storage in a private bucket.
 5. Text extraction and Presidio-based detection/tokenization, including custom recognizers for loan references, account-like strings and borrower identifiers.
 6. Analyst redaction-review screen. The original document may be viewed only by an authorized analyst; only tokenized text may be sent to an inference provider.
-7. Dolphin partner adapter for extraction, activated only after the exact `@dphnAI` endpoint/model/privacy policy is confirmed. Extract one Debt/Adjusted EBITDA covenant, cap, comparator, definitions, permitted add-backs, testing date and supporting page/quote evidence.
+7. NEAR AI Cloud extraction adapter using only TEE-verifiable models with fresh Intel TDX/NVIDIA NRAS attestation, activated only after key, credit and model validation. Extract one Debt/Adjusted EBITDA covenant, cap, comparator, definitions, permitted add-backs, testing date and supporting page/quote evidence.
 8. Schema validation and human correction/confirmation of the extracted covenant terms.
 9. Manual entry and confirmation of total debt, reported EBITDA and allowed add-back line items.
 10. Deterministic calculation using integer minor units / decimal-safe arithmetic. AI must not calculate the authoritative ratio.
@@ -226,7 +240,7 @@ User -> Login UI -> Supabase Auth -> Access token
 **Entry:** confirmed redaction page.  
 **Preconditions:** partner provider passes connectivity and policy check; redacted payload only; run still editable.  
 **Action:** Analyst starts extraction.  
-**System:** application graph invokes Dolphin adapter to extract only the supported Debt/Adjusted EBITDA covenant. Prompt explicitly labels document content untrusted and forbids following embedded instructions. The result is parsed and Zod-validated; supporting quotes and page numbers are retained; confidence is a routing signal, not proof of correctness.  
+**System:** application graph invokes the NEAR AI adapter to extract only the supported Debt/Adjusted EBITDA covenant. Prompt explicitly labels document content untrusted and forbids following embedded instructions. The result is parsed and Zod-validated; supporting quotes and page numbers are retained; confidence is a routing signal, not proof of correctness.  
 **SERV role:** SERV Reasoning executes the bounded reasoning step that interprets structured extracted clause facts and chooses between the defined covenant branches: supported/clear, analyst review required, or unsupported covenant. It does not write the DB or decide approval.  
 **Validation:** threshold must be positive and within configured bounds; comparator must be `<=` for MVP; currency definitions must be coherent; required evidence quotes/page references must exist; one covenant only.  
 **Success:** Analyst reviews extracted fields, corrects any errors and confirms a versioned term snapshot.  
@@ -587,7 +601,7 @@ Assay API (Fastify / Node.js on Render)
   |-- domain services + state machine
   |-- deterministic calculation engine
   |-- SERV reasoning adapter (structured reasoning nodes)
-  |-- Dolphin inference adapter (tokenized agreement only)
+  |-- NEAR AI inference adapter (tokenized agreement only)
   |-- Reppo adapter (synthetic feedback only)
   |-- Kite adapter (optional x402, strict policy gate)
   |-- encrypted Supabase Storage access
@@ -600,7 +614,7 @@ Supabase Postgres + private Storage + Auth
 Python Presidio service (Render Web Service; server-to-server token)
 
 Proof worker: Circom circuit + SnarkJS within the worker/runtime image
-External providers: OpenServ SERV; verified @dphnAI API; Reppo; Kite (optional)
+External providers: OpenServ SERV; NEAR AI Cloud (Layer 2); OpenRouter (general); Reppo; Kite (optional)
 ```
 
 ## 8.2 Responsibilities
@@ -610,7 +624,7 @@ External providers: OpenServ SERV; verified @dphnAI API; Reppo; Kite (optional)
 - **Job worker:** asynchronous parsing, redaction, extraction, proof generation and Reppo polling. Jobs are durable in Postgres and claimed with row locks. Worker restart resumes queued/retry jobs.
 - **Presidio:** PII detection and anonymization only. It is not an authorization or data-governance engine.
 - **SERV:** bounded reasoning/model orchestration on explicit graph steps. Application code owns the workflow state machine and deterministic acceptance checks.
-- **Dolphin:** sensitive extraction execution via the actual hackathon partner endpoint once verified. It receives tokenized agreement text, never token map or direct identity fields.
+- **NEAR AI:** Layer 2 sensitive extraction through its TEE-attested gateway. It receives tokenized agreement text and structured financial figures only, never token maps or direct identity fields. Attestation evidence must be verified.
 - **Circom/SnarkJS:** fixed proof predicate, independent of the LLM.
 - **Supabase:** Auth, Postgres and private Storage. Service role is server-only.
 - **Reppo:** independent scoring of synthetic/de-identified traces; it does not alter production prompts on its own.
@@ -667,7 +681,7 @@ Use Pino JSON logs with request ID, route, status, duration, job ID, provider re
 | Jobs | Postgres `jobs` table + custom SKIP LOCKED worker | No Redis/queue service required; robust enough for single-instance MVP. |
 | PII | Microsoft Presidio Analyzer + Anonymizer in Python 3.12 service | Standard recognizers plus custom finance-domain recognizers. |
 | PDF text | `pdfjs-dist` in isolated backend worker | Text-layer extraction; reject scan-only documents, no OCR in MVP. |
-| AI client | OpenAI SDK-compatible client | Single client wrapper with provider-specific base URL/model. SERV is used for reasoning nodes; Dolphin adapter only for verified partner service. |
+| AI client | OpenAI SDK-compatible client | Single client wrapper with provider-specific base URL/model. SERV orchestrates reasoning nodes; NEAR AI handles Layer 2 extraction; OpenRouter handles structured judgement/generation. |
 | Proofs | Circom 2.x + SnarkJS | One fixed circuit for one covenant predicate; pin exact tool versions and circuit artefacts. |
 | Crypto | Node `crypto` (AES-256-GCM, SHA-256, Ed25519) | Encryption, hash chain and signed event hashes. |
 | API docs | OpenAPI generated from Fastify schemas | Accurate API documentation. |
@@ -916,15 +930,15 @@ Security: private bucket, server-side access, strict JWT validation, no service-
 ### OpenServ SERV Reasoning
 Purpose: core bounded reasoning nodes.  
 Base URL from current OpenServ public materials: `https://inference-api.openserv.ai/v1`; authentication via SERV API key; OpenAI-compatible client pattern.  
-Data: tokenized agreement excerpts and structured, non-identifying calculation facts.  
+Data: structured, non-identifying calculation facts. SERV nodes route tokenized agreement text only to NEAR AI; general judgement/generation receives structured data from OpenRouter.  
 Failure: no fake success; bounded transient retry; mark SERV validation pending/failed and block final “SERV completed” status.  
 Security: no raw token map, no real PII in MVP, provider/model/trace metadata only in logs.
 
-### Dolphin partner (@dphnAI)
+### NEAR AI Cloud (Layer 2 confidential extraction)
 Purpose: structured extraction of tokenized credit-agreement text.  
-The exact API base URL, model ID, authentication, supported JSON mode and privacy/service terms must be verified from the actual hackathon partner account/docs. `dphn.ai/API` is the partner reference indicated by the handoff. **Do not substitute `api.dolphinllm.com`**: current public material for `dolphinllm.com` describes a different `uncensored` model service and does not establish that it is the hackathon partner.  
-Data: redacted/tokenized text, no token map.  
-Failure: adapter disabled if partner credentials or terms are unverified; core manual term-entry fallback remains available, with the extraction feature visibly marked unavailable. Never silently route sensitive prompts to a different provider.
+Base URL: `https://cloud-api.near.ai/v1`; bearer auth via `NEARAI_API_KEY`. Select only models with `verifiable: true` and `attestationSupported: true`; request fresh Intel TDX/NVIDIA NRAS evidence with a client-supplied nonce.  
+Data: tokenized agreement text and structured financial figures only; no token map, borrower identity or raw document.  
+Failure: adapter disabled or run routed to manual review if key, credit, attestation or model verification fails. Never silently route sensitive prompts to a different provider.
 
 ## Conditional / SHOULD HAVE
 
@@ -969,7 +983,8 @@ AI may not:
 
 ## 17.2 Routing
 
-- **Dolphin partner:** tokenized agreement extraction only, after endpoint/model/privacy terms have been verified.
+- **NEAR AI (Layer 2):** tokenized agreement extraction only, using TEE-verifiable models and fresh attestation evidence.
+- **OpenRouter (general):** structured judgement and generation nodes only; never raw documents.
 - **SERV:** all structured reasoning/decision routing nodes; requests to the current SERV endpoint and selected model catalog entry. No direct provider bypass in normal flow.
 - **No model call:** calculation, scenario arithmetic, proof generation/verification, RBAC, state transitions, spending limits, audit-chain verification.
 
@@ -985,7 +1000,7 @@ AI may not:
 
 ## 17.4 Cost and rate limits
 
-- Default budget: one Dolphin extraction call, up to two SERV reasoning calls, and at most one schema-repair call total; Reppo evaluation is separate and explicitly gated.
+- Default budget: one NEAR AI extraction call, up to two SERV/OpenRouter reasoning calls, and at most one schema-repair call total; Reppo evaluation is separate and explicitly gated.
 - Configurable max document chars/pages; 10 MiB/40-page upload cap.
 - Provider timeout 45 seconds; one transient retry; per-user request rate limit.
 - Record model ID, request ID, token usage and estimated provider cost only.
@@ -995,7 +1010,7 @@ AI may not:
 
 - For tests: deterministic fixtures.
 - For operator demo: provider must be marked `LIVE` or `FIXTURE` in UI state; fixtures are not presented as live inference.
-- If Dolphin unavailable, analyst may manually input covenant terms and the UI displays “AI extraction unavailable”; core calculation may still proceed, but SERV workflow and manual review must be accurately recorded.
+- If NEAR AI is unavailable, analyst may manually input covenant terms and the UI displays “AI extraction unavailable”; core calculation may still proceed, but SERV workflow and manual review must be accurately recorded. Do not route sensitive text to a substitute provider.
 - If SERV unavailable, never claim SERV reasoning completed. Preserve entered data and mark run `SERV_PENDING` or blocked from final approval according to the configured acceptance gate.
 
 ---
@@ -1071,7 +1086,7 @@ Operational controls:
 - Jobs queue transaction, worker lease expiry and retry.
 - Presidio service returns spans/custom recognizers; backend blocks raw entity values in outbound payload.
 - SERV adapter request/response against sandbox or contract fixture; verify required graph trace metadata.
-- Dolphin adapter contract using verified endpoint sandbox; do not use production borrower data.
+- NEAR AI adapter contract using sandbox/synthetic tokenized text and attestation fixtures; do not use production borrower data.
 - Circom compile + SnarkJS proof generation/verification.
 - Reppo sandbox submit/poll; test failure status.
 - Kite sandbox/testnet policy + receipt reconciliation only if credentials are authorized.
@@ -1135,7 +1150,7 @@ Assay/
 │   ├── contracts/              # Zod schemas, API DTOs
 │   ├── db/                     # Drizzle schema, migrations, seeds
 │   ├── crypto/                 # encryption, signatures, audit chain
-│   ├── ai/                     # SERV/Dolphin/Reppo/Kite adapters + prompts
+│   ├── ai/                     # SERV/NEAR AI/OpenRouter/Reppo/Kite adapters + prompts
 │   ├── proof/                  # Circom source, scripts, verifier
 │   └── test-fixtures/          # synthetic documents and financial scenarios
 ├── tests/
@@ -1180,10 +1195,14 @@ All secrets are server-only unless explicitly marked `NEXT_PUBLIC_`.
 | `SERV_BASE_URL` | Yes | AI adapter | Default `https://inference-api.openserv.ai/v1` |
 | `SERV_REASONING_API_KEY` | Yes | API/worker | Secret |
 | `SERV_MODEL` | Yes | API/worker | Non-secret model identifier confirmed in catalog |
-| `DOLPHIN_BASE_URL` | Conditional | AI adapter | Server config, exact partner endpoint from verified docs |
-| `DOLPHIN_API_KEY` | Conditional | AI adapter | Secret |
-| `DOLPHIN_MODEL` | Conditional | AI adapter | Model ID confirmed from partner account |
-| `DOLPHIN_PRIVACY_TERMS_VERIFIED` | Yes for enablement | API | Boolean deployment gate, default false |
+| `NEARAI_BASE_URL` | Yes | AI adapter | Default `https://cloud-api.near.ai/v1` |
+| `NEARAI_API_KEY` | Yes | API/worker | Secret |
+| `NEARAI_MODEL` | Yes | API/worker | TEE-verifiable model ID confirmed from catalog metadata |
+| `NEARAI_ATTESTATION_REQUIRED` | Yes | API/worker | Boolean, default true; fail closed on missing/invalid attestation |
+| `OPENROUTER_BASE_URL` | Yes | AI adapter | Default `https://openrouter.ai/api/v1` |
+| `OPENROUTER_API_KEY` | Yes | API/worker | Secret |
+| `OPENROUTER_MODEL_JUDGEMENT` | Yes | API/worker | Model ID confirmed in catalog |
+| `OPENROUTER_MODEL_GENERATION` | Yes | API/worker | Model ID confirmed in catalog |
 | `REPPO_API_KEY` | Optional | API/worker | Secret |
 | `REPPO_ENABLED` | Optional | API | Boolean, default false |
 | `KITE_ENABLED` | Optional | API/worker | Boolean, default false |
@@ -1204,7 +1223,7 @@ All secrets are server-only unless explicitly marked `NEXT_PUBLIC_`.
 | `NEXT_PUBLIC_APP_URL` | Yes | Web | Client-safe frontend URL |
 | `MAX_UPLOAD_BYTES` | Yes | API | Default 10485760 |
 | `MAX_PDF_PAGES` | Yes | API | Default 40 |
-| `AI_MAX_CALLS_PER_RUN` | Yes | API | Default 4 total (1 Dolphin extraction + up to 2 SERV calls + 1 repair) |
+| `AI_MAX_CALLS_PER_RUN` | Yes | API | Default 4 total (1 NEAR AI extraction + up to 2 SERV/OpenRouter calls + 1 repair) |
 | `AI_PROVIDER_TIMEOUT_MS` | Yes | API | Default 45000 |
 | `GOOGLE_GENAI_API_KEY` | Optional | Demo tooling only | Secret; public narration only; free tier validated before use |
 | `DEMO_FIXTURES_ENABLED` | Yes | API | Boolean, preview/demo only |
@@ -1249,7 +1268,7 @@ All secrets are server-only unless explicitly marked `NEXT_PUBLIC_`.
 ## Phase 3 — Core domain behavior and APIs
 
 **Objective:** implement the full domain engine and provider adapters.  
-**Tasks:** borrower/facility/doc upload; parsing; redaction review; bounded SERV graph; verified Dolphin extraction adapter; terms review; financial inputs; deterministic calculation/scenarios; Circom circuit/proof; manager approval; audit timeline/verify; Reppo and Kite adapters behind feature flags.  
+**Tasks:** borrower/facility/doc upload; parsing; redaction review; bounded SERV graph; NEAR AI extraction adapter with attestation verification; OpenRouter judgement/generation routing; terms review; financial inputs; deterministic calculation/scenarios; Circom circuit/proof; manager approval; audit timeline/verify; Reppo and Kite adapters behind feature flags.  
 **Tests:** unit + integration per FR; provider contract fixtures; proof mutation tests; concurrency tests.  
 **Acceptance:** all MUST HAVE API-level flows pass; unsupported/unavailable providers are explicit; no fake integrations.  
 **Commit:** `feat: implement covenant analysis workflow`.
@@ -1347,7 +1366,7 @@ The current state and resumable next task are maintained in `AI_HANDOFF.md`. At 
 | Reference images supplied | **PENDING — critical intake blocker** |
 | Reference-led direct UI; no mockup gate | PASS — section 15 |
 | Stageshow command included | PASS — section 15 |
-| External partner endpoint/credential verification | **PENDING — intake; Dolphin exact endpoint is not assumed** |
+| External partner endpoint/credential verification | **PENDING — intake; NEAR AI/OpenRouter/SERV keys, credits and attestation require validation** |
 | Kite spend boundary | PASS — default disabled; operator must authorize exact cap |
 | Reppo privacy and quota boundary | PASS — synthetic-only; current quota verify at intake |
 | Payment authority explicit | PASS — no payment absent exact session and spend authority |

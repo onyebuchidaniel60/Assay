@@ -11,6 +11,7 @@
 - Vercel hosts the Next.js frontend and preview deployments.
 - Render hosts Fastify API and Presidio service. The MVP worker loop runs in the API service and uses Postgres as its durable queue.
 - Supabase provides Postgres, Auth and private Storage.
+- AI routing: SERV orchestrates; NEAR AI Cloud handles tokenized Layer 2 extraction with TEE attestation; OpenRouter handles structured judgement/generation. Dolphin is not deployed.
 - Do not use Render free Postgres for persistent application data; its free database has a 30-day limit. Do not use local Render filesystem for documents; use private Supabase Storage.
 - Free service sleep/pause and quotas must be considered. A sleeping Render service can delay a demo; warm it before recording. Supabase free projects may pause after inactivity and have storage/egress limits. Record actual plans during intake.
 

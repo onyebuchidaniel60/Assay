@@ -13,8 +13,9 @@ Fastify API / Node.js 24 LTS (Render)
   -> Supabase Postgres (canonical data + queue)
   -> Supabase private Storage (ciphertext only)
   -> Presidio Python service (server-to-server token)
-  -> OpenServ SERV reasoning API
-  -> verified @dphnAI inference API (tokenized text only)
+  -> OpenServ SERV reasoning API (orchestration)
+       -> NEAR AI Cloud TEE-attested gateway (tokenized text only)
+       -> OpenRouter (structured SERV judgement/generation)
   -> optional Reppo Evaluation API (synthetic-only)
   -> optional Kite Passport/x402 (testnet, explicit spending authority)
 Worker loop inside API deployment
@@ -35,7 +36,7 @@ Worker loop inside API deployment
 - API: Fastify 5.x, TypeScript, Drizzle ORM, `pg`.
 - Data/Auth/Storage: Supabase Postgres, Supabase Auth, private Supabase Storage.
 - Worker: Postgres jobs table; custom row-locking worker and leases.
-- PII: Python 3.12, Microsoft Presidio Analyzer/Anonymizer, custom recognizers.
+- PII: Python 3.12, Microsoft Presidio Analyzer/Anonymizer, custom recognizers, deployed in `REDUCED_PII_MODE` on the Render free tier (small spaCy model; not full `en_core_web_lg`).
 - PDF: `pdfjs-dist`, text layer only; scanned PDFs rejected.
 - Crypto: Node crypto AES-256-GCM, SHA-256, Ed25519.
 - Proof: Circom 2.x + SnarkJS fixed circuit.
@@ -50,18 +51,19 @@ The application graph contains explicit nodes/contracts:
 2. `CLASSIFY_ADDBACKS`: analyst-entered lines and confirmed add-back list → eligible/ineligible/uncertain classification with evidence.
 3. `ROUTE_RESULT`: deterministic calculation result + scenario flags → compliant/breach/uncertain routing.
 
-The provider/model for each reasoning call is configured through the SERV endpoint. The graph and outputs are versioned. Each node output passes Zod schema validation and deterministic invariants before the next step. SERV does not mutate the database directly and cannot call arbitrary tools.
+SERV is the orchestration layer: its BRAID graph nodes call either NEAR AI or OpenRouter according to the routing rules below. SERV does not itself perform inference. The graph and outputs are versioned. Each node output passes Zod schema validation and deterministic invariants before the next step. SERV does not mutate the database directly and cannot call arbitrary tools.
 
-Current OpenServ public materials identify `https://inference-api.openserv.ai/v1` as an OpenAI-compatible SERV endpoint. The operator must verify the current model catalog, key permissions, credits and any graph/Shadow Agent/PromptGuard capability in the account before enabling claims about those capabilities.
+Current OpenServ public materials identify `https://inference-api.openserv.ai/v1` as an OpenAI-compatible SERV endpoint. An unauthenticated probe returns HTTP 401. The operator must verify the current model catalog, key permissions, credits and any graph/Shadow Agent/PromptGuard capability in the account before enabling claims about those capabilities.
 
 ## Provider routing and privacy boundaries
 
-- Dolphin partner receives tokenized agreement text only, after Presidio review and after exact @dphnAI endpoint/model/privacy terms are verified.
-- SERV receives structured, non-identifying inputs; use it for the reasoning graph.
-- Reppo receives synthetic/de-identified correction records only.
-- Kite receives payment/service metadata; no borrower payload is sent to Kite services by default.
-- Token-to-identity maps never leave backend storage.
-- Do not use `api.dolphinllm.com` as a substitute for the @dphnAI partner without explicit verification; it is a separate service in current public results.
+- **NEAR AI Cloud (Layer 2):** receives only tokenized credit-agreement text and structured financial figures for extraction. Never send token maps, borrower identities or raw documents. Requests must carry fresh Intel TDX/NVIDIA NRAS attestation evidence bound to a client-supplied nonce; fail closed if attestation is missing or invalid.
+- **OpenRouter (general):** receives only structured, already-extracted data for SERV judgement and generation nodes. Never send raw documents or tokenized agreement text.
+- **SERV:** receives structured, non-identifying inputs and orchestrates the graph; it does not itself perform inference.
+- **Reppo:** receives synthetic/de-identified correction records only; disabled unless credentials and authority exist.
+- **Kite:** receives payment/service metadata; no borrower payload is sent to Kite services by default.
+- **Token-to-identity maps** never leave backend storage.
+- **Dolphin:** removed and rejected; no adapter or endpoint is part of the architecture.
 
 ## Jobs
 
@@ -80,7 +82,7 @@ Private witness: total debt and adjusted EBITDA minor units. Public input: coven
 ## Hosting
 
 - Vercel: frontend routes and static assets; preview deployment first.
-- Render: Fastify API and Presidio service; use free services only if sufficient. The API worker runs in the same API service to avoid a separate paid worker tier for the MVP; Postgres is the durable queue.
+- Render: Fastify API and a `REDUCED_PII_MODE` Presidio-equivalent service; use free services only. The API worker runs in the same API service to avoid a separate paid worker tier for the MVP; Postgres is the durable queue. Full `en_core_web_lg` Presidio is not deployed on the 512 MB free tier.
 - Supabase: DB/Auth/Storage; free plan only for demo and subject to pause/size limits. Render free Postgres is not used because free DBs expire after 30 days.
 - No production release or paid-plan activation without explicit operator authorization.
 

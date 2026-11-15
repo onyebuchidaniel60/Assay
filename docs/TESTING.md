@@ -6,7 +6,7 @@ Test calculation functions, rounding, add-back eligibility/caps, state transitio
 
 ## Integration
 
-Test migrations, Auth JWT validation, private Storage, Postgres job claiming/leases/retries, Presidio custom recognizers, SERV/Dolphin adapters using sandbox or contract fixtures, Circom compile and SnarkJS proof generation/verification, and optional Reppo/Kite APIs only when authorized credentials exist.
+Test migrations, Auth JWT validation, private Storage, Postgres job claiming/leases/retries, `REDUCED_PII_MODE` Presidio-equivalent custom recognizers, SERV/NEAR AI/OpenRouter adapters using sandbox or contract fixtures, NEAR AI attestation failure handling, Circom compile and SnarkJS proof generation/verification, and optional Reppo/Kite APIs only when authorized credentials exist.
 
 ## End-to-end
 

@@ -14,7 +14,7 @@ Audience: hackathon judges and technically informed product reviewers. Explain t
 |---|---|---|---|
 | 0:00–0:12 | Hook | Real app dashboard and a synthetic credit review queue | “A covenant review is not just a calculation. It is contract interpretation, evidence, controls and sign-off.” |
 | 0:12–0:28 | Upload + redaction | Analyst uploads synthetic agreement; redaction results and tokenized preview appear | Explain that identified fields are tokenized before model submission; show the actual result. |
-| 0:28–0:52 | SERV + extraction | Show workflow node/status and real extraction evidence quotes/page numbers; show Dolphin provider state accurately | Explain SERV's bounded reasoning role and the provider's extraction task; do not claim unverified privacy guarantees. |
+| 0:28–0:52 | SERV + extraction | Show workflow node/status and real extraction evidence quotes/page numbers; show NEAR AI provider state accurately | Explain SERV's bounded reasoning role and NEAR AI's Layer 2 extraction task; only claim TEE attestation when fresh Intel TDX/NVIDIA NRAS evidence is verified and visible. |
 | 0:52–1:12 | Confirm + calculate | Analyst confirms clause terms, enters synthetic figures, calculation results appear | Explain deterministic calculation and the exact supported covenant. |
 | 1:12–1:28 | Scenarios + proof | Show baseline and two stress scenarios; show proof verification result | Explain proof proves the fixed inequality, not truth of source figures. |
 | 1:28–1:48 | Manager control | Switch to manager account; restricted view; manager approves eligible result and records risk acknowledgement if required | Explain separate manager decision gate; no raw figures shown in manager view. |

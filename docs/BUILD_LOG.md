@@ -7,12 +7,37 @@
 - **Preview URL:** None.
 - **Commit:** None.
 - **Reference image:** Not supplied; critical blocker.
-- **Provider access:** SERV, Dolphin @dphnAI, Reppo and Kite credentials/terms require intake verification. Kite/Reppo remain optional until authorized.
+- **Provider access:** SERV, NEAR AI, OpenRouter, Reppo and Kite credentials/terms require intake verification. Kite/Reppo remain optional until authorized.
 - **Hosting:** target Vercel frontend, Render API/Presidio, Supabase Postgres/Auth/Storage. No Railway.
 - **Production authority:** not granted.
 - **Budget:** no new spend by default; stop before any paid tier/top-up/payment.
 - **Tests:** none yet; do not claim passes.
 - **Next:** complete consolidated operator intake, verify reference image and credentials/access, then execute Phase 1.
+
+## 15 November 2026 — Phase 0 intake and readiness inspection
+
+- **Phase:** 0 — Operator Intake / Readiness.
+- **Baseline commit:** `6a90b02eb9c7363bddd22238ce2689de94f2aafd` (`source docs`), branch `main`, clean working tree.
+- **Repository state:** public repo; `origin` reachable; write access verified with `git push --dry-run origin main` → `Everything up-to-date`; no branch protection; no application code, manifests, migrations, tests, CI, deploy configuration, `.env` files or old product files.
+- **Read:** `AGENTS.md`, `MASTER_BLUEPRINT.md`, `PROJECT_SPEC.md`, `ARCHITECTURE.md`, `IMPLEMENTATION_PLAN.md`, `OPERATOR_INTAKE.md`, `REFERENCE_ASSETS.md`, `DEMO_VIDEO_PLAN.md`, `AI_HANDOFF.md` and all files under `docs/`.
+- **Provider revision applied:** Dolphin removed/rejected because its confidentiality mechanism is unverified (no TEE, no MPC, zero-retention unverified). NEAR AI Cloud is Layer 2 extraction; OpenRouter is general inference; SERV orchestrates both. No Dolphin adapter, endpoint, model or environment variable will be implemented.
+- **Catalog probes:**
+  - `GET https://cloud-api.near.ai/v1/model/list` → HTTP 200; 64 models; 14 text-output models report both `verifiable: true` and `attestationSupported: true`.
+  - `GET https://openrouter.ai/api/v1/models` → HTTP 200; 470 models.
+  - `GET https://inference-api.openserv.ai/v1/models` without a key → HTTP 401 `Missing or invalid API key`, confirming the endpoint responds.
+- **Proposed provider configuration (pending operator confirmation):**
+  - NEAR AI extraction: `z-ai/glm-5.3-flash` (TEE-verifiable metadata, structured outputs, 1M context).
+  - OpenRouter judgement: `openai/gpt-5.4-mini`; generation: `deepseek/deepseek-v3.2`.
+- **Vercel:** CLI 65.8.0 authenticated as `onyebuchidaniel60-1034`; team `uhhh2` (Hobby); no Assay project; preview permission not explicitly granted.
+- **Presidio blocker:** resolved by design. `REDUCED_PII_MODE` uses Presidio Analyzer with the small spaCy model plus deterministic custom financial recognizers; full `en_core_web_lg` is not deployed on Render free 512 MB; no paid upgrade. Phase 2 must validate RSS and use the deterministic recognizer-only fallback under the same label if needed.
+- **Critical blockers:** Tier A scope not confirmed; UI reference missing with no generation authorization; NEAR AI/OpenRouter/SERV keys, credits and live validation absent; Supabase project/keys/bucket absent; Render access absent; Vercel preview permission absent; budget remains `$0` new spend.
+- **Optional integrations:** Reppo disabled; Kite disabled with `$0` spend cap; Google TTS not configured.
+- **Tests:** no application tests exist; no pass claimed. The only executed checks are read-only Git, CLI, DNS/HTTP and environment-name checks.
+- **Preview URL:** none. **Deployed commit:** none.
+- **Reference/skill status:** no reference image; `stageshow` skill not attempted (Phase 6 only).
+- **Docs updated:** `OPERATOR_INTAKE.md`, `AI_HANDOFF.md`, `docs/BUILD_LOG.md`, `docs/RESEARCH_NOTES.md`, `docs/INTEGRATIONS.md`, `docs/CONFIGURATION.md`, and provider references in the source-of-truth docs.
+- **Authorization boundary:** no application code, monorepo scaffold, deployment, paid provisioning or production action. Stop before Phase 1.
+- **Next exact task:** operator resolves `OPERATOR_INTAKE.md` §4; then Phase 1 shell and safe preview.
 
 ## Build log entry template
 

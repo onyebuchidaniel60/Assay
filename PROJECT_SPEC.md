@@ -52,7 +52,7 @@ Covenant reviews combine contract interpretation, manual spreadsheet arithmetic,
 3. Uploads text PDF/TXT; API encrypts bytes before private storage.
 4. Worker parses and redacts with Presidio/custom recognizers.
 5. Analyst reviews redaction and confirms.
-6. Dolphin partner extracts terms from tokenized text only, after partner endpoint/privacy verification. SERV reasoning interprets structured facts and routes supported/uncertain/unsupported cases.
+6. NEAR AI Cloud's TEE-attested gateway extracts terms from tokenized text only; SERV reasoning orchestrates the graph and routes supported/uncertain/unsupported cases. General judgement/generation calls route to OpenRouter with structured, already-extracted data only.
 7. Analyst confirms/corrects terms.
 8. Analyst enters debt, EBITDA and permitted add-back amounts, with currency and source references.
 9. Deterministic engine calculates baseline leverage/headroom and scenarios.

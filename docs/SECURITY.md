@@ -14,7 +14,10 @@ See `MASTER_BLUEPRINT.md` §13 for the risk/mitigation matrix. This file records
 - Synthetic-only MVP.
 - Documents encrypted before private object storage.
 - Per-borrower DEK wrapped by server-only KEK; token maps and sensitive audit payloads encrypted.
-- Presidio review required before any external inference.
+- Presidio review required before any external inference. The deployed service is `REDUCED_PII_MODE` and analyst review is mandatory.
+- NEAR AI receives only tokenized agreement text and structured financial figures for Layer 2 extraction. TEE attestation evidence must be verified; failure blocks the result.
+- OpenRouter receives only structured, already-extracted data for SERV judgement/generation; never raw documents.
+- Dolphin is removed and must not be used.
 - Reppo payloads contain synthetic/de-identified examples only.
 - No raw document, financials, prompts, token map, auth tokens or provider keys in logs.
 

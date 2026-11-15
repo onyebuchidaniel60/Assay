@@ -13,16 +13,35 @@
 - Node release schedule currently lists Node 26 as Active LTS and Node 24 as Maintenance LTS. The blueprint selects Node 24 for ecosystem compatibility and stability; pin exact runtime and re-evaluate if a required dependency supports only Node 26.
 - Next.js 16 is currently Active LTS. Use latest patched stable 16.x; do not use canary.
 
+## Provider revision — 15 November 2026
+
+### NEAR AI Cloud — Layer 2 confidential inference
+
+- Base URL: `https://cloud-api.near.ai/v1` (OpenAI-compatible gateway).
+- Public model catalog: `GET https://cloud-api.near.ai/v1/model/list` returned HTTP 200 and 64 models. Fourteen text-output models report both `verifiable: true` and `attestationSupported: true`.
+- Proposed extraction model: `z-ai/glm-5.3-flash` — TEE-verifiable metadata, 1,048,576-token context, structured outputs and JSON mode. The alternative `deepseek-ai/DeepSeek-V4.1-Flash-1017` is also verifiable but does not advertise structured outputs.
+- Attestation: request fresh evidence with a client-supplied nonce and verify against Intel TDX and NVIDIA NRAS. Public deployment manifests: `github.com/nearai/cvm-compose-files`.
+- The advertised starter credit is not treated as confirmed; verify the exact amount in the NEAR AI dashboard before Phase 3.
+- Routing: only tokenized credit-agreement text and structured financial figures. Do not send token maps, borrower identities or raw documents.
+- Required wording: “Sensitive inference is routed to NEAR AI Cloud's TEE-attested gateway. Each request can be verified against Intel TDX and NVIDIA NRAS attestation evidence.” Do not claim guaranteed zero retention or that cryptography proves data was never logged.
+
+### OpenRouter — general inference
+
+- Base URL: `https://openrouter.ai/api/v1` (OpenAI-compatible).
+- Public model catalog returned HTTP 200 and 470 models.
+- Proposed judgement model: `openai/gpt-5.4-mini` (400,000-token context). Proposed generation model: `deepseek/deepseek-v3.2` (163,840-token context).
+- Routing: SERV judgement and generation nodes receive only structured, already-extracted data — never raw documents.
+- No Assay-scoped API key is present. Model IDs and credits require operator confirmation.
+
+### Dolphin — evaluated and rejected
+
+Dolphin was evaluated and rejected because its confidentiality mechanism is unverified: no TEE, no MPC and unverified zero-retention claims. No Dolphin adapter, endpoint, model or environment variable will be implemented. Historical blueprint references are superseded by the Phase 0 intake.
+
 ## OpenServ
 
-- Current public OpenServ materials show `https://inference-api.openserv.ai/v1` as a SERV-compatible base URL and use `SERV_REASONING_API_KEY` in examples. Verify the actual key, model catalog, graph features and credits in account.
-- SERV is positioned as a structured reasoning engine; application code must still enforce domain contracts and deterministic rules.
-
-## Dolphin partner identity caution
-
-- Assay handoff identifies the OpenServ hackathon partner as `@dphnAI` and references `dphn.ai/API`, with DeepSeek V4.1 Flash.
-- Current public results for `dolphinllm.com` advertise a separate API with model ID `uncensored`; its public description does not match the hackathon partner described in the handoff. Do not use that hostname or model as a substitute.
-- `dphn.ai` could not be fully opened by the web research tool (403), so exact endpoint/auth/model/privacy claims remain intake verification items. Do not infer them from name similarity.
+- Current public OpenServ materials show `https://inference-api.openserv.ai/v1` as a SERV-compatible base URL and use `SERV_REASONING_API_KEY` in examples. An unauthenticated probe returned HTTP 401, confirming the endpoint responds; the key, model catalog, graph features and credits remain unverified.
+- SERV is the orchestration layer; its nodes call NEAR AI or OpenRouter. SERV does not itself perform inference. Application code must still enforce domain contracts and deterministic rules.
+- Do not claim Shadow Agent, PromptGuard or graph-versioning execution without account/runtime evidence.
 
 ## Reppo
 
@@ -35,6 +54,7 @@
 ## Presidio and proofs
 
 - Microsoft Presidio Analyzer supports built-in and custom recognizers; the app adds domain-specific recognizers and analyst review.
+- Render's free web service is limited to 512 MB, which is insufficient for full Presidio with `en_core_web_lg`. The selected deployment mode is `REDUCED_PII_MODE`: Presidio Analyzer with the small spaCy model plus deterministic custom financial recognizers. This is not full-strength Presidio, must be labelled as reduced, and keeps analyst review mandatory. Full Presidio remains a local/paid-environment option. No paid Render upgrade is authorized.
 - Circom/SnarkJS docs show proof verification against a verification key and public inputs/outputs. Assay's proof claim must be limited to the exact fixed inequality and supplied witness.
 
 ## Demo TTS
@@ -52,6 +72,9 @@
 - Next.js support policy: https://nextjs.org/support-policy
 - OpenServ reasoning: https://www.openserv.ai/reasoning
 - OpenServ main: https://www.openserv.ai/
+- NEAR AI Cloud: https://cloud-api.near.ai/v1
+- NEAR AI public deployment manifests: https://github.com/nearai/cvm-compose-files
+- OpenRouter: https://openrouter.ai/api/v1
 - Kite Passport: https://docs.gokite.ai/passport
 - Kite allowance and sessions: https://docs.gokite.ai/passport/payments/allowance
 - Reppo Evaluation API: https://www.reppofoundation.org/evaluation-api
@@ -59,4 +82,3 @@
 - Circom proof verification: https://docs.circom.io/getting-started/proving-circuits/
 - Gemini API pricing: https://ai.google.dev/gemini-api/docs/pricing/
 - Gemini speech generation: https://ai.google.dev/gemini-api/docs/speech-generation
-- Dolphin partner reference from handoff: https://dphn.ai/API

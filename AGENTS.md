@@ -10,7 +10,7 @@ Read `PROJECT_SPEC.md`, `ARCHITECTURE.md`, `IMPLEMENTATION_PLAN.md`, `OPERATOR_I
 
 ## One consolidated intake before coding
 
-Before modifying the repository, inspect repository/Git metadata and complete one consolidated Operator Intake/Readiness Check. Collect missing product inputs, user roles/workflows, business rules, reference image(s), assets and ownership, Vercel/Render/Supabase access, domains, environment variables/secrets, OpenServ/Dolphin/Reppo/Kite credentials, account permissions, webhook/sandbox details, quotas, costs, budgets, data handling, permitted actions, production authorization, demo audience/pronunciation/redactions/output directory. Do not ask for information already in source or environment. Use safe defaults only for noncritical omissions. Mark blockers vs optional. Do not start implementation before critical input and reference image requirements pass.
+Before modifying the repository, inspect repository/Git metadata and complete one consolidated Operator Intake/Readiness Check. Collect missing product inputs, user roles/workflows, business rules, reference image(s), assets and ownership, Vercel/Render/Supabase access, domains, environment variables/secrets, OpenServ/NEAR AI/OpenRouter/Reppo/Kite credentials, account permissions, webhook/sandbox details, quotas, costs, budgets, data handling, permitted actions, production authorization, demo audience/pronunciation/redactions/output directory. Do not ask for information already in source or environment. Use safe defaults only for noncritical omissions. Mark blockers vs optional. Do not start implementation before critical input and reference image requirements pass.
 
 ## Authorization boundaries
 
@@ -27,7 +27,8 @@ Execute Phases 1–9 sequentially. At each checkpoint: implement → test → in
 - Postgres jobs table is the queue. No Redis/Kafka/Kubernetes without an approved architectural change.
 - Deterministic code performs arithmetic, business rules, approval checks, audit verification and spending policy. No LLM can calculate authoritatively, approve or pay.
 - SERV reasoning is a core bounded reasoning layer; do not bypass it and still claim SERV completion.
-- Dolphin is the @dphnAI hackathon partner only after exact endpoint/model/privacy terms are verified. Do not use `api.dolphinllm.com` as a guessed substitute.
+- Dolphin is rejected and removed: its confidentiality mechanism is unverified (no TEE, no MPC, zero-retention unverified). Do not build an adapter or add Dolphin endpoints, models, keys or flags.
+- NEAR AI Cloud is the Layer 2 confidential inference provider; verify TEE-verifiable model metadata and fresh Intel TDX/NVIDIA NRAS attestation for every extraction request. OpenRouter is the general inference provider for SERV judgement/generation using structured, already-extracted data only.
 - Reppo receives synthetic/de-identified feedback only.
 - Kite Passport/x402 is optional; no payment without exact approved session/cap/asset/service.
 - No real borrower information, production deployment, public signup, arbitrary covenant support or baseline breach override.

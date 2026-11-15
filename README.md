@@ -12,7 +12,7 @@ Assay helps a credit analyst review one maximum Debt / Adjusted EBITDA covenant 
 2. The analyst uploads a text-based PDF or TXT agreement.
 3. Assay encrypts the document before private storage, parses its text and uses Presidio to detect/tokenize identifying fields.
 4. The analyst reviews redaction before any model call.
-5. AI extracts a single Debt / Adjusted EBITDA covenant, its threshold and permitted add-back definitions, with supporting quote/page evidence. SERV Reasoning handles bounded interpretation and routing; the analyst confirms the result.
+5. AI extracts a single Debt / Adjusted EBITDA covenant, its threshold and permitted add-back definitions, with supporting quote/page evidence. Sensitive extraction is routed to NEAR AI Cloud's TEE-attested gateway only after redaction; SERV Reasoning orchestrates the graph and routes structured judgement/generation to OpenRouter. The analyst confirms the result.
 6. The analyst enters total debt, reported EBITDA and permitted add-backs.
 7. Assay calculates leverage and headroom deterministically, then runs an EBITDA-downside and debt-upside scenario.
 8. A fixed ZK circuit proves the baseline inequality when compliant. A manager approves or rejects from a restricted view; proof verification is required before approval.

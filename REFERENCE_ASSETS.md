@@ -4,6 +4,8 @@
 
 **No UI reference image was attached with the current blueprint request.** This is an explicit initial-intake blocker under the supplied workflow. Do not invent filenames, paths, provenance or design observations.
 
+**Phase 0 intake — 15 November 2026:** no image was supplied in the repository or in an accessible operator path, and no express authorization to generate reference imagery was provided. This remains a hard blocker. See `OPERATOR_INTAKE.md` §2.10 and §4.
+
 ## Required operator-supplied asset(s)
 
 | Asset ID | Exact filename/path | Source / owner | Intended use | Review status |

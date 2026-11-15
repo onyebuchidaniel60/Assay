@@ -8,7 +8,7 @@ The phases below are internal engineering checkpoints, not human approval gates.
 
 ### Phase 0 — Consolidated Operator Intake / Readiness
 
-Read all handoff files and inspect repository/Git metadata without editing. Fill `OPERATOR_INTAKE.md` in one pass. Verify product inputs, missing image references, repository access, accounts, deployment, provider credentials, external permissions, costs, data restrictions, production authority and demo output. Verify endpoint/model and privacy terms for each activated provider. Do not begin implementation while a critical input or required reference image is missing. Optional integrations may remain disabled.
+Read all handoff files and inspect repository/Git metadata without editing. Fill `OPERATOR_INTAKE.md` in one pass. Apply the authoritative provider revision: Dolphin removed; NEAR AI Cloud for Layer 2 extraction; OpenRouter for structured judgement/generation; SERV orchestration; `REDUCED_PII_MODE` Presidio on the Render free tier. Verify product inputs, missing image references, repository access, accounts, deployment, provider credentials, external permissions, costs, data restrictions, production authority and demo output. Verify endpoint/model and privacy terms for each activated provider. Do not begin implementation while a critical input or required reference image is missing. Optional integrations may remain disabled.
 
 **Commit:** `docs: complete operator intake and readiness`.
 
@@ -21,14 +21,14 @@ Create clean pnpm monorepo, route-complete Next.js shell, responsive nav, login 
 
 ### Phase 2 — Backend/data/auth foundation
 
-Create Drizzle schema/migrations, Supabase Auth verification, profile roles, private bucket, encryption envelope service, signed audit chain, Postgres job queue/worker, Presidio service/custom recognizers and readiness health checks.
+Create Drizzle schema/migrations, Supabase Auth verification, profile roles, private bucket, encryption envelope service, signed audit chain, Postgres job queue/worker, `REDUCED_PII_MODE` Presidio-equivalent service/custom recognizers and readiness health checks.
 
 **Acceptance:** auth/RBAC tests pass; sample file stored as ciphertext; queue survives service restart; audit tamper tests pass.  
 **Commit:** `feat: add auth data and security foundations`.
 
 ### Phase 3 — Core domain and APIs
 
-Implement borrower/facility, upload/parse/redaction, bounded SERV graph, verified Dolphin adapter, covenant term schema/review, financial inputs, deterministic engine/scenarios, Circom/SnarkJS proof, manager approval and audit APIs. Add Reppo/Kite only behind feature flags and only with authorized credentials.
+Implement borrower/facility, upload/parse/redaction, bounded SERV graph, NEAR AI extraction adapter with TEE attestation verification, OpenRouter judgement/generation routing, covenant term schema/review, financial inputs, deterministic engine/scenarios, Circom/SnarkJS proof, manager approval and audit APIs. Add Reppo/Kite only behind feature flags and only with authorized credentials.
 
 **Acceptance:** API-level MUST HAVE requirements pass; no pretend integration state.  
 **Commit:** `feat: implement covenant analysis workflow`.

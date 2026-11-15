@@ -2,7 +2,7 @@
 
 ## Status
 
-Pending Phase 0 reference image(s). No image has been received in the blueprint request. The temporary Phase 1 system is a neutral functional shell; it is not the final visual direction.
+Pending Phase 0 reference image(s). No image has been received in the blueprint request or the 15 November 2026 intake, and no express authorization to generate reference imagery was provided. The temporary Phase 1 system is a neutral functional shell; it is not the final visual direction. This remains a hard blocker for Phase 6 and for the Phase 0 readiness gate.
 
 ## Reference inventory
 
