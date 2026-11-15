@@ -4,8 +4,8 @@
 
 ## Hosting
 
-- Render lists web services and background workers, but its free-deployment documentation says free instances are for preview/testing and not production. Free web services have no persistent local disk; free Postgres databases expire 30 days after creation. Therefore the app uses Supabase Postgres for persistent data and avoids Render free Postgres. Render remains the API/Presidio host, with Postgres-backed job queue.
-- Supabase pricing currently lists a free tier with 500 MB DB, 1 GB file storage and project pausing after one week of inactivity. It is suitable for demo constraints only, not a production SLA.
+- Render lists web services and background workers, but its free-deployment documentation says free instances are for preview/testing and not production. Free web services have no persistent local disk; free Postgres databases expire 30 days after creation. Therefore the app uses Neon Postgres for persistent data and avoids Render free Postgres. Render remains the API/Presidio host, with Postgres-backed job queue.
+- Neon pricing currently lists a free tier with 500 MB DB, 1 GB file storage and project pausing after one week of inactivity. It is suitable for demo constraints only, not a production SLA.
 - Vercel Hobby is a free plan suited to personal and small projects; verify project policy and resource limits in the account.
 
 ## Versions
@@ -66,7 +66,7 @@ Dolphin was evaluated and rejected because its confidentiality mechanism is unve
 - Render pricing: https://render.com/pricing
 - Render free deploy limits: https://render.com/docs/free
 - Render background workers: https://render.com/docs/background-workers
-- Supabase pricing: https://supabase.com/pricing
+- Neon pricing: https://neon.com/pricing
 - Vercel Hobby plan: https://vercel.com/docs/plans/hobby
 - Node release schedule: https://nodejs.org/en/about/previous-releases
 - Next.js support policy: https://nextjs.org/support-policy

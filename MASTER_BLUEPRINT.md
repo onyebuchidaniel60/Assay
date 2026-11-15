@@ -188,9 +188,9 @@ The manager view uses a deliberately minimal output: borrower pseudonym/referenc
 ## 4.1 Sign-in and access
 
 **Entry:** `/login`.  
-**Preconditions:** user has been created/invited in Supabase Auth and a matching Assay profile has an active role.  
-**Action:** user signs in using email/password or the configured Supabase Auth method.  
-**System:** Supabase validates credentials and creates a session; frontend obtains an access token; API validates JWT signature, issuer, audience and expiry, then loads active profile/role.  
+**Preconditions:** user has been created/invited in Neon Auth and a matching Assay profile has an active role.  
+**Action:** user signs in using email/password or the configured Neon Auth method.  
+**System:** Neon validates credentials and creates a session; frontend obtains an access token; API validates JWT signature, issuer, audience and expiry, then loads active profile/role.  
 **State:** login event is recorded without credentials or tokens.  
 **Success:** user lands on role-appropriate dashboard.  
 **Failure:** invalid credentials show a generic message; inactive user receives access denied; expired token returns 401 and triggers re-auth.  
@@ -198,7 +198,7 @@ The manager view uses a deliberately minimal output: borrower pseudonym/referenc
 **Edge cases:** auth user exists without profile → deny and log configuration error; role disabled during active session → next API call denies; token replay after expiry → 401.
 
 ```text
-User -> Login UI -> Supabase Auth -> Access token
+User -> Login UI -> Neon Auth -> Access token
   -> Assay API JWT verification -> active profile + role
   -> role-specific dashboard
 ```
@@ -219,7 +219,7 @@ User -> Login UI -> Supabase Auth -> Access token
 **Preconditions:** Analyst; facility active; maximum one agreement file per analysis run.  
 **Action:** upload PDF or TXT.  
 **Validation:** max 10 MiB; PDF or UTF-8 text only; verify magic bytes; reject encrypted/password-protected PDFs, image-only/scanned PDFs, zero-text documents, more than 40 pages and unsupported MIME.  
-**System:** stream to API; compute SHA-256; generate/obtain per-borrower data encryption key; encrypt file with AES-256-GCM; upload ciphertext to private Supabase Storage; save metadata; enqueue parse/redaction job. Raw bytes are not written to local disk or logs.  
+**System:** stream to API; compute SHA-256; generate/obtain per-borrower data encryption key; encrypt file with AES-256-GCM; upload ciphertext to private private S3-compatible storage; save metadata; enqueue parse/redaction job. Raw bytes are not written to local disk or logs.  
 **Success:** document status `PROCESSING`, then `REDACTION_REVIEW`.  
 **Failure:** invalid file → 422; duplicate checksum → 409 with existing document link; storage failure → rollback metadata and return 503; worker failure → document `FAILED` with safe error code and retry option.  
 **Permissions:** Analyst may upload and preview; other roles cannot retrieve original bytes.
@@ -454,7 +454,7 @@ PostgreSQL is the canonical application store. Use UUID primary keys, `timestamp
 ## 7.1 Entities
 
 ### `profiles`
-- `id uuid PK` references Supabase `auth.users.id`.
+- `id uuid PK` references Neon `auth.users.id`.
 - `email text NOT NULL` (normalized; not used as a public identifier).
 - `display_name text NOT NULL`.
 - `role enum('ANALYST','MANAGER','AUDITOR','ADMIN') NOT NULL`.
@@ -594,7 +594,7 @@ A small, separated web application with a Node API, a durable PostgreSQL job que
 
 ```text
 Browser (Next.js on Vercel)
-  | HTTPS + Supabase Auth access token
+  | HTTPS + Neon Auth access token
   v
 Assay API (Fastify / Node.js on Render)
   |-- auth/JWT + RBAC
@@ -604,10 +604,10 @@ Assay API (Fastify / Node.js on Render)
   |-- NEAR AI inference adapter (tokenized agreement only)
   |-- Reppo adapter (synthetic feedback only)
   |-- Kite adapter (optional x402, strict policy gate)
-  |-- encrypted Supabase Storage access
+  |-- encrypted private S3-compatible storage access
   |-- Postgres jobs table + worker loop in same service
   v
-Supabase Postgres + private Storage + Auth
+Neon Postgres + private Storage + Auth
   ^
   | worker claims jobs with SKIP LOCKED
   |
@@ -626,7 +626,7 @@ External providers: OpenServ SERV; NEAR AI Cloud (Layer 2); OpenRouter (general)
 - **SERV:** bounded reasoning/model orchestration on explicit graph steps. Application code owns the workflow state machine and deterministic acceptance checks.
 - **NEAR AI:** Layer 2 sensitive extraction through its TEE-attested gateway. It receives tokenized agreement text and structured financial figures only, never token maps or direct identity fields. Attestation evidence must be verified.
 - **Circom/SnarkJS:** fixed proof predicate, independent of the LLM.
-- **Supabase:** Auth, Postgres and private Storage. Service role is server-only.
+- **Neon:** Auth, Postgres and private Storage. Service role is server-only.
 - **Reppo:** independent scoring of synthetic/de-identified traces; it does not alter production prompts on its own.
 - **Kite:** optional spending-session and x402 enforcement, distinct from credit approval.
 
@@ -646,7 +646,7 @@ Use a Postgres `jobs` table with `FOR UPDATE SKIP LOCKED`, lease expiry and boun
 
 ## 8.5 Storage and encryption
 
-- Supabase Storage bucket: `assay-private-documents`, private, no public URLs.
+- private S3-compatible storage bucket: `assay-private-documents`, private, no public URLs.
 - Upload to backend; backend encrypts before upload. Store only ciphertext in object storage.
 - One random 256-bit DEK per borrower. Wrap with AES-256-GCM under a server-side KEK from Render secret store. Persist only wrapped DEK, nonce and tag.
 - Use borrower DEK for document ciphertext, encrypted token map and audit payloads with unique nonces.
@@ -674,10 +674,10 @@ Use Pino JSON logs with request ID, route, status, duration, job ID, provider re
 | Frontend data | TanStack Query + Zod | Server-state caching, retries and shared response parsing; no client-authoritative domain state. |
 | Backend | Fastify 5.x + TypeScript | Small API service, schema validation, clear plugin boundaries and background-worker hosting. |
 | Validation | Zod | Request/response and provider payload schemas. |
-| Database | Supabase-managed PostgreSQL | Persistent relational storage and Supabase Auth integration. Use SQL migrations in repo. |
+| Database | Neon-managed PostgreSQL | Persistent relational storage and Neon Auth integration. Use SQL migrations in repo. |
 | ORM / SQL | Drizzle ORM + `pg` | Typed schema and explicit SQL transactions/row locking where required. |
-| Auth | Supabase Auth | Invite-only staff login; API validates signed JWT and profile role. |
-| Object storage | Supabase private Storage | Encrypted PDF/TXT objects, private bucket. |
+| Auth | Neon Auth | Invite-only staff login; API validates signed JWT and profile role. |
+| Object storage | private S3-compatible storage | Encrypted PDF/TXT objects, private bucket. |
 | Jobs | Postgres `jobs` table + custom SKIP LOCKED worker | No Redis/queue service required; robust enough for single-instance MVP. |
 | PII | Microsoft Presidio Analyzer + Anonymizer in Python 3.12 service | Standard recognizers plus custom finance-domain recognizers. |
 | PDF text | `pdfjs-dist` in isolated backend worker | Text-layer extraction; reject scan-only documents, no OCR in MVP. |
@@ -685,21 +685,21 @@ Use Pino JSON logs with request ID, route, status, duration, job ID, provider re
 | Proofs | Circom 2.x + SnarkJS | One fixed circuit for one covenant predicate; pin exact tool versions and circuit artefacts. |
 | Crypto | Node `crypto` (AES-256-GCM, SHA-256, Ed25519) | Encryption, hash chain and signed event hashes. |
 | API docs | OpenAPI generated from Fastify schemas | Accurate API documentation. |
-| Tests | Vitest + Testcontainers or Supabase local + Playwright | Unit/integration/E2E. Use deterministic fixtures. |
+| Tests | Vitest + Testcontainers or Neon local + Playwright | Unit/integration/E2E. Use deterministic fixtures. |
 | Frontend hosting | Vercel preview/deployment | Early navigable UI and stable preview URL. |
 | API/Presidio hosting | Render Web Services | No Railway. Use free tier only if limits permit; never start paid services without approval. |
-| Database/Auth/Storage | Supabase | Free tier suited only to demo; free project pause/storage limits documented. |
+| Database/Auth/Storage | Neon | Free tier suited only to demo; free project pause/storage limits documented. |
 | Video | Playwright + FFmpeg + Google Gemini TTS free tier where currently available | Capture real journeys, generate narration, synchronize and review. |
 
 **Runtime versions:** use Node.js 24 LTS for app/API, Python 3.12 for Presidio, and exact patch versions pinned in lockfiles/images. Current Node release data shows 26 is Active LTS, but 24 remains supported Maintenance LTS; 24 is selected for broader compatibility with the current package/circuit stack. Use a patched stable Next.js 16.x release, not canary. Do not upgrade major versions mid-build without a documented compatibility/security need.
 
-**Rejected alternatives:** Railway is unavailable to the operator. Avoid a separate Redis/Kafka service, Kubernetes, separate microservice per partner, custom auth implementation, unverified database hosting and an LLM-driven arithmetic engine. Render free Postgres is rejected for persistent application data because its documented free database expires after 30 days; use Supabase Postgres instead. Vercel is not used for long-running processing; API/worker work stays on Render.
+**Rejected alternatives:** Railway is unavailable to the operator. Avoid a separate Redis/Kafka service, Kubernetes, separate microservice per partner, custom auth implementation, unverified database hosting and an LLM-driven arithmetic engine. Render free Postgres is rejected for persistent application data because its documented free database expires after 30 days; use Neon Postgres instead. Vercel is not used for long-running processing; API/worker work stays on Render.
 
 ---
 
 # 10. API specification
 
-Base path `/v1`. JSON responses use camelCase. All authenticated routes require `Authorization: Bearer <Supabase access token>`. All IDs are UUIDs. `Idempotency-Key` required for run creation, payment execution and other retry-sensitive POSTs.
+Base path `/v1`. JSON responses use camelCase. All authenticated routes require `Authorization: Bearer <Neon access token>`. All IDs are UUIDs. `Idempotency-Key` required for run creation, payment execution and other retry-sensitive POSTs.
 
 ## 10.1 Common error shape
 
@@ -813,11 +813,11 @@ The API must ignore user-supplied `role`, `approvedBy`, `resultCode`, `proofVeri
 
 # 12. Authentication and authorization
 
-Supabase Auth is the identity provider. Signup is disabled. Admin creates staff identities out of band and assigns a profile role. The frontend sends an access token; Fastify validates JWT signature/issuer/audience/expiry using Supabase's supported key discovery/JWKS and then loads current profile status/role from Postgres on protected requests (or a very short role cache invalidated by admin action).
+Neon Auth is the identity provider. Signup is disabled. Admin creates staff identities out of band and assigns a profile role. The frontend sends an access token; Fastify validates JWT signature/issuer/audience/expiry using Neon's supported key discovery/JWKS and then loads current profile status/role from Postgres on protected requests (or a very short role cache invalidated by admin action).
 
 Every service method receives an authenticated principal and resource ID. Authorization is checked on the server against the database record and role before returning any data. Never authorize by hidden UI controls, request-body role, URL UUID alone or client-side ownership claims. Role-shaped serializers ensure Manager/Auditor endpoints cannot accidentally include analyst-only columns.
 
-Supabase `service_role` key, database password and signing/encryption keys are server-only. If browser direct access to tables is not needed, do not expose sensitive tables via public client queries. Enable RLS on exposed Supabase tables and private Storage policies even if the main API uses the server connection. No public bucket.
+Neon `service_role` key, database password and signing/encryption keys are server-only. If browser direct access to tables is not needed, do not expose sensitive tables via public client queries. Enable RLS on exposed Neon tables and private Storage policies even if the main API uses the server connection. No public bucket.
 
 Account lifecycle: invited → active → disabled. Disabling a user blocks API access immediately on the next request. Role changes are admin-only, audited and cannot be done through user profile edit.
 
@@ -827,14 +827,14 @@ Account lifecycle: invited → active → disabled. Disabling a user blocks API 
 
 | Risk | Mitigation / required test |
 |---|---|
-| Authentication bypass / weak sessions | Supabase Auth, signed JWT validation, expiry/issuer/audience validation, secure cookies, no local custom passwords; test invalid/expired/revoked sessions. |
+| Authentication bypass / weak sessions | Neon Auth, signed JWT validation, expiry/issuer/audience validation, secure cookies, no local custom passwords; test invalid/expired/revoked sessions. |
 | IDOR / cross-user access | Load each resource from DB and authorize role before query result serialization; negative E2E tests with a second account and guessed UUIDs. |
 | Privilege escalation | Ignore client roles and `approvedBy`; role from trusted profile table; audit every role change. |
 | SQL injection | Drizzle parameterized statements; no string-built SQL from user input; test malformed filters. |
 | XSS | React escaping, no `dangerouslySetInnerHTML`; render extracted PDF text as plain text; CSP; test script payloads in borrower labels and PDF text. |
 | CSRF | Bearer-token API and strict CORS; use secure SameSite cookies where SSR session requires them; CSRF tokens for cookie-authenticated mutations. |
 | CORS abuse | Exact Vercel preview and production origins from env; no wildcard with credentials. |
-| Brute force / enumeration | Supabase Auth protection, rate limits, generic login errors; do not reveal whether borrower/email exists. |
+| Brute force / enumeration | Neon Auth protection, rate limits, generic login errors; do not reveal whether borrower/email exists. |
 | File upload attack | Strict type/magic-byte/size/page limit, encrypted storage, isolated parser, no filesystem execution, text-only PDF; reject encrypted/scanned/unsupported files. |
 | Prompt injection | Treat agreement text as untrusted evidence, never as instructions; fixed system messages; extraction output schema validation; PromptGuard only if verified; deterministic tool allowlist; no model-directed arbitrary tool use. |
 | Data exfiltration | Presidio redaction and stable tokens; outbound request builder allowlists fields; no token map to model; only synthetic Reppo payloads. |
@@ -864,7 +864,7 @@ The exact final visual system is reference-image-led. No reference image is atta
 
 | Route | Purpose / role | Key components and actions | Data / states / E2E |
 |---|---|---|---|
-| `/login` | Staff sign-in | Email/password or configured Supabase Auth control; errors; show product identity | Auth session; invalid/inactive/loading/success; E2E login and sign-out |
+| `/login` | Staff sign-in | Email/password or configured Neon Auth control; errors; show product identity | Auth session; invalid/inactive/loading/success; E2E login and sign-out |
 | `/` | Role-specific dashboard | Summary cards, recent borrowers/analyses, pending manager reviews, provider health indicator | API summary; skeleton, empty, error; verify role-specific card visibility |
 | `/borrowers` | Borrower list | Search by alias/token, status filter, create button for Analyst/Admin | Paginated API list; empty/error/loading/denied; E2E create/list |
 | `/borrowers/new` | Create synthetic borrower | Alias/reference fields, validation, save/cancel | POST borrower; field errors and duplicate state |
@@ -920,7 +920,7 @@ npx skills add benjitaylor/skills --skill stageshow
 
 ## Mandatory
 
-### Supabase
+### Neon
 Purpose: Auth, Postgres and private file storage.  
 Auth: project URL and anon key in frontend; service role/database credentials server-only.  
 Data: user identity/roles, application entities and encrypted document blobs.  
@@ -1025,7 +1025,7 @@ The only possible money movement is an optional Kite Passport x402 payment for o
 
 # 19. Admin and operations
 
-Admin MVP features: list active staff, deactivate account, assign one of the approved roles, view integration health (configured/disabled/error, never secret contents), and inspect audit-verification status. No general admin console for editing borrower data. No user-facing secret editor. Provider secrets are configured in Vercel/Render/Supabase environment settings.
+Admin MVP features: list active staff, deactivate account, assign one of the approved roles, view integration health (configured/disabled/error, never secret contents), and inspect audit-verification status. No general admin console for editing borrower data. No user-facing secret editor. Provider secrets are configured in Vercel/Render/Neon environment settings.
 
 Operational controls:
 - Health endpoints and deploy metadata.
@@ -1042,7 +1042,7 @@ Operational controls:
 
 | Area | Invalid / missing | Duplicate / concurrent | Provider / network failure | Recovery |
 |---|---|---|---|---|
-| Login | Invalid credential or inactive profile → generic 401/403 | Multiple sessions allowed under Auth policy | Supabase unavailable → sign-in unavailable | Retry; no local bypass |
+| Login | Invalid credential or inactive profile → generic 401/403 | Multiple sessions allowed under Auth policy | Neon unavailable → sign-in unavailable | Retry; no local bypass |
 | Borrower | Missing alias/reference → 422 | Unique reference and idempotency | DB fail → transaction rollback | Correct input/retry same key |
 | Upload | Wrong type, >10 MiB, >40 pages, scan-only, password-protected → 422 | Checksum duplicate → 409 | Storage outage → 503, cleanup orphan | Re-upload after fixing; no plaintext fallback |
 | Redaction | Span out of range or unresolved PII → block | Same revision idempotent; changed revision increments | Presidio down → stop before inference | Retry service; manual redaction only if explicitly permitted and logged |
@@ -1080,7 +1080,7 @@ Operational controls:
 
 ## Integration tests
 
-- Supabase Auth JWT validation and disabled-user rejection.
+- Neon Auth JWT validation and disabled-user rejection.
 - Postgres migrations and FK/unique/check constraints.
 - Private Storage encryption upload/download and access restrictions.
 - Jobs queue transaction, worker lease expiry and retry.
@@ -1185,13 +1185,18 @@ All secrets are server-only unless explicitly marked `NEXT_PUBLIC_`.
 
 | Variable | Required | Used by | Exposure |
 |---|---|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Web | Client-safe URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Web | Client-safe public anon key; RLS required |
-| `SUPABASE_URL` | Yes | API | Server-only |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | API | Secret; never client |
-| `DATABASE_URL` | Yes | API/worker | Secret Postgres connection string |
-| `SUPABASE_STORAGE_BUCKET` | Yes | API | Server config, default `assay-private-documents` |
-| `SUPABASE_JWKS_URL` | Yes | API | Public URL, server config |
+| `NEXT_PUBLIC_APP_URL` | Yes | Web | Client-safe app origin |
+| `NEXT_PUBLIC_API_URL` | Yes | Web | Client-safe API URL |
+| `NEON_AUTH_BASE_URL` | Yes | API | Server-side managed auth URL |
+| `NEON_AUTH_API_KEY` | Yes | API | Secret; server-only |
+| `NEON_AUTH_COOKIE_SECRET` | Yes | API | Secret; high-entropy cookie/session secret |
+| `DATABASE_URL` | Yes | API/worker | Secret pooled Postgres connection string |
+| `DATABASE_URL_UNPOOLED` | Optional | API/migrations | Secret direct Postgres connection string |
+| `NEON_STORAGE_BUCKET` | Yes | API | Private bucket name, default `assay-private-documents` |
+| `AWS_ENDPOINT_URL_S3` | Yes | API | S3-compatible object storage endpoint |
+| `AWS_REGION` | Yes | API | Object storage region |
+| `AWS_ACCESS_KEY_ID` | Yes | API | Secret |
+| `AWS_SECRET_ACCESS_KEY` | Yes | API | Secret |
 | `SERV_BASE_URL` | Yes | AI adapter | Default `https://inference-api.openserv.ai/v1` |
 | `SERV_REASONING_API_KEY` | Yes | API/worker | Secret |
 | `SERV_MODEL` | Yes | API/worker | Non-secret model identifier confirmed in catalog |
@@ -1240,7 +1245,7 @@ All secrets are server-only unless explicitly marked `NEXT_PUBLIC_`.
 ## Phase 0 — Operator Intake / Readiness
 
 **Objective:** collect all required product/access/reference/credential/budget/authority inputs in one consolidated intake.  
-**Tasks:** read this package and repository metadata without editing; fill every field in `OPERATOR_INTAKE.md`; inspect reference image(s); validate repository access; verify Vercel, Render and Supabase access; verify OpenServ and partner credentials; confirm no-cost boundaries; confirm preview and production permissions; establish demo audience/output.  
+**Tasks:** read this package and repository metadata without editing; fill every field in `OPERATOR_INTAKE.md`; inspect reference image(s); validate repository access; verify Vercel, Render and Neon access; verify OpenServ and partner credentials; confirm no-cost boundaries; confirm preview and production permissions; establish demo audience/output.  
 **Files:** update `OPERATOR_INTAKE.md`, `REFERENCE_ASSETS.md`, `AI_HANDOFF.md`.  
 **Tests/evidence:** auth/provider test calls; deployment permission check; secret presence checks (never print values); cost/plan review.  
 **Acceptance:** every critical item marked verified; reference image supplied or explicit authorization for agent-generated reference; no unknown production authority; no unbounded cost.  
@@ -1250,7 +1255,7 @@ All secrets are server-only unless explicitly marked `NEXT_PUBLIC_`.
 ## Phase 1 — Repository/platform foundation + skeletal frontend deployment
 
 **Objective:** create the clean monorepo and navigable UI shell; deploy the first preview.  
-**Tasks:** inspect clean Git status; scaffold pnpm workspaces; create Next app routes and responsive shell; login placeholder, role-aware nav placeholders, loading/error/empty states clearly marked nonfunctional; API skeleton and health endpoint; configure Vercel frontend and Render API placeholder; configure safe Supabase project and CORS.  
+**Tasks:** inspect clean Git status; scaffold pnpm workspaces; create Next app routes and responsive shell; login placeholder, role-aware nav placeholders, loading/error/empty states clearly marked nonfunctional; API skeleton and health endpoint; configure Vercel frontend and Render API placeholder; configure safe Neon project and CORS.  
 **Expected files:** repo manifests, app shells, route placeholders, CI basics, `.env.example`, initial docs updates.  
 **DB/API/UI:** minimal health/profile route; no borrower data seeded beyond safe fixtures.  
 **Tests:** lint/typecheck/build; Playwright smoke for route navigation; `/health/live`; verify no secrets bundled.  
@@ -1260,7 +1265,7 @@ All secrets are server-only unless explicitly marked `NEXT_PUBLIC_`.
 ## Phase 2 — Backend/data/auth foundation
 
 **Objective:** set up database, auth, storage, encryption and job processing.  
-**Tasks:** Drizzle schema/migrations; Supabase Auth integration; role middleware; private bucket; encryption envelope service; audit hash/signature core; Postgres jobs queue and worker lease; Presidio service container and custom recognizers; health/readiness.  
+**Tasks:** Drizzle schema/migrations; Neon Auth integration; role middleware; private bucket; encryption envelope service; audit hash/signature core; Postgres jobs queue and worker lease; Presidio service container and custom recognizers; health/readiness.  
 **Tests:** migration tests; auth/RBAC; key wrap/unwrap; AES-GCM tamper; audit chain; job lease/retry; private storage.  
 **Acceptance:** no public data endpoints; role denial tests pass; test file stored as ciphertext; job resumes after worker restart.  
 **Commit:** `feat: add auth data and security foundations`.

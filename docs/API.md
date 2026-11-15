@@ -1,6 +1,6 @@
 # API Reference
 
-Base path: `/v1`. JSON, camelCase. Protected endpoints require a valid Supabase Auth bearer token. The full endpoint/role table and representative payloads are in `MASTER_BLUEPRINT.md` §10.
+Base path: `/v1`. JSON, camelCase. Protected endpoints require a valid Neon Auth bearer token. The full endpoint/role table and representative payloads are in `MASTER_BLUEPRINT.md` §10.
 
 ## Common response/error contract
 

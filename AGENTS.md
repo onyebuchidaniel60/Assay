@@ -10,7 +10,7 @@ Read `PROJECT_SPEC.md`, `ARCHITECTURE.md`, `IMPLEMENTATION_PLAN.md`, `OPERATOR_I
 
 ## One consolidated intake before coding
 
-Before modifying the repository, inspect repository/Git metadata and complete one consolidated Operator Intake/Readiness Check. Collect missing product inputs, user roles/workflows, business rules, reference image(s), assets and ownership, Vercel/Render/Supabase access, domains, environment variables/secrets, OpenServ/NEAR AI/OpenRouter/Reppo/Kite credentials, account permissions, webhook/sandbox details, quotas, costs, budgets, data handling, permitted actions, production authorization, demo audience/pronunciation/redactions/output directory. Do not ask for information already in source or environment. Use safe defaults only for noncritical omissions. Mark blockers vs optional. Do not start implementation before critical input and reference image requirements pass.
+Before modifying the repository, inspect repository/Git metadata and complete one consolidated Operator Intake/Readiness Check. Collect missing product inputs, user roles/workflows, business rules, reference image(s), assets and ownership, Vercel/Render/Neon access, domains, environment variables/secrets, OpenServ/NEAR AI/OpenRouter/Reppo/Kite credentials, account permissions, webhook/sandbox details, quotas, costs, budgets, data handling, permitted actions, production authorization, demo audience/pronunciation/redactions/output directory. Do not ask for information already in source or environment. Use safe defaults only for noncritical omissions. Mark blockers vs optional. Do not start implementation before critical input and reference image requirements pass.
 
 ## Authorization boundaries
 
@@ -23,7 +23,7 @@ Execute Phases 1–9 sequentially. At each checkpoint: implement → test → in
 ## Fixed architecture and product constraints
 
 - Product: Assay, synthetic-data MVP for one maximum Debt/Adjusted EBITDA covenant.
-- Stack: pnpm workspaces; Next.js 16.x + TS frontend; Fastify 5.x + TS API; Supabase Postgres/Auth/private Storage; Render API/Presidio; Vercel frontend; Python Presidio; Circom/SnarkJS; no Railway.
+- Stack: pnpm workspaces; Next.js 16.x + TS frontend; Fastify 5.x + TS API; Neon Postgres/Auth/private Storage; Render API/Presidio; Vercel frontend; Python Presidio; Circom/SnarkJS; no Railway.
 - Postgres jobs table is the queue. No Redis/Kafka/Kubernetes without an approved architectural change.
 - Deterministic code performs arithmetic, business rules, approval checks, audit verification and spending policy. No LLM can calculate authoritatively, approve or pay.
 - SERV reasoning is a core bounded reasoning layer; do not bypass it and still claim SERV completion.

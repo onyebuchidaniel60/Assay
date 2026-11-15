@@ -11,11 +11,14 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     env:
       NEXT_TELEMETRY_DISABLED: "1"
       APP_ENV: test
       CORS_ALLOWED_ORIGINS: http://localhost:3000
+      DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/assay
+      NEON_AUTH_BASE_URL: https://example.invalid/api/auth
+      NEON_AUTH_COOKIE_SECRET: ci-build-placeholder-secret-at-least-32-chars
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -34,28 +37,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build workspace packages
+        run: pnpm --filter @assay/domain --filter @assay/crypto --filter @assay/contracts --filter @assay/storage --filter @assay/proof --filter @assay/db build
+
       - name: Typecheck
         run: pnpm typecheck
 
       - name: Unit and integration tests
         run: pnpm test
 
-      - name: Build
-        run: pnpm build
-
-  dependency-audit:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.34.5
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - name: Audit production dependencies
-        run: pnpm audit --prod --audit-level=high
-        continue-on-error: true
+      - name: Build applications
+        run: pnpm --filter @assay/api --filter @assay/web build

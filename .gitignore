@@ -46,3 +46,8 @@ artifacts/demo/*.mp4.tmp
 
 # Proof build artifacts (generated locally)
 packages/proof/build/
+
+# Python
+__pycache__/
+*.pyc
+.venv/

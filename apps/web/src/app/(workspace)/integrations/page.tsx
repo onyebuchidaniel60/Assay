@@ -35,9 +35,16 @@ export default function IntegrationsPage() {
     {
       name: "Neon / Postgres",
       role: "Canonical data + jobs",
-      configured: presence(process.env.DATABASE_URL) || presence(process.env.NEON_DATABASE_URL),
-      state: "Credential absent",
-      detail: "Phase 2 requires a real connection string, migrations and tenant-scoped repositories.",
+      configured: presence(process.env.DATABASE_URL),
+      state: "Configured · migrations applied",
+      detail: "24 Drizzle tables applied to Neon PostgreSQL 18.7; tenant-scoped repositories and the SKIP LOCKED worker are wired.",
+    },
+    {
+      name: "Neon Auth",
+      role: "Invite-only staff authentication",
+      configured: presence(process.env.NEON_AUTH_BASE_URL) && presence(process.env.NEON_AUTH_COOKIE_SECRET),
+      state: "Configured · sign-in verified",
+      detail: "Managed Better Auth proxies through /api/auth; Fastify validates the session server-side and resolves organization membership.",
     },
     {
       name: "Presidio",
@@ -110,8 +117,8 @@ export default function IntegrationsPage() {
         <section className="rounded-3xl border border-line bg-paper p-5">
           <SectionLabel>Deployment</SectionLabel>
           <div className="mt-3 space-y-2 text-sm">
-            <p className="flex items-center justify-between"><span className="text-muted">Vercel</span><span className="font-semibold">CLI access verified</span></p>
-            <p className="flex items-center justify-between"><span className="text-muted">Render</span><span className="font-semibold">Access credential absent</span></p>
+            <p className="flex items-center justify-between"><span className="text-muted">Vercel</span><span className="font-semibold">Preview shell verified</span></p>
+            <p className="flex items-center justify-between"><span className="text-muted">Render</span><span className="font-semibold">Deferred to Phase 5 (Option B)</span></p>
             <p className="flex items-center justify-between"><span className="text-muted">Production</span><span className="font-semibold">Authorized after gates</span></p>
           </div>
           <Link href="/settings" className="mt-4 inline-flex items-center gap-1 text-xs font-semibold underline decoration-line underline-offset-4 hover:text-ink">Workspace settings <ArrowUpRight className="size-3.5" /></Link>

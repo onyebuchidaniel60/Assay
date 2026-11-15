@@ -8,10 +8,10 @@ A pnpm monorepo containing a Next.js web UI, Fastify API, Python Presidio servic
 
 ```text
 Browser / Next.js 16.x (Vercel)
-  -> HTTPS API + Supabase Auth JWT
+  -> HTTPS API + Neon Auth JWT
 Fastify API / Node.js 24 LTS (Render)
-  -> Supabase Postgres (canonical data + queue)
-  -> Supabase private Storage (ciphertext only)
+  -> Neon Postgres (canonical data + queue)
+  -> private S3-compatible storage (ciphertext only)
   -> Presidio Python service (server-to-server token)
   -> OpenServ SERV reasoning API (orchestration)
        -> NEAR AI Cloud TEE-attested gateway (tokenized text only)
@@ -34,13 +34,13 @@ Worker loop inside API deployment
 
 - Web: Next.js 16.x, React, TypeScript, Tailwind CSS 4.x, shadcn/ui/Radix, Lucide, TanStack Query, Zod.
 - API: Fastify 5.x, TypeScript, Drizzle ORM, `pg`.
-- Data/Auth/Storage: Supabase Postgres, Supabase Auth, private Supabase Storage.
+- Data/Auth/Storage: Neon Postgres, Neon Auth, private S3-compatible storage.
 - Worker: Postgres jobs table; custom row-locking worker and leases.
 - PII: Python 3.12, Microsoft Presidio Analyzer/Anonymizer, custom recognizers, deployed in `REDUCED_PII_MODE` on the Render free tier (small spaCy model; not full `en_core_web_lg`).
 - PDF: `pdfjs-dist`, text layer only; scanned PDFs rejected.
 - Crypto: Node crypto AES-256-GCM, SHA-256, Ed25519.
 - Proof: Circom 2.x + SnarkJS fixed circuit.
-- Hosting: Vercel web preview; Render API and Presidio; Supabase Postgres/Auth/Storage. Railway is prohibited.
+- Hosting: Vercel web preview; Render API and Presidio; Neon Postgres/Auth and private S3-compatible storage. Railway is prohibited.
 - Tests: Vitest, API integration tests, Playwright E2E, static/dependency/security scans.
 
 ## SERV reasoning graph
@@ -83,7 +83,7 @@ Private witness: total debt and adjusted EBITDA minor units. Public input: coven
 
 - Vercel: frontend routes and static assets; preview deployment first.
 - Render: Fastify API and a `REDUCED_PII_MODE` Presidio-equivalent service; use free services only. The API worker runs in the same API service to avoid a separate paid worker tier for the MVP; Postgres is the durable queue. Full `en_core_web_lg` Presidio is not deployed on the 512 MB free tier.
-- Supabase: DB/Auth/Storage; free plan only for demo and subject to pause/size limits. Render free Postgres is not used because free DBs expire after 30 days.
+- Neon: Postgres and Auth; private S3-compatible storage holds encrypted objects. Free plan only for demo and subject to pause/size limits. Render free Postgres is not used because free DBs expire after 30 days.
 - No production release or paid-plan activation without explicit operator authorization.
 
 ## Failure handling

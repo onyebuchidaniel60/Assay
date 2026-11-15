@@ -21,7 +21,7 @@ Create clean pnpm monorepo, route-complete Next.js shell, responsive nav, login 
 
 ### Phase 2 — Backend/data/auth foundation
 
-Create Drizzle schema/migrations, Supabase Auth verification, profile roles, private bucket, encryption envelope service, signed audit chain, Postgres job queue/worker, `REDUCED_PII_MODE` Presidio-equivalent service/custom recognizers and readiness health checks.
+Create Drizzle schema/migrations, Neon Auth verification, profile roles, private bucket, encryption envelope service, signed audit chain, Postgres job queue/worker, `REDUCED_PII_MODE` Presidio-equivalent service/custom recognizers and readiness health checks.
 
 **Acceptance:** auth/RBAC tests pass; sample file stored as ciphertext; queue survives service restart; audit tamper tests pass.  
 **Commit:** `feat: add auth data and security foundations`.

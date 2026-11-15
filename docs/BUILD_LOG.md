@@ -8,7 +8,7 @@
 - **Commit:** None.
 - **Reference image:** Not supplied; critical blocker.
 - **Provider access:** SERV, NEAR AI, OpenRouter, Reppo and Kite credentials/terms require intake verification. Kite/Reppo remain optional until authorized.
-- **Hosting:** target Vercel frontend, Render API/Presidio, Supabase Postgres/Auth/Storage. No Railway.
+- **Hosting:** target Vercel frontend, Render API/Presidio, Neon Postgres/Auth/Storage. No Railway.
 - **Production authority:** not granted.
 - **Budget:** no new spend by default; stop before any paid tier/top-up/payment.
 - **Tests:** none yet; do not claim passes.
@@ -30,7 +30,7 @@
   - OpenRouter judgement: `openai/gpt-5.4-mini`; generation: `deepseek/deepseek-v3.2`.
 - **Vercel:** CLI 65.8.0 authenticated as `onyebuchidaniel60-1034`; team `uhhh2` (Hobby); no Assay project; preview permission not explicitly granted.
 - **Presidio blocker:** resolved by design. `REDUCED_PII_MODE` uses Presidio Analyzer with the small spaCy model plus deterministic custom financial recognizers; full `en_core_web_lg` is not deployed on Render free 512 MB; no paid upgrade. Phase 2 must validate RSS and use the deterministic recognizer-only fallback under the same label if needed.
-- **Critical blockers:** Tier A scope not confirmed; UI reference missing with no generation authorization; NEAR AI/OpenRouter/SERV keys, credits and live validation absent; Supabase project/keys/bucket absent; Render access absent; Vercel preview permission absent; budget remains `$0` new spend.
+- **Critical blockers:** Tier A scope not confirmed; UI reference missing with no generation authorization; NEAR AI/OpenRouter/SERV keys, credits and live validation absent; Neon project/keys/bucket absent; Render access absent; Vercel preview permission absent; budget remains `$0` new spend.
 - **Optional integrations:** Reppo disabled; Kite disabled with `$0` spend cap; Google TTS not configured.
 - **Tests:** no application tests exist; no pass claimed. The only executed checks are read-only Git, CLI, DNS/HTTP and environment-name checks.
 - **Preview URL:** none. **Deployed commit:** none.
@@ -124,9 +124,35 @@
   - Root `pnpm typecheck` → passed.
   - Root `pnpm test` → passed (domain 18, contracts 6, proof 3, API 4).
   - Root `pnpm build` → passed.
-- **Not implemented / not claimed:** database migrations, Supabase/Neon auth, private storage, job queue, live NEAR AI/OpenRouter/SERV adapters, Presidio service, ZK proof generation, API route integration and E2E application flows. These require the missing credentials and Phase 2 foundation.
+- **Not implemented / not claimed:** database migrations, Neon/Neon auth, private storage, job queue, live NEAR AI/OpenRouter/SERV adapters, Presidio service, ZK proof generation, API route integration and E2E application flows. These require the missing credentials and Phase 2 foundation.
 - **Blocker:** `.env.local` still contains only Kite variables; see `OPERATOR_INTAKE.md` §0.7. No live provider/database call was made.
 - **Next exact task:** restore credentials and auth/storage choice; implement Phase 2 schema/auth/storage/audit/jobs/PII; then verify NEAR AI attestation and OpenRouter model IDs before adapters.
+
+## 15 November 2026 — Phase 2 data/auth/storage foundation
+
+- **Phase:** 2 — backend/data/auth foundation. Neon is the sole data/auth layer; Supabase references and dependencies are removed.
+- **Environment presence (names only):** `DATABASE_URL`, `NEON_AUTH_BASE_URL`, `NEON_AUTH_API_KEY`, `NEON_AUTH_COOKIE_SECRET`, `NEON_STORAGE_BUCKET`, `AWS_ENDPOINT_URL_S3`, `AWS_REGION`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `NEARAI_API_KEY`, `NEARAI_MODEL`, `OPENROUTER_API_KEY`, `OPENROUTER_MODEL_JUDGEMENT`, `OPENROUTER_MODEL_GENERATION`, `SERV_REASONING_API_KEY`, `SERV_MODEL`, `REPPO_API_KEY`, `RENDER_API_KEY`, `DATA_KEK_BASE64`, `AUDIT_SIGNING_PRIVATE_KEY_BASE64`, `AUDIT_SIGNING_PUBLIC_KEY_BASE64`, `PRESIDIO_SERVICE_TOKEN`, Kite variables. All non-empty; no values printed.
+- **Neon connectivity:**
+  - `select version()` via `DATABASE_URL` → PostgreSQL 18.7.
+  - `NEON_AUTH_BASE_URL/ok` → HTTP 200 `{"ok":true}`.
+  - `aws s3 ls --endpoint-url "$AWS_ENDPOINT_URL_S3"` → private bucket `assay-private-documents` listed.
+- **Provider checks:**
+  - OpenRouter `openai/gpt-4o-mini` and `deepseek/deepseek-v3.2` both found in the catalog; live small request returned the exact judgement model ID.
+  - NEAR AI `z-ai/glm-5.3-flash` present with `verifiable=true` and `attestationSupported=true`; live extraction returned the exact model ID and valid JSON.
+  - NEAR AI official verifier: Intel TDX quote verified, NVIDIA NRAS verdict true, nonce binding true, gateway/model compose hashes matched; evidence report SHA-256 `ccbcd0be6d83bd688f8b58559275fd117101fcda50daa356a0650066fd71536c` (client nonce `ed9047ec…51e6`). Chat verifier also verified provider TEE attestation.
+  - SERV `gpt-5.4-mini` returned a versioned alias (`gpt-5.4-mini-2026-03-17`) and was not accepted; switched to catalog model `serv-standard`, which returns the exact configured ID and completed a live call.
+- **Database:** Drizzle schema with 24 tables and enums; migration `0000_melted_sabretooth.sql` applied. Tables include organizations, profiles, memberships, invitations, borrowers, facilities, documents/versions, extraction runs, covenant definitions/versions, financial evidence, assessments, verification runs, scenarios, cases/notes, memo drafts, approvals/decisions, signed audit events/heads, idempotency and jobs.
+- **Auth:** `@neon/auth` managed Better Auth wired in the Next.js app (`/api/auth/[...path]`, login server action, proxy protection) and Fastify session validation (`/v1/me`, role/org resolution). Verified analyst sign-in and session; unauth `/v1/me` 401; analyst audit verify 403; manager audit verify `VALID`.
+- **Storage:** `packages/storage` uses AWS SDK with `forcePathStyle=true` and `requestChecksumCalculation="WHEN_REQUIRED"`. Real private bucket put/read/head/presign/delete healthcheck passed.
+- **Encryption:** `packages/crypto` implements per-borrower AES-256-GCM DEK wrapping under `DATA_KEK_BASE64`, document byte encryption and Ed25519 audit signing. 4/4 tests pass, including tamper failure.
+- **Audit:** DB-backed append-only audit events with row-locked per-org sequence, SHA-256 chain and Ed25519 signature. Appended and verified a synthetic event; chain `VALID`.
+- **Jobs:** Postgres `jobs` table, idempotent enqueue, `FOR UPDATE SKIP LOCKED` claim, lease/reclaim, retry/dead-letter fields. Worker loop in the API completed a `healthcheck` job (status `SUCCEEDED`).
+- **Presidio:** Python FastAPI `REDUCED_PII_MODE` service with `en_core_web_sm` + custom reference/account/email recognizers. `/health` and `/tokenize` verified; Organization, reference, account and full email tokenized. Measured RSS ≈ 176 MB, below the 512 MB Render free-tier limit.
+- **Supabase removal:** no `SUPABASE_*` variables in `.env.example`/config, no `@supabase/*` dependency, no Supabase references in code or docs. Neon is the sole data layer; private object storage is S3-compatible.
+- **Render decision:** Option B recorded — defer Render deployment to Phase 5; Phases 2–4 run the API locally against Neon.
+- **Tests:** root typecheck/build pass; domain 18/18, contracts 6/6, proof 3/3, API 4/4; Playwright shell 10/10 with authenticated demo users.
+- **Preview:** Phase 1 preview remains the protected shell; it is not yet the Phase 2 authenticated preview. Production remains gated.
+- **Next exact task:** implement Phase 3 domain/API routes: borrower/facility CRUD, document upload/parse/redaction, NEAR AI extraction with attestation, OpenRouter/SERV reasoning, covenant review, evidence confirmation, assessment/verification, case/memo/approval and audit APIs; then Phase 4 UI wiring.
 
 ## Build log entry template
 

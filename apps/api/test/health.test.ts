@@ -27,7 +27,7 @@ describe("Assay API health", () => {
     expect(response.statusCode).toBe(503);
     const body = response.json();
     expect(body.status).toBe("degraded");
-    expect(body.checks.database).toBe("not_configured");
+    expect(body.checks.database).toBe("not_checked");
   });
 
   it("returns a safe unauthenticated envelope", async () => {

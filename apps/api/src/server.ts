@@ -1,6 +1,11 @@
+import "./env.js";
 import Fastify, { type FastifyError, type FastifyInstance } from "fastify";
 import cors from "@fastify/cors";
+import { createDb, sql, verifyOrganizationAudit } from "@assay/db";
 import { loadConfig } from "./config.js";
+import { resolveAuthUser } from "./auth.js";
+
+const db = createDb();
 
 export function buildServer(options: { env?: NodeJS.ProcessEnv } = {}): FastifyInstance {
   const config = loadConfig(options.env ?? process.env);
@@ -59,17 +64,24 @@ export function buildServer(options: { env?: NodeJS.ProcessEnv } = {}): FastifyI
   app.get("/health/ready", async (_request, reply) => {
     const checks: Record<string, string> = {
       config: "ok",
-      database: config.DATABASE_URL ? "configured" : "not_configured",
+      database: "not_checked",
       layer2: config.NEARAI_API_KEY ? "configured" : "not_configured",
       generalInference: config.OPENROUTER_API_KEY ? "configured" : "not_configured",
       serv: config.SERV_REASONING_API_KEY ? "configured" : "not_configured",
       pii: config.PRESIDIO_MODE,
     };
 
-    const ready = Boolean(config.DATABASE_URL);
-    if (!ready) {
-      reply.code(503);
+    let ready = Boolean(config.DATABASE_URL);
+    if (ready) {
+      try {
+        await db.execute(sql`select 1`);
+        checks.database = "ok";
+      } catch {
+        checks.database = "unavailable";
+        ready = false;
+      }
     }
+    if (!ready) reply.code(503);
 
     return {
       status: ready ? "ready" : "degraded",
@@ -78,15 +90,33 @@ export function buildServer(options: { env?: NodeJS.ProcessEnv } = {}): FastifyI
     };
   });
 
-  app.get("/v1/me", async (_request, reply) => {
-    reply.code(401);
-    return {
-      error: {
-        code: "UNAUTHENTICATED",
-        message: "Authentication is not wired in the Phase 1 shell.",
-        requestId: "request-id-placeholder",
-      },
-    };
+  app.get("/v1/me", async (request, reply) => {
+    const user = await resolveAuthUser(request, reply);
+    if (!user) {
+      reply.code(401);
+      return {
+        error: {
+          code: "UNAUTHENTICATED",
+          message: "Sign in with an invited staff account.",
+          requestId: String(request.id),
+        },
+      };
+    }
+    return { data: { user, capabilities: {} }, meta: { requestId: String(request.id) } };
+  });
+
+  app.get("/v1/audit/verify", async (request, reply) => {
+    const user = await resolveAuthUser(request, reply);
+    if (!user) {
+      reply.code(401);
+      return { error: { code: "UNAUTHENTICATED", message: "Sign in first.", requestId: String(request.id) } };
+    }
+    if (!["CREDIT_MANAGER", "ORG_ADMIN", "AUDITOR"].includes(user.role)) {
+      reply.code(403);
+      return { error: { code: "FORBIDDEN", message: "Audit verification permission is required.", requestId: String(request.id) } };
+    }
+    const result = await verifyOrganizationAudit(db, user.organizationId);
+    return { data: result, meta: { requestId: String(request.id) } };
   });
 
   app.setNotFoundHandler(async (_request, reply) => {

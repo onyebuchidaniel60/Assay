@@ -4,7 +4,7 @@ See `MASTER_BLUEPRINT.md` §13 for the risk/mitigation matrix. This file records
 
 ## Identity and access
 
-- Signed Supabase JWT verified by API; current profile role checked server-side.
+- Signed Neon JWT verified by API; current profile role checked server-side.
 - Invite-only accounts; no public signup.
 - Resource ownership and role checks in API/service layer, not UI alone.
 - Role-shaped response DTOs prevent raw amount leakage into Manager/Auditor views.

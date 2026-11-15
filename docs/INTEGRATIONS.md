@@ -55,9 +55,9 @@ Kite documentation describes passkey-approved spending sessions with a per-payme
 
 Use Microsoft Presidio Analyzer and Anonymizer with the small spaCy model plus deterministic custom recognizers for the demo’s borrower reference, loan/facility reference and account-like patterns. The deployed service is labelled `REDUCED_PII_MODE`; it is not full-strength Presidio and must not be described as such. Full `en_core_web_lg` is not deployed on Render’s free 512 MB web service. Analysts must review redaction; unresolved cases block model calls. No paid Render upgrade is authorized.
 
-## Supabase — mandatory platform dependency
+## Neon — mandatory data/auth dependency
 
-Auth, Postgres and private Storage. Service-role/database secrets remain server-only. Preview and development use separate projects. No public object bucket.
+Neon provides Postgres and managed Better Auth. Private S3-compatible storage holds encrypted documents and exports. Database/auth secrets remain server-only. Preview and development use separate projects/branches. No public object bucket.
 
 ## Vercel — frontend preview
 
@@ -65,7 +65,7 @@ Hobby/free plan only unless the operator raises the budget. Preview deployment r
 
 ## Render — API and Presidio host
 
-Free web services only; 512 MB RAM, no persistent local disk and possible sleep. Persistent data belongs in Supabase. Free Render Postgres is not used because it expires after 30 days. No paid plan, disk or add-on without explicit budget authority.
+Free web services only; 512 MB RAM, no persistent local disk and possible sleep. Persistent data belongs in Neon. Free Render Postgres is not used because it expires after 30 days. No paid plan, disk or add-on without explicit budget authority.
 
 ## Google Gemini TTS — demo only
 
@@ -73,5 +73,5 @@ Check current official Gemini TTS model availability and free-tier limits on the
 
 ## Disabled by default
 
-- Reppo: no key/quota and no synthetic-feedback authorization.
-- Kite: no account/session/testnet authority; spend cap `$0`.
+- Reppo: optional; enable only after synthetic-data authorization.
+- Kite: testnet session enabled; payment path is provider-blocked and the over-cap policy rejection is verified.

@@ -1,4 +1,12 @@
 import type { NextConfig } from "next";
+import { loadEnvFile } from "node:process";
+import { fileURLToPath } from "node:url";
+
+try {
+  loadEnvFile(fileURLToPath(new URL("../../.env.local", import.meta.url)));
+} catch {
+  // Production deployments inject environment variables through the platform.
+}
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,

@@ -53,7 +53,7 @@ See:
 
 ## Developer quick start
 
-Prerequisites: Node.js 24 LTS, pnpm, Python 3.12, Docker (for local Supabase/Presidio where used), Circom 2.x and SnarkJS. Exact patch versions are pinned in lockfiles and image definitions.
+Prerequisites: Node.js 24 LTS, pnpm, Python 3.12 for the Presidio service, Docker where containerized services are used, Circom 2.x and SnarkJS. Neon provides the managed Postgres/Auth layer. Exact patch versions are pinned in lockfiles and image definitions.
 
 ```bash
 pnpm install
@@ -63,7 +63,7 @@ pnpm build
 pnpm dev
 ```
 
-`pnpm dev` starts the Next.js shell on `http://localhost:3000` and the Fastify API on `http://localhost:3001`. Database migrations and provider adapters are added in Phase 2/3; the Phase 1 shell is read-only. Use `.env.example` as a variable catalogue; copy it to `.env.local` only for local work and never commit the real file. The API validates variables at startup.
+`pnpm dev` starts the Next.js app on `http://localhost:3000` and the Fastify API on `http://localhost:3001`. Neon Postgres/Auth, private S3-compatible storage, encryption, signed audit events, the Postgres job worker and the `REDUCED_PII_MODE` Presidio service are wired. Covenant domain/API routes are the next Phase 3 deliverable. Use `.env.example` as a variable catalogue; copy it to `.env.local` only for local work and never commit the real file. The API validates variables at startup.
 
 Phase 1 preview: **https://assay-guyo5yh6z-uhhh2.vercel.app** (protected by Vercel Authentication). It is a labelled shell, not a live covenant engine.
 
@@ -79,7 +79,7 @@ README and `docs/` are maintained alongside functionality. The final submission 
 
 ## Project status
 
-Phase 1 is implemented: a pnpm monorepo with a route-complete Next.js shell, a Fastify health/API foundation, CI, unit tests and 10 Playwright shell tests. The Vercel preview is deployed and protected. Phase 2 is blocked until the authorized provider/database credentials are present in `.env.local`; see `OPERATOR_INTAKE.md` §0.7 and `AI_HANDOFF.md`. Check `docs/BUILD_LOG.md` for exact test and deployment evidence.
+Phases 1–2 are implemented: a pnpm monorepo with a route-complete Next.js shell, Fastify API foundation, Neon Postgres/Auth, private S3-compatible storage, envelope encryption, signed audit chain, Postgres job worker, `REDUCED_PII_MODE` Presidio service, CI and tests. NEAR AI, OpenRouter and SERV live checks passed; Kite testnet is enabled with the payment path provider-blocked. The protected Vercel Phase 1 preview remains online. Phase 3 domain/API routes are next. Check `docs/BUILD_LOG.md` and `AI_HANDOFF.md` for exact evidence.
 
 ## License
 

@@ -80,7 +80,7 @@ The operator authorized Phases 1–9, Tier A, Vercel preview and production, Ren
 
 It does **not** contain any of the following authorized-provider or database variables:
 
-`NEARAI_API_KEY`, `NEARAI_MODEL`, `OPENROUTER_API_KEY`, `OPENROUTER_MODEL_JUDGEMENT`, `OPENROUTER_MODEL_GENERATION`, `SERV_REASONING_API_KEY`, `SERV_MODEL`, `DATABASE_URL`/`NEON_DATABASE_URL`, `REPPO_API_KEY`, `RENDER_API_KEY`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_STORAGE_BUCKET`.
+`NEARAI_API_KEY`, `NEARAI_MODEL`, `OPENROUTER_API_KEY`, `OPENROUTER_MODEL_JUDGEMENT`, `OPENROUTER_MODEL_GENERATION`, `SERV_REASONING_API_KEY`, `SERV_MODEL`, `DATABASE_URL`/`NEON_DATABASE_URL`, `REPPO_API_KEY`, `RENDER_API_KEY`, `NEON_AUTH_BASE_URL`, `NEON_AUTH_API_KEY`, `NEON_AUTH_COOKIE_SECRET`, `NEON_STORAGE_BUCKET`.
 
 Process-environment checks also show none of these names. The `.env.local` file was last written during the Kite setup; if provider values were added before that write, they may have been overwritten. Re-add them out-of-band; do not paste values into chat.
 
@@ -110,7 +110,7 @@ Process-environment checks also show none of these names. The `.env.local` file 
 
 The following names were checked in the process environment and relevant local configuration; **no values were printed**:
 
-`NEARAI_API_KEY`, `OPENROUTER_API_KEY`, `SERV_REASONING_API_KEY`, `OPENSERV_API_KEY`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `DATABASE_URL`, `RENDER_API_KEY`, `PRESIDIO_SERVICE_TOKEN`, `REPPO_API_KEY`, `KITE_*`, `DATA_KEK_BASE64`, `AUDIT_SIGNING_PRIVATE_KEY_BASE64`.
+`NEARAI_API_KEY`, `OPENROUTER_API_KEY`, `SERV_REASONING_API_KEY`, `OPENSERV_API_KEY`, `NEON_AUTH_BASE_URL`, `NEON_AUTH_API_KEY`, `NEON_AUTH_COOKIE_SECRET`, `DATABASE_URL`, `RENDER_API_KEY`, `PRESIDIO_SERVICE_TOKEN`, `REPPO_API_KEY`, `KITE_*`, `DATA_KEK_BASE64`, `AUDIT_SIGNING_PRIVATE_KEY_BASE64`.
 
 **Result:** none of these Assay-scoped variables is present in the process environment.
 
@@ -177,17 +177,18 @@ Additional observations:
 | Environment variables | No | `REMOVED` | No Dolphin variables in Assay config; `.env.example` will not include them |
 | Historical references | No | `SUPERSEDED` | Old blueprint text is historical; this intake is authoritative |
 
-### 2.5 Supabase
+### 2.5 Neon
 
 | Item | Required? | Status | Evidence / action |
 |---|---:|---|---|
-| Project URL | Yes | `ABSENT` | No Supabase project URL in environment or repo |
-| Anon key | Yes | `ABSENT` | No `NEXT_PUBLIC_SUPABASE_ANON_KEY` |
-| Service role key | Yes | `ABSENT` | No server-side service-role key |
-| Database URL | Yes | `ABSENT` | No Postgres connection string |
-| Private bucket | Yes | `NOT PROVISIONED` | Target name `assay-private-documents`; no bucket verified |
-| Project access | Yes | `BLOCKED` | No Supabase CLI/config/access token; free plan only |
-| Plan / quota | Yes | `UNKNOWN` | Must verify free-tier limits and pause behavior |
+| Auth base URL | Yes | `PRESENT` | `NEON_AUTH_BASE_URL` non-empty; `/ok` returned HTTP 200 |
+| Auth API key | Yes | `PRESENT` | `NEON_AUTH_API_KEY` non-empty; server-only |
+| Auth cookie secret | Yes | `GENERATED` | `NEON_AUTH_COOKIE_SECRET` generated locally and stored outside Git |
+| Database URL | Yes | `VALIDATED` | `DATABASE_URL` non-empty; `select version()` returned PostgreSQL 18.7 |
+| Private bucket | Yes | `VALIDATED` | S3 listing returned `assay-private-documents` |
+| Project access | Yes | `VALIDATED` | Connection string, auth endpoint and S3 bucket all reachable |
+| Plan / quota | Yes | `UNKNOWN` | Verify Neon plan limits/pause behavior; no paid upgrade authorized |
+| S3 credentials | Yes | `PRESENT` | AWS endpoint/region/key names non-empty; secret values not printed |
 
 ### 2.6 Vercel
 
@@ -205,7 +206,7 @@ Additional observations:
 |---|---:|---|---|
 | Account/service access | Yes | `BLOCKED` | No Render CLI, API key or account session |
 | Free web-service limits | Yes | `DOCUMENTED` | 512 MB RAM; free instances may sleep; no persistent local disk |
-| Free Postgres | No | `REJECTED` | Free databases expire after 30 days; Supabase Postgres is the persistent store |
+| Free Postgres | No | `REJECTED` | Free databases expire after 30 days; Neon Postgres is the persistent store |
 | API service | Yes | `BLOCKED` | Must be created/verified after authorization |
 | Presidio service | Yes | `RESOLUTION RECORDED` | See §0.6; reduced Presidio-equivalent mode selected |
 | Paid upgrade | No | `NOT AUTHORIZED` | No paid Render plan, disk or add-on |
@@ -271,7 +272,7 @@ The reference asset gate is **PASSED** for implementation. Do not copy the sourc
 | NEAR AI | Key, starter credit, TEE-verifiable model and fresh attestation test validated | **AUTHORIZED — credentials absent** |
 | OpenRouter | Key, model IDs, credits and live test validated | **AUTHORIZED — credentials absent** |
 | SERV / OpenServ | Key, catalog entry, credits and harmless call validated | **AUTHORIZED — credentials absent** |
-| Database/Neon | Connection string, auth/storage configuration and migrations verified | **AUTHORIZED — credentials absent** |
+| Database/Neon | Connection string, auth/storage configuration and migrations verified | **PASS — connectivity verified; migrations pending** |
 | Vercel | Project access and preview deployment permission verified | **PASS (CLI access + authorization)** |
 | Render | API and Presidio service access verified; free-tier fit confirmed | **AUTHORIZED — credentials absent** |
 | Presidio | Deployment blocker resolved and recorded | **RESOLVED** |
@@ -285,16 +286,17 @@ The reference asset gate is **PASSED** for implementation. Do not copy the sourc
 
 ---
 
-## 4. Exact operator action required
+## 4. Current readiness and operator follow-up
 
-Authorization is recorded. The remaining action is to restore the authorized credential values to `.env.local` (or the approved secret store), out-of-band:
+Credentials are now present in `.env.local`. Verified on 15 November 2026:
 
-1. `NEARAI_API_KEY` + confirmed `NEARAI_MODEL` (proposed `z-ai/glm-5.3-flash`) and starter-credit amount.
-2. `OPENROUTER_API_KEY` + confirmed `OPENROUTER_MODEL_JUDGEMENT` and `OPENROUTER_MODEL_GENERATION`.
-3. `SERV_REASONING_API_KEY` + confirmed `SERV_MODEL` and credit balance.
-4. `DATABASE_URL`/`NEON_DATABASE_URL` (and any auth/storage/Supabase keys required by the chosen auth path).
-5. `RENDER_API_KEY`/service access for the free API and Presidio services.
-6. `REPPO_API_KEY` if Reppo is to be enabled (optional).
-7. Confirm the exact auth/storage architecture: the original blueprint specifies Supabase Auth/Storage; the authorization message names Neon. Record which provider supplies auth and object storage before Phase 2.
+- PostgreSQL 18.7 via `DATABASE_URL`.
+- `NEON_AUTH_BASE_URL/ok` returns HTTP 200.
+- Private S3 bucket `assay-private-documents` lists successfully.
+- OpenRouter judgement `openai/gpt-4o-mini` and generation `deepseek/deepseek-v3.2` exist in the catalog.
+- NEAR AI `z-ai/glm-5.3-flash` is present, `verifiable=true`, `attestationSupported=true`; a model attestation passed Intel TDX and NVIDIA NRAS checks.
+- Internal secrets generated locally: `NEON_AUTH_COOKIE_SECRET`, `BETTER_AUTH_SECRET`, `DATA_KEK_BASE64`, `AUDIT_SIGNING_PRIVATE_KEY_BASE64`, `AUDIT_SIGNING_PUBLIC_KEY_BASE64`, `PRESIDIO_SERVICE_TOKEN`.
 
-Do not paste values into chat or commit them. Phase 1 local scaffolding may proceed, but live database/auth/provider integration, full preview and release cannot be honestly completed until the credentials and auth/storage choice are present.
+**Render decision:** Option B — defer Render to Phase 5. Phases 2–4 run the API locally against Neon. No Render deployment is claimed yet.
+
+**Remaining operator follow-up:** confirm the Neon plan/quota and attach the exact reference-image license text; no paid upgrade is authorized.

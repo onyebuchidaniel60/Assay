@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { ArrowLeft, ArrowUpRight, KeyRound, LockKeyhole } from "lucide-react";
 import { StatusBadge } from "@/components/status-badge";
+import { signIn } from "./actions";
 
 export const metadata = { title: "Sign in" };
 
-export default function LoginPage() {
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+  const { error } = await searchParams;
   return (
     <main className="grid min-h-screen lg:grid-cols-[1fr_0.85fr]">
       <section className="flex flex-col justify-between px-5 py-6 sm:px-8 lg:px-14 lg:py-10">
@@ -25,7 +27,14 @@ export default function LoginPage() {
             Assay accounts are provisioned by a workspace administrator. Public signup is disabled.
           </p>
 
-          <form className="mt-8 space-y-5" action="/dashboard">
+          {error ? (
+            <div role="alert" className="mt-6 rounded-xl border border-danger/25 bg-danger/10 px-4 py-3 text-sm text-danger">
+              {error === "missing"
+                ? "Enter your work email and password."
+                : "The email or password did not match an active invited account."}
+            </div>
+          ) : null}
+          <form className="mt-8 space-y-5" action={signIn}>
             <div>
               <label htmlFor="email" className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-muted">
                 Work email
@@ -59,14 +68,14 @@ export default function LoginPage() {
               type="submit"
               className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-ink px-4 py-3 text-sm font-semibold text-paper transition hover:bg-ink-soft"
             >
-              Continue to preview <ArrowUpRight className="size-4" />
+              Sign in <ArrowUpRight className="size-4" />
             </button>
           </form>
 
           <div className="mt-6 rounded-2xl border border-dashed border-ink/20 bg-paper/60 p-4 text-xs leading-5 text-muted">
-            <span className="mb-1 block font-semibold text-ink">Phase 1 shell</span>
-            Authentication is not wired yet. The form is a preview; use the preview workspace link to inspect the route shell.
-            Supabase/Neon authentication is configured in Phase 2.
+            <span className="mb-1 block font-semibold text-ink">Neon Auth · invite-only</span>
+            Sign-in is handled server-side by Neon managed Better Auth. Public signup remains disabled. Use an invited synthetic
+            staff account; contact the workspace administrator if you do not have one.
           </div>
         </div>
 

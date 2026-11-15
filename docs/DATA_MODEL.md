@@ -4,7 +4,7 @@ PostgreSQL is canonical. Full field definitions, constraints and relationships a
 
 Main tables:
 
-- `profiles` — Supabase Auth identity + Assay role/status.
+- `profiles` — Neon Auth identity + Assay role/status.
 - `borrowers` — synthetic borrower aliases/reference tokens.
 - `facilities` — credit facility attached to borrower.
 - `documents` — encrypted object metadata and lifecycle status.

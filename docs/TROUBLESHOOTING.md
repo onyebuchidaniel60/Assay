@@ -3,8 +3,8 @@
 | Symptom | Likely cause | Safe response |
 |---|---|---|
 | Frontend cannot reach API | API sleeping, wrong `API_PUBLIC_URL`, CORS mismatch | Check Render service health and exact origin allowlist; do not use wildcard CORS. |
-| API readiness fails | DB credentials, Supabase pause, migration mismatch | Inspect safe health logs and provider dashboard; never print secrets. |
-| Login works but API returns 401 | Expired JWT, wrong Supabase project/issuer, JWKS config | Verify token issuer/audience and project config; re-authenticate. |
+| API readiness fails | DB credentials, Neon pause, migration mismatch | Inspect safe health logs and provider dashboard; never print secrets. |
+| Login works but API returns 401 | Expired JWT, wrong Neon project/issuer, JWKS config | Verify token issuer/audience and project config; re-authenticate. |
 | User receives 403 | Missing/disabled profile or insufficient role | Check profile role/status through Admin path; do not change role from browser. |
 | PDF upload rejected | File too large, wrong magic bytes, >40 pages, scanned/encrypted | Use a text-based PDF/TXT under limits; OCR is out of scope. |
 | Redaction service unreachable | Presidio sleep/deploy/token mismatch | Check service health and shared token; no inference request until redaction confirmed. |

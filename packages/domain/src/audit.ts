@@ -60,7 +60,10 @@ export function verifyAuditChain(events: AuditEvent[]): AuditVerification {
     return { result: "UNAVAILABLE", checkedCount: 0, firstFailedSequence: null, recoveredHead: null };
   }
   const sorted = [...events].sort((a, b) => a.sequenceNo - b.sequenceNo);
-  let previousHash = sorted[0]?.sequenceNo === 1 ? "GENESIS" : sorted[0]?.previousHash ?? "GENESIS";
+  let previousHash = sorted[0]?.previousHash ?? "GENESIS";
+  if (previousHash.trim() !== "GENESIS" && !/^[0-9a-f]{64}$/.test(previousHash)) {
+    return { result: "INVALID", checkedCount: sorted.length, firstFailedSequence: sorted[0]?.sequenceNo ?? null, recoveredHead: null };
+  }
   let expectedSequence = sorted[0]?.sequenceNo ?? 1;
   for (const event of sorted) {
     if (event.sequenceNo !== expectedSequence) {
