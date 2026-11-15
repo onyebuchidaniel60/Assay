@@ -11,7 +11,7 @@ import {
   type SealedColumns,
 } from "@assay/crypto";
 import type { AssayDb } from "./client.js";
-import { auditEvents, auditHeads, borrowerKeys } from "./schema.js";
+import { auditEvents, auditHeads, borrowerKeys, profiles } from "./schema.js";
 
 export type AuditActor = {
   organizationId: string;
@@ -235,6 +235,7 @@ export type AuditEventView = {
   eventType: string;
   actorType: string;
   actorId: string | null;
+  actorName: string | null;
   entityType: string;
   entityId: string;
   metadata: Record<string, unknown>;
@@ -251,17 +252,19 @@ export async function listBorrowerAuditEvents(
   limit = 100,
 ): Promise<AuditEventView[]> {
   const rows = await db
-    .select()
+    .select({ event: auditEvents, actorName: profiles.displayName })
     .from(auditEvents)
+    .leftJoin(profiles, eq(profiles.userId, auditEvents.actorId))
     .where(and(eq(auditEvents.organizationId, organizationId), eq(auditEvents.borrowerId, borrowerId)))
     .orderBy(asc(auditEvents.sequenceNo))
     .limit(Math.max(1, Math.min(500, limit)));
-  return rows.map((row) => ({
+  return rows.map(({ event: row, actorName }) => ({
     id: row.id,
     sequenceNo: Number(row.sequenceNo),
     eventType: row.eventType,
     actorType: row.actorType,
     actorId: row.actorId,
+    actorName: actorName ?? null,
     entityType: row.entityType,
     entityId: row.entityId,
     metadata: row.metadata,

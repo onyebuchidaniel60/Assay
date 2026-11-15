@@ -16,6 +16,7 @@ type AuditEvent = {
   eventType: string;
   actorType: string;
   actorId: string | null;
+  actorName: string | null;
   entityType: string;
   entityId: string;
   metadata: Record<string, unknown>;
@@ -153,7 +154,7 @@ export default async function AuditPage({
                         <span className="mt-0.5 block text-[10px] text-muted">{event.signature ? "signed" : "unsigned"}</span>
                       </td>
                       <td className="px-3 py-4 text-xs">
-                        {event.actorType === "SYSTEM" ? "SYSTEM" : (me?.user.name ?? event.actorId?.slice(0, 8))}
+                        {event.actorType === "SYSTEM" ? "SYSTEM" : (event.actorName ?? event.actorId?.slice(0, 8))}
                       </td>
                       <td className="px-3 py-4 text-xs text-muted">{event.entityType} · {event.entityId.slice(0, 8)}</td>
                       <td className="px-3 py-4">
