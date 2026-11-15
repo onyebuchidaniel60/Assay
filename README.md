@@ -81,7 +81,7 @@ Phase 1 preview: **https://assay-guyo5yh6z-uhhh2.vercel.app** (protected by Verc
 
 ## Documentation and demo
 
-README and `docs/` are maintained alongside functionality. The final submission includes a real, reviewed demo video under `artifacts/demo/` (maximum 180 seconds), its script, captions and production notes. The video must show real application behavior and must not present fixtures as live provider results.
+README and `docs/` are maintained alongside functionality. The demo is at [`artifacts/demo/assay-demo.mp4`](artifacts/demo/assay-demo.mp4) (113.5 s, 1080p). It uses real Playwright capture, local free TTS, burned captions and synthetic data only; the script, narration, captions and production notes are beside it. The deployed preview is authenticated and uses the live Render API and Neon database.
 
 ## Project status
 

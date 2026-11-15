@@ -196,6 +196,22 @@
 - **Tests:** root typecheck/build pass; unit suites unchanged at domain 18/18, crypto 4/4, contracts 6/6, document 8/8, proof 3/3, AI 10/10, API 4/4; local Playwright 18/18.
 - **Next:** Phase 6 visual refinement (`stageshow` attempt), final demo-data setup, demo video, and the remaining Phase 9 checks (production-mode shred, proof mutation, full IDOR matrix, secret scan in CI).
 
+## 16 November 2026 — Phase 6 visual pass, demo video and final hardening
+
+- **Phase:** 6 — visual refinement and demo; remaining Phase 9 checks.
+- **`stageshow` attempt:** `npx skills add benjitaylor/skills --skill stageshow` succeeded; installed at `.agents/skills/stageshow` with Gen Safe / Socket 0 alerts / Snyk Low Risk. The skill is for authored faux product UI; it was not used to replace the real authenticated screens. Its restraint/focal-hierarchy/crop principles were applied instead. Deviation recorded in `docs/DESIGN_NOTES.md` and `REFERENCE_ASSETS.md`.
+- **UI refinements:** removed stale Phase 1 placeholders, added live status badge, attestation evidence panel, actor-name resolution in audit events, active/denied/empty states, and real manager/auditor role-shaped views. No inert primary controls remain.
+- **Demo video:** `artifacts/demo/assay-demo.mp4`, 113.5 s, 1920×1080/30 fps H.264 + AAC. Real Playwright capture against the local Next.js app backed by the deployed Render API. Scenes: dashboard, facility, analysis/attestation/scenarios/proof, real manager approval with risk acknowledgement, auditor chain verification, honest provider status. The approval moved synthetic BOR-013 from `READY_FOR_MANAGER` to `APPROVED` during capture.
+- **TTS:** no Google AI/TTS credential was present and no paid TTS was activated. Narration uses genuinely free local `espeak-ng` (`en-us+f3`, 158 wpm). Audio measured mean −16.3 dB, max −0.3 dB. Script, narration and captions are saved beside the MP4.
+- **Video verification:** `ffprobe` confirms 113.5 s, 1920×1080, 30 fps, H.264 High/yuv420p + AAC mono. Representative frames were extracted and inspected; captions are legible and no secrets or raw manager amounts are shown.
+- **Hardening evidence:**
+  - XSS probe: borrower alias `<script>alert(1)</script>` rendered escaped (`&lt;script&gt;…`) and the raw tag was absent; probe record deleted.
+  - SQL-injection probe: reference token `BOR' OR '1'='1` rejected `422 VALIDATION_ERROR`.
+  - Secret scan: no environment/credential files tracked; no key/private-key/connection-string patterns in tracked files. Added `scripts/check-secrets.sh` to CI.
+  - Production/demo shred denial, Kite over-cap/provider-blocked, CORS denial, upload magic bytes, auth/role boundaries, audit tamper and concurrent approval were previously verified.
+- **Remaining gaps:** proof-mutation on a fresh pending run, full cross-tenant IDOR matrix, token expiry/revocation, prompt-injection fixture, and concurrent-approval stress on the final deployed commit are documented as residual Phase 9 checks rather than claimed passing.
+- **Final demo data:** BOR-004/005/006/013 approved; failed BOR-007–012/014 removed. BOR-013’s approval is the one captured in the video. No real borrower data exists.
+
 ## Build log entry template
 
 For every checkpoint add:

@@ -37,6 +37,13 @@ Assay should use the reference's editorial confidence and data density, but adap
 - Manager and auditor views must remain role-shaped and must not expose raw financial values by default.
 - No Carry brand assets, wordmark, copy, or protected trade dress may be reused.
 
+## Implemented interpretation (Phases 4–6)
+
+- Editorial display headings, compact uppercase labels, thin rules and paper/ink surfaces applied across all workspace routes.
+- Acid yellow used for active navigation, selection and proof emphasis; status badges always carry text and a dot.
+- Dashboard metrics, borrower/facility registers, staged analysis detail, restricted manager queue, audit table and integration status use the reference's density and hierarchy without copying branding or copy.
+- `stageshow` was installed during Phase 6 and its craft principles (restraint, focal hierarchy, hard crops) were applied only to real screens; faux UI/mock cursor compositions were rejected because they conflict with the real-action rule. See `docs/DESIGN_NOTES.md`.
+
 ## Inspection checklist
 
 - [x] Exact paths recorded.

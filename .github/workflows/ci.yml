@@ -37,6 +37,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Secret hygiene
+        run: bash scripts/check-secrets.sh
+
       - name: Build workspace packages
         run: pnpm --filter @assay/domain --filter @assay/crypto --filter @assay/contracts --filter @assay/storage --filter @assay/proof --filter @assay/db --filter @assay/ai build
 

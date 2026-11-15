@@ -1,6 +1,6 @@
 # Assay — AI Handoff / Build State
 
-**Status:** Phases 1–5 implemented; authenticated preview deployed to Vercel with Render API/Presidio and Neon. Phase 6 visual refinement/demo is next, with remaining Phase 9 hardening checks.  
+**Status:** Phases 1–6 implemented; authenticated preview deployed to Vercel with Render API/Presidio and Neon; demo video rendered and inspected. Residual Phase 9 checks are documented before any production release claim.  
 **Repository:** `https://github.com/onyebuchidaniel60/Assay` — public, default branch `main`.  
 **Preview URL:** `https://assay-uhhh2.vercel.app` — protected, authenticated Phase 5 preview backed by the Render API. Legacy `https://assay-guyo5yh6z-uhhh2.vercel.app` points to the earlier deployment.
 **Render API:** `https://assay-api-7hy0.onrender.com`. **Render Presidio:** `https://assay-presidio.onrender.com`.  
@@ -75,14 +75,34 @@
 - Public sign-up is disabled at Neon Auth.
 - Known latency: attested extraction is background and can take 75 s–4.5 min under provider load; the UI auto-refreshes.
 
-## Next exact task — Phase 6 and remaining gate
+## Phase 6 — complete
 
-1. Attempt `npx skills add benjitaylor/skills --skill stageshow`; inspect and apply only trustworthy, non-conflicting guidance.
-2. Refine the authenticated UI against the supplied reference direction, preserving role-shaped data boundaries and accessible states.
-3. Create a final pending demo run (BOR-007) so the manager queue has a live item; keep BOR-004/005/006 as approved history.
-4. Produce the <=180 s demo video with real Playwright capture, free/local TTS, captions and FFmpeg; save under `artifacts/demo/`.
-5. Complete remaining Phase 9 checks: proof-mutation test, full IDOR matrix, XSS/SQL-injection/prompt-injection probes, token expiry, secret scanning in CI, log-redaction review, production-mode shred and Kite duplicate-payment policy.
-6. Redeploy the final preview, record the exact commit/URL, update docs and push.
+- `stageshow` installed successfully but applied only as craft guidance; faux UI/mock cursor compositions were rejected because they conflict with the real-action rule. Deviation recorded.
+- UI refined: live status, attestation panel, correct audit actor names, role-shaped screens, accessible empty/error/denied states, no inert primary controls.
+- Demo video: `artifacts/demo/assay-demo.mp4` — 113.5 s, 1080p/30 fps, real Playwright capture, local free `espeak-ng` narration, burned captions. Script, narration, captions and production notes are under `artifacts/demo/`. The real manager approval of BOR-013 is captured.
+- Final demo data: BOR-004/005/006/013 approved; failed test borrowers removed. No real data.
+
+## Verified hardening
+
+- Unauthenticated 401; analyst/auditor/manager role boundaries; manager DTO excludes raw amounts.
+- Upload magic-byte, page, scan and size validation; Kite over-cap 422 and provider-blocked 503; demo-shred denial.
+- Audit tamper `VALID → INVALID → VALID`; concurrent approval one `201`, one `409`.
+- XSS probe escaped; SQL-injection probe rejected 422; secret scan clean; CI secret-hygiene step added.
+- Public signup disabled (`400 EMAIL_PASSWORD_SIGN_UP_DISABLED`).
+
+## Residual Phase 9 checks before production
+
+1. Proof-mutation test on a fresh pending run (altered threshold/witness/artifact must block approval).
+2. Full cross-tenant IDOR matrix with a second organization/membership.
+3. Token expiry/revocation and CORS/browser matrix on the final deployed commit.
+4. Prompt-injection fixture against extraction (document text must not alter schema/policy).
+5. Log-redaction review under provider failures.
+6. Kite duplicate-payment/reconciliation policy test; no live payment without exact authority.
+7. Production-mode shred denial and final secret scan on the release commit.
+
+## Next exact task
+
+Re-run the full typecheck/test/build and Playwright suites on the final commit; push; redeploy the protected preview; record the final commit/URL here and in `docs/DEPLOYMENT.md`. Do not claim production release until the residual Phase 9 checks above pass.
 
 ## Authorization boundaries
 

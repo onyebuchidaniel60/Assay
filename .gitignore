@@ -54,3 +54,6 @@ __pycache__/
 
 # Operator-supplied reference images (license text pending; not redistributed)
 design/
+
+# Installed agent skills (reinstall with npx skills add; lock file records provenance)
+.agents/

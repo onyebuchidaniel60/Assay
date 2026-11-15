@@ -1,0 +1,68 @@
+1
+00:00:02,500 --> 00:00:07,474
+Assay is a covenant operations workspace for synthetic credit
+data.
+
+2
+00:00:07,474 --> 00:00:19,500
+It turns a maximum leverage agreement into a reviewable
+decision trail: source-linked terms, deterministic arithmetic,
+a compliance proof, and a manager decision.
+
+3
+00:00:19,500 --> 00:00:22,145
+The analyst starts at the facility.
+
+4
+00:00:22,145 --> 00:00:32,500
+One encrypted agreement, a page-linked review trail, and a
+redaction step that must be confirmed before any external
+model sees the text.
+
+5
+00:00:32,500 --> 00:00:40,158
+Extraction returns one covenant with its threshold,
+definitions, permitted add-backs and verbatim evidence.
+
+6
+00:00:40,158 --> 00:00:48,818
+Every extraction is bound to fresh Intel TDX and NVIDIA NRAS
+attestation, a request nonce and a signed provider response.
+
+7
+00:00:48,818 --> 00:01:08,500
+The analyst confirms the terms. Attested financial inputs are
+converted to integer minor units and sealed. Decimal
+arithmetic produces the baseline and two stress scenarios, an
+independent verifier recomputes the predicate, and a fixed
+circuit proves the baseline inequality.
+
+8
+00:01:08,500 --> 00:01:18,700
+The manager sees a deliberately restricted view: threshold,
+proof status and scenario bands, but no raw amounts or named
+counterparties.
+
+9
+00:01:18,700 --> 00:01:26,500
+Both stress cases breach, so approval requires an explicit
+risk acknowledgement and a written rationale.
+
+10
+00:01:26,500 --> 00:01:32,709
+The auditor verifies the per-borrower signed hash chain and
+sees
+
+11
+00:01:32,709 --> 00:01:39,500
+the approval evidence, including the exact proof and analysis
+version.
+
+12
+00:01:39,500 --> 00:01:49,470
+Provider status stays honest: NEAR AI attested, Kite testnet
+provider-blocked, Reppo disabled.
+
+13
+00:01:49,470 --> 00:01:53,500
+Assay records evidence, not a promise.
