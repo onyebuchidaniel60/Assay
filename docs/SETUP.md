@@ -8,18 +8,29 @@
 - Circom 2.x and SnarkJS for proof compilation and local verification.
 - Access to a Supabase development project or local Supabase stack.
 
-## First-time setup
+## Phase 1 — current verified setup
 
 1. Clone the approved Assay repository.
-2. Install pinned dependencies: `pnpm install --frozen-lockfile`.
-3. Copy `.env.example` to the local environment file and fill only development/test values.
-4. Start local Supabase or select the dedicated development project.
-5. Run database migrations and seed synthetic users/borrowers.
-6. Start the Presidio service; verify `/health` using its internal service token.
-7. Start API and frontend workspaces.
-8. Run unit tests and Playwright smoke tests.
+2. Use Node.js 24 LTS and pnpm 10.34.5.
+3. Install pinned dependencies: `pnpm install --frozen-lockfile`.
+4. Copy `.env.example` to `.env.local` and fill only development/test values. Never commit `.env.local`.
+5. Start the shell and API: `pnpm dev`.
+   - Web: `http://localhost:3000`
+   - API: `http://localhost:3001`
+6. Verify: `pnpm typecheck`, `pnpm test`, `pnpm build`.
+7. Run the shell E2E suite: `pnpm --filter @assay/web exec playwright test`. This requires Chromium; run `pnpm --filter @assay/web exec playwright install chromium` once.
 
-The implementation agent must write exact commands to match actual workspace scripts and verify each command before publishing this guide. Do not document commands that were not tested.
+The Phase 1 shell is read-only and uses synthetic preview data. Database migrations, Supabase/Neon auth, storage and the Presidio service are Phase 2 tasks and are not yet available. Do not treat the preview shell as a live covenant engine.
+
+## Phase 2 prerequisites (not yet complete)
+
+- Authorized database/auth/storage credentials in `.env.local`.
+- Drizzle schema and migrations.
+- `REDUCED_PII_MODE` Presidio-equivalent service.
+- Render API/Presidio service access.
+- Live provider credentials for Phase 3.
+
+Exact commands for those phases must be added only after they are implemented and tested. Do not document unrun commands as passing.
 
 ## Demo fixture setup
 

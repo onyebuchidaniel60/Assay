@@ -57,18 +57,21 @@ Prerequisites: Node.js 24 LTS, pnpm, Python 3.12, Docker (for local Supabase/Pre
 
 ```bash
 pnpm install
-pnpm db:generate
-pnpm db:migrate
+pnpm typecheck
+pnpm test
+pnpm build
 pnpm dev
 ```
 
-The commands above become available after implementation. Use `.env.example` as a variable catalogue; copy it to `.env.local` only for local work and never commit the real file. The API validates required variables at startup.
+`pnpm dev` starts the Next.js shell on `http://localhost:3000` and the Fastify API on `http://localhost:3001`. Database migrations and provider adapters are added in Phase 2/3; the Phase 1 shell is read-only. Use `.env.example` as a variable catalogue; copy it to `.env.local` only for local work and never commit the real file. The API validates variables at startup.
+
+Phase 1 preview: **https://assay-guyo5yh6z-uhhh2.vercel.app** (protected by Vercel Authentication). It is a labelled shell, not a live covenant engine.
 
 ## Development operating modes
 
-- **Local development:** Supabase local or a dedicated development project, synthetic fixtures, provider calls disabled by default.
-- **Preview:** Vercel frontend + Render API/Presidio + Supabase demo project; sandbox providers only; `ENABLE_DEMO_SHRED=false` unless an explicitly authorized demo session requires it.
-- **Production:** not part of this MVP. Production deployment requires separate operator authorization and a production security/retention review.
+- **Local development:** Next.js shell + Fastify API; synthetic fixtures; provider calls disabled until credentials and adapters are verified.
+- **Preview:** Vercel frontend + Render API/Presidio + authorized database; synthetic data only; sandbox providers only; `ENABLE_DEMO_SHRED=false` unless an explicitly authorized demo session requires it.
+- **Production:** authorized by the operator, but release remains gated on the full Phase 5/9 test and security matrix. No production deployment is currently claimed.
 
 ## Documentation and demo
 
@@ -76,7 +79,7 @@ README and `docs/` are maintained alongside functionality. The final submission 
 
 ## Project status
 
-This repository is intended to be rebuilt from a clean state. The initial handoff is a blueprint, not proof that code, deployment, tests or demo artifacts already exist. Check `AI_HANDOFF.md` and `docs/BUILD_LOG.md` for verified progress.
+Phase 1 is implemented: a pnpm monorepo with a route-complete Next.js shell, a Fastify health/API foundation, CI, unit tests and 10 Playwright shell tests. The Vercel preview is deployed and protected. Phase 2 is blocked until the authorized provider/database credentials are present in `.env.local`; see `OPERATOR_INTAKE.md` §0.7 and `AI_HANDOFF.md`. Check `docs/BUILD_LOG.md` for exact test and deployment evidence.
 
 ## License
 

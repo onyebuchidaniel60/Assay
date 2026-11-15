@@ -15,6 +15,14 @@
 - Do not use Render free Postgres for persistent application data; its free database has a 30-day limit. Do not use local Render filesystem for documents; use private Supabase Storage.
 - Free service sleep/pause and quotas must be considered. A sleeping Render service can delay a demo; warm it before recording. Supabase free projects may pause after inactivity and have storage/egress limits. Record actual plans during intake.
 
+## Current preview
+
+- **URL:** `https://assay-guyo5yh6z-uhhh2.vercel.app`
+- **Commit:** `5deaa51491e322f5f5fe82b389a7b66206aad126`
+- **Protection:** Vercel Authentication.
+- **State:** Phase 1 shell only; read-only synthetic views; no database, auth or live provider calls.
+- **Verification:** `vercel curl` returned expected titles for `/`, `/dashboard`, `/facilities/demo`, `/integrations` and `/audit`.
+
 ## Preview deployment order
 
 1. Confirm Vercel/Render/Supabase access and no-cost limits during Phase 0.
@@ -23,6 +31,8 @@
 4. Configure CORS to the exact Vercel preview origin.
 5. Add only synthetic test data and sandbox secrets.
 6. Redeploy and smoke-test after verified checkpoints.
+
+An unverified Production build was auto-triggered by the GitHub connection during Phase 1 and removed before release. Production remains gated on the Phase 5/9 test and security matrix.
 
 ## Secrets
 

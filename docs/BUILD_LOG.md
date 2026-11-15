@@ -81,6 +81,27 @@
 - **Phase 3 adapter statement:** when the Phase 3 adapter is built, it will use the active session `agent_session_01a1dfc3-794e-70cb-bde8-90c6315736cf` and enforce the 5 PIEUSD per-tx / 20 PIEUSD total caps in Assay's deterministic policy engine before any payment call. The adapter is not built yet because the monorepo/Phase 1 foundation does not exist; the provider-blocked test does not authorize bypassing the Phase 0/Phase 1 gates.
 - **Next exact action:** proceed with Phase 0/Phase 1 foundation when the outstanding critical inputs are resolved; then implement the Kite adapter against the active session with policy checks and honest provider failure states.
 
+## 15 November 2026 — Phase 1 foundation and Vercel shell preview
+
+- **Phase:** 1 — repository/platform foundation + early skeletal UI.
+- **Commit:** `5deaa51491e322f5f5fe82b389a7b66206aad126` — `feat: establish app shell and preview deployment`.
+- **Preview URL:** `https://assay-guyo5yh6z-uhhh2.vercel.app` (Vercel Authentication protected).
+- **Deployment evidence:** `vercel curl` returned the expected titles for `/`, `/dashboard`, `/facilities/demo`, `/integrations` and `/audit`.
+- **Workspace:** pnpm 10.34.5; Node.js 24.22.1; Next.js 16.4.6 + React 19.3.1 + Tailwind CSS 4.3.5; Fastify 5.12.8 + Zod 4.6.7.
+- **Implemented:** landing, login preview, dashboard, borrowers, borrower creation shell, facilities, facility detail, covenants, covenant detail, analysis queue, assessment detail, cases, case detail, approvals, audit fixture, integrations, settings, forbidden and not-found routes.
+- **UI behavior:** responsive sidebar/mobile drawer, skip link, semantic headings, visible focus, actual/forecast status separation, synthetic-data labels and labelled Phase 1 placeholders. No inert control is presented as live.
+- **API behavior:** `/health/live` 200; `/health/ready` 503/degraded without `DATABASE_URL`; safe 401/404 envelopes; CORS allowlist; Pino redaction.
+- **Commands and results:**
+  - `pnpm install` → passed.
+  - `pnpm typecheck` → passed.
+  - `pnpm test` → passed; API 4/4 tests; web no test files.
+  - `pnpm build` → passed; Next.js built 16 routes.
+  - `pnpm --filter @assay/web exec playwright test` → 10/10 passed (desktop + mobile).
+- **Reference:** operator-supplied `design/reference/assayref1–4.avif`; inspected and recorded in `REFERENCE_ASSETS.md`. Images remain untracked pending license text; not copied into UI.
+- **Release boundary:** an automatically triggered Production build appeared in Vercel after a push; it was removed with `vercel remove` to honor the Phase 5/9 release gate. No production deployment is claimed.
+- **Blocker:** Phase 2 provider/database credentials are absent from `.env.local` (only Kite keys present). See `OPERATOR_INTAKE.md` §0.7 and `AI_HANDOFF.md`. No live provider/database/auth work can be honestly completed until they are restored.
+- **Next exact task:** restore credentials and confirm auth/storage provider; run Phase 2 migrations/auth/storage/audit/PII foundations; then Phase 3 adapters.
+
 ## Build log entry template
 
 For every checkpoint add:

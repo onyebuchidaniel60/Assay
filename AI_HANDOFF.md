@@ -1,93 +1,85 @@
 # Assay — AI Handoff / Build State
 
-**Status:** Phase 0 intake completed; implementation not started; critical blockers remain.  
-**Current phase:** Phase 0 — Operator Intake / Readiness.  
-**Repository:** `https://github.com/onyebuchidaniel60/Assay` — public, default branch `main`; Phase 0 inspection baseline `6a90b02eb9c7363bddd22238ce2689de94f2aafd`; this Phase 0 documentation checkpoint is recorded below.  
-**Preview URL:** None — no deployment performed.  
-**Deployed commit:** None.  
-**Production release authority:** Not granted.  
+**Status:** Phase 1 complete (local shell + Vercel preview). Phase 2 is blocked by absent provider/database credentials.  
+**Current phase:** Phase 1 checkpoint complete; Phase 2 not started.  
+**Repository:** `https://github.com/onyebuchidaniel60/Assay` — public, default branch `main`, Phase 1 commit `5deaa51491e322f5f5fe82b389a7b66206aad126`.  
+**Preview URL:** `https://assay-guyo5yh6z-uhhh2.vercel.app` (Vercel Authentication protected).  
+**Deployed commit:** `5deaa51` — `feat: establish app shell and preview deployment`.  
+**Production release authority:** Authorized by operator, but production release remains gated on the full Phase 5/9 test and security matrix. An unintended auto-triggered production build was removed; no production deployment is claimed.  
 **Data boundary:** Synthetic data only; no real borrower, lender or production records.  
-**New spend authority:** `$0`; free tiers and preloaded credits only.
+**New spend authority:** `$0` beyond existing NEAR AI ($1) and SERV ($1) credits.
 
-## Phase 0 completed
+## Phase 1 completed
 
-- Read `AGENTS.md`, `MASTER_BLUEPRINT.md`, `PROJECT_SPEC.md`, `ARCHITECTURE.md`, `IMPLEMENTATION_PLAN.md`, `OPERATOR_INTAKE.md`, `REFERENCE_ASSETS.md`, `DEMO_VIDEO_PLAN.md`, `AI_HANDOFF.md` and all files under `docs/`.
-- Inspected repository and Git metadata without modifying application files.
-- Confirmed the repository is a documentation-only clean-start state: 24 tracked documentation files, no application code, manifests, migrations, tests, CI, deploy configuration or `.env` files.
-- Confirmed default branch `main`, clean working tree, remote reachability and write access (`git push --dry-run` succeeded).
-- Confirmed Vercel CLI access: account `onyebuchidaniel60-1034`, team `uhhh2` (Hobby); no Assay project exists.
-- Checked provider endpoints and public model catalogs without using secrets:
-  - NEAR AI model list reachable; 64 models returned.
-  - OpenRouter model catalog reachable; 470 models returned.
-  - OpenServ endpoint reachable and returns `401` without a key.
-- Applied the operator's provider overrides:
-  - Dolphin removed and rejected; no adapter, endpoint, model or environment variable will be implemented.
-  - NEAR AI Cloud is Layer 2 confidential extraction.
-  - OpenRouter is general inference for SERV judgement/generation.
-  - SERV is the orchestration layer and does not itself infer.
-  - Layer 2 wording restrictions recorded.
-- Resolved the Presidio/Render memory blocker by selecting `REDUCED_PII_MODE`: Presidio Analyzer with the small spaCy model plus deterministic custom financial recognizers; full `en_core_web_lg` is not deployed on the Render free 512 MB tier. No paid upgrade.
-- Updated `OPERATOR_INTAKE.md` with the complete consolidated intake and statuses.
+- Created a pnpm workspace with `apps/web` (Next.js 16.4.6, React 19.3.1, Tailwind 4) and `apps/api` (Fastify 5.12.8, Zod).
+- Built a responsive, route-complete Next.js shell with:
+  - `/` landing page; `/login` preview form; `/dashboard`; `/borrowers`; `/borrowers/new`; `/facilities`; `/facilities/[id]`; `/covenants`; `/covenants/[id]`; `/analysis-runs`; `/analysis-runs/[id]`; `/cases`; `/cases/[id]`; `/approvals`; `/audit`; `/integrations`; `/settings`; `/forbidden`; `/not-found`.
+  - Actual and forecast status dimensions visually and textually separated.
+  - Labelled Phase 1 placeholders; no inert controls without a disabled reason.
+  - Responsive sidebar/mobile drawer, skip link, semantic headings, visible focus and synthetic-data labels.
+  - Public GitHub/Documentation footer links only (repository is public).
+- Added Fastify health routes:
+  - `GET /health/live` → 200.
+  - `GET /health/ready` → 503/degraded when `DATABASE_URL` is absent; no false ready claim.
+  - Safe 401 and 404 envelopes; CORS allowlist; Pino redaction; no secrets in responses.
+- Added `.env.example`, `.gitignore` coverage for `.env*`, `.kite-passport`, and `.vercel`; no secrets committed.
+- Added CI for install, typecheck, tests, build and a non-blocking production dependency audit.
+- Deployed the shell to Vercel: `https://assay-guyo5yh6z-uhhh2.vercel.app`.
+- Verified the deployment with `vercel curl` for `/`, `/dashboard`, `/facilities/demo`, `/integrations` and `/audit`.
 
-## Critical blockers
+## Verification evidence
 
-1. **Scope tier:** Tier A (full blueprint) has not been explicitly confirmed.
-2. **UI reference:** no image supplied and no express authorization to generate one; `REFERENCE_ASSETS.md` remains unfulfilled.
-3. **NEAR AI:** `NEARAI_API_KEY` absent; starter-credit amount unverified; live extraction model and fresh Intel TDX/NVIDIA NRAS attestation test not performed. Proposed model: `z-ai/glm-5.3-flash`.
-4. **OpenRouter:** `OPENROUTER_API_KEY` absent; model IDs and credits unverified. Proposed: `openai/gpt-5.4-mini` (judgement), `deepseek/deepseek-v3.2` (generation).
-5. **SERV / OpenServ:** `SERV_REASONING_API_KEY` absent; catalog entry, credits and a harmless graph/model test unverified.
-6. **Supabase:** project URL, anon key, service-role key, database URL and private bucket are absent.
-7. **Vercel:** CLI access exists, but no Assay project and no explicit preview deployment permission.
-8. **Render:** no service/account access; API and Presidio services cannot be created or verified.
-9. **Budget:** `$0` new spend; no paid tier, top-up, wallet funding or unexpected charge is authorized.
-10. **Kite testnet smoke test:** testnet login, faucet and active session are complete. The same-key payment retry returned provider `internal error` again; no payment event, receipt or spend exists. The over-cap test passed with `session_rule_exceeded` (exit 6) and no payment. The payment path is provider-blocked; do not retry again without a provider change or new operator instruction. The adapter is not built because the Phase 0/Phase 1 foundation remains blocked.
+| Command | Result |
+|---|---|
+| `pnpm install` | Passed |
+| `pnpm typecheck` | Passed |
+| `pnpm test` | Passed — API 4/4; web no unit tests (passWithNoTests) |
+| `pnpm build` | Passed — Next.js 16 production build, 16 routes |
+| `pnpm --filter @assay/web exec playwright test` | Passed — 10/10 desktop + mobile shell tests |
+| `vercel --yes` | Preview deployment ready; URL recorded above |
+| `vercel curl <preview>/...` | 200 with expected titles for five routes |
+
+## Critical blocker
+
+`OPERATOR_INTAKE.md` §0.7 records the authorization/credential mismatch. `.env.local` currently contains only the eight Kite variables. The following authorized credentials are absent:
+
+`NEARAI_API_KEY`, `NEARAI_MODEL`, `OPENROUTER_API_KEY`, `OPENROUTER_MODEL_JUDGEMENT`, `OPENROUTER_MODEL_GENERATION`, `SERV_REASONING_API_KEY`, `SERV_MODEL`, `DATABASE_URL`/`NEON_DATABASE_URL`, `REPPO_API_KEY`, `RENDER_API_KEY`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_STORAGE_BUCKET`.
+
+Process-environment checks show none of these names. The `.env.local` file was last written during Kite setup; if values were added before that write, they may have been overwritten. Re-add them out-of-band.
+
+**Impact:** Phase 2 database/auth/storage, Phase 3 live provider adapters, the full E2E gate and release cannot be honestly completed. No fixture success is being presented as live.
 
 ## Provider and integration status
 
 | Provider | Status | Evidence / boundary |
 |---|---|---|
-| NEAR AI Cloud | `BLOCKED` | Base URL/model catalog reachable; no key/credit/attestation test |
-| OpenRouter | `BLOCKED` | Base URL/model catalog reachable; no Assay-scoped key |
-| SERV / OpenServ | `BLOCKED` | Endpoint reachable; no key/catalog/credit verification |
-| Dolphin | `REJECTED` | Removed; confidentiality mechanism unverified; no adapter/env |
-| Supabase | `BLOCKED` | No project URL/keys/database/bucket |
-| Vercel | `PARTIAL` | CLI authenticated; preview permission not granted |
-| Render | `BLOCKED` | No account/service access; free-tier limits documented |
-| Presidio | `RESOLVED (DESIGN)` | `REDUCED_PII_MODE` selected; Phase 2 RSS validation required |
-| Reppo | `DISABLED` | Optional; no key/authorization; synthetic-only if enabled |
-| Kite | `ENABLED (TESTNET) — payment provider-blocked` | Testnet authenticated; wallet funded 100 PIEUSD; active session `agent_session_01a1dfc3-794e-70cb-bde8-90c6315736cf` (5/20 PIEUSD, expires `2026-11-16T15:11:32Z`). Same-key retry returned provider `internal error`; no receipt/charge. Over-cap test returned `session_rule_exceeded` (exit 6) with no payment. |
-| Google TTS | `NOT CONFIGURED` | Free-tier check deferred to Phase 8; no billing |
+| NEAR AI Cloud | `AUTHORIZED — credential absent` | Public catalog reachable; no key/attestation test |
+| OpenRouter | `AUTHORIZED — credential absent` | Public catalog reachable; no Assay-scoped key |
+| SERV / OpenServ | `AUTHORIZED — credential absent` | Endpoint reachable; no key/catalog/credit verification |
+| Database/Neon | `AUTHORIZED — credential absent` | No connection string; readiness correctly degraded |
+| Vercel | `PREVIEW READY` | `https://assay-guyo5yh6z-uhhh2.vercel.app`; protected |
+| Render | `AUTHORIZED — credential absent` | No service/account access |
+| Presidio | `RESOLVED (DESIGN)` | `REDUCED_PII_MODE`; Phase 2 RSS validation required |
+| Reppo | `DISABLED` | Optional; no key; synthetic-only if enabled |
+| Kite | `ENABLED (TESTNET) — payment provider-blocked` | Active 5/20 PIEUSD session; over-cap rejection verified; payment endpoint internal error twice |
+| Google TTS | `NOT CONFIGURED` | Free-tier check deferred to Phase 8 |
 
 ## Authority and defaults
 
 - Synthetic data only; no real borrower or production data.
 - No public signup; invite-only staff accounts.
-- No Kite wallet spend or paid-service top-up.
-- Preview deployment only after exact access and permission are verified.
-- Production deployment is not authorized.
+- No Kite wallet spend beyond the approved testnet session; no paid top-up.
+- Production release is authorized in principle but blocked until the full test/security matrix passes.
 - `ENABLE_DEMO_SHRED=false` except during an explicitly authorized synthetic demo.
-- No raw documents, token maps, borrower identities or full prompts in logs or external provider calls beyond the recorded routing rules.
-- Manager approval is separate from any Kite spending authorization.
-- Audit chain is tamper-evident and signed; do not call it immutable.
-
-## Verification evidence
-
-- Repository state: `git status --short --branch` → `## main...origin/main`; `git rev-parse HEAD` → `6a90b02eb9c7363bddd22238ce2689de94f2aafd`.
-- Write access: `git push --dry-run origin main` → `Everything up-to-date`.
-- GitHub permissions: admin/push enabled; `main` has no branch protection.
-- Vercel: `vercel whoami` → `onyebuchidaniel60-1034`; `vercel teams ls` → team `uhhh2`, Hobby; no Assay project.
-- NEAR AI: `GET https://cloud-api.near.ai/v1/model/list` → HTTP 200, 64 models.
-- OpenRouter: `GET https://openrouter.ai/api/v1/models` → HTTP 200, 470 models.
-- OpenServ: `GET https://inference-api.openserv.ai/v1/models` without key → HTTP 401.
-- No application tests exist; no test pass is claimed.
-- No preview URL or deployed commit exists.
+- Provider failure must be visible; never fabricate output, receipts or verification.
 
 ## Next exact task
 
-**Operator action:** resolve the critical blockers in `OPERATOR_INTAKE.md` §4 — scope tier, UI reference, NEAR AI/OpenRouter/SERV credentials and validation, Supabase, Vercel preview permission, Render access and budget.
-
-**After authorization:** begin Phase 1 only: create the clean pnpm monorepo, navigable Next.js shell with labelled placeholders, Fastify health route, environment validation, CI basics, and a protected synthetic preview. No Phase 1 work before the operator confirms the blockers are resolved.
+1. Re-add the authorized provider/database credentials to `.env.local` out-of-band and confirm the auth/storage choice (Supabase vs Neon).
+2. Run Phase 2: Drizzle schema/migrations, auth/RBAC, tenant repositories, private storage, encryption envelope, signed audit chain, job queue, `REDUCED_PII_MODE` PII service and readiness.
+3. Verify one NEAR AI attestation call and the OpenRouter model IDs before building adapters.
+4. Continue Phase 3–9 autonomously after Phase 2; Phase 5 gate must pass before Phase 6 UI refinement.
 
 ## Blocked by
 
-Scope-tier confirmation; UI reference or generation authorization; NEAR AI, OpenRouter and SERV credentials/credits; Supabase and Render access; Vercel preview permission; paid-spend authority if any paid resource is required.
+Missing `NEARAI_API_KEY`, `OPENROUTER_API_KEY`, `SERV_REASONING_API_KEY`, database/auth/storage credentials and `RENDER_API_KEY`; architecture confirmation for Supabase vs Neon. No application code was written after the Phase 1 shell because these Phase 2 inputs are indispensable.
