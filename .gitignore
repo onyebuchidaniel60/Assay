@@ -1,0 +1,43 @@
+# Environment and secrets — never commit
+.env
+.env.*
+.env.local
+.env.*.local
+*.pem
+*.key
+.kite-passport/
+.wallet/
+secrets/
+
+# Dependencies
+node_modules/
+.pnpm-store/
+.pnp.*
+
+# Build output
+.next/
+dist/
+build/
+out/
+.turbo/
+*.tsbuildinfo
+
+# Test / coverage
+coverage/
+playwright-report/
+test-results/
+
+# Logs and runtime
+*.log
+logs/
+pids/
+*.pid
+
+# Editor / OS
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# Generated artifacts that are environment-specific
+artifacts/demo/*.mp4.tmp
