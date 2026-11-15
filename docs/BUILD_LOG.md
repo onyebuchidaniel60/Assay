@@ -211,6 +211,7 @@
   - Production/demo shred denial, Kite over-cap/provider-blocked, CORS denial, upload magic bytes, auth/role boundaries, audit tamper and concurrent approval were previously verified.
 - **Remaining gaps:** proof-mutation on a fresh pending run, full cross-tenant IDOR matrix, token expiry/revocation, prompt-injection fixture, and concurrent-approval stress on the final deployed commit are documented as residual Phase 9 checks rather than claimed passing.
 - **Final demo data:** BOR-004/005/006/013 approved; failed BOR-007–012/014 removed. BOR-013’s approval is the one captured in the video. No real borrower data exists.
+- **Final deploy:** commit `d608534` deployed to Render API and Vercel preview `https://assay-uhhh2.vercel.app`; authenticated dashboard/report smoke test passed. Root typecheck/build, unit suites and Playwright 18/18 passed on the final code.
 
 ## Build log entry template
 

@@ -20,7 +20,7 @@
 ## Current preview
 
 - **URL:** `https://assay-uhhh2.vercel.app` (aliases the protected deployment `https://assay-h7uyd6mg5-uhhh2.vercel.app`).
-- **Commit:** `042cb90` (Phase 3/4 feature commit; later UI/docs commits may be newer).
+- **Commit:** `d608534` (final deployed app commit; docs-only commits may follow).
 - **Protection:** Vercel Authentication.
 - **API:** `https://assay-api-7hy0.onrender.com` (Render free web service, health `/health/ready`).
 - **Presidio:** `https://assay-presidio.onrender.com` (Render free Python service, `REDUCED_PII_MODE`).

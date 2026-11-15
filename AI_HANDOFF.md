@@ -2,7 +2,7 @@
 
 **Status:** Phases 1–6 implemented; authenticated preview deployed to Vercel with Render API/Presidio and Neon; demo video rendered and inspected. Residual Phase 9 checks are documented before any production release claim.  
 **Repository:** `https://github.com/onyebuchidaniel60/Assay` — public, default branch `main`.  
-**Preview URL:** `https://assay-uhhh2.vercel.app` — protected, authenticated Phase 5 preview backed by the Render API. Legacy `https://assay-guyo5yh6z-uhhh2.vercel.app` points to the earlier deployment.
+**Preview URL:** `https://assay-uhhh2.vercel.app` — protected, authenticated preview backed by the Render API. **Latest deployed app commit:** `d608534`. Legacy `https://assay-guyo5yh6z-uhhh2.vercel.app` points to the earlier deployment.
 **Render API:** `https://assay-api-7hy0.onrender.com`. **Render Presidio:** `https://assay-presidio.onrender.com`.  
 **Production release authority:** Authorized by the operator, but release remains gated on the full Phase 5/9 test and security matrix. No production deployment is claimed.  
 **Data boundary:** Synthetic data only; no real borrower, lender or production records.  
