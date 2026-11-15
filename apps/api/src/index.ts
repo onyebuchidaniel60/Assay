@@ -1,0 +1,17 @@
+import { buildServer } from "./server.js";
+
+const app = buildServer();
+
+const port = Number(process.env.PORT ?? 3001);
+const host = process.env.HOST ?? "0.0.0.0";
+
+const start = async () => {
+  try {
+    await app.listen({ port, host });
+  } catch (error) {
+    app.log.error(error);
+    process.exit(1);
+  }
+};
+
+void start();

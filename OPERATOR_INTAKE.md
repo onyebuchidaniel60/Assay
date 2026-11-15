@@ -3,8 +3,8 @@
 **Phase:** 0 — readiness  
 **Intake completed:** 2026-11-15 (UTC)  
 **Repository:** `https://github.com/onyebuchidaniel60/Assay`  
-**Scope tier:** **BLOCKED — Tier A (full blueprint) has not been explicitly confirmed by the operator.**  
-**Overall readiness:** **NOT READY — critical blockers remain.** No application code, monorepo scaffold, deployment or paid provisioning has been performed.
+**Scope tier:** **CONFIRMED — Tier A (full blueprint).**  
+**Overall readiness:** **AUTHORIZED — credential presence mismatch.** The operator authorized Phases 1–9 and production, but the provider/database credentials asserted to be in `.env.local` are not present there. See §0.7. No application code, monorepo scaffold or deployment has been performed yet.
 
 This file records the single consolidated intake, the authoritative provider revision of 15 November 2026, the evidence gathered during the read-only inspection, and the exact operator actions still required before Phase 1.
 
@@ -69,6 +69,22 @@ Prohibited:
 - Full `en_core_web_lg` Presidio is not deployed on Render's free 512 MB web service.
 - No paid Render upgrade, disk or add-on is authorized.
 - Phase 2 must measure the service RSS. If the reduced Presidio configuration still exceeds 512 MB, use the deterministic custom-recognizer-only fallback under the same `REDUCED_PII_MODE` label. No paid upgrade is permitted without operator budget approval.
+
+### 0.7 Execution authorization and credential-presence audit — 15 November 2026
+
+The operator authorized Phases 1–9, Tier A, Vercel preview and production, Render free API + Presidio, synthetic data and production release after the full test/security gate. Budget: `$0` new spend beyond existing NEAR AI and SERV credits.
+
+**Credential-presence audit after that authorization:** `.env.local` currently contains only these eight Kite keys:
+
+`KITE_ENABLED`, `KITE_MAX_PER_PAYMENT_MINOR`, `KITE_MAX_TOTAL_MINOR`, `KITE_PASSPORT_API`, `KITE_SESSION_EXPIRY`, `KITE_SESSION_ID`, `KITE_TESTNET_ASSET`, `KITE_TEST_X402_ENDPOINT`.
+
+It does **not** contain any of the following authorized-provider or database variables:
+
+`NEARAI_API_KEY`, `NEARAI_MODEL`, `OPENROUTER_API_KEY`, `OPENROUTER_MODEL_JUDGEMENT`, `OPENROUTER_MODEL_GENERATION`, `SERV_REASONING_API_KEY`, `SERV_MODEL`, `DATABASE_URL`/`NEON_DATABASE_URL`, `REPPO_API_KEY`, `RENDER_API_KEY`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_STORAGE_BUCKET`.
+
+Process-environment checks also show none of these names. The `.env.local` file was last written during the Kite setup; if provider values were added before that write, they may have been overwritten. Re-add them out-of-band; do not paste values into chat.
+
+**Consequence:** Phase 1 local scaffolding may proceed, but Phase 2/3 live database, auth, storage and provider integration and any full preview cannot be honestly completed until the credentials are present. The production authorization remains recorded, but release is gated by the full test/security matrix.
 
 ---
 
@@ -218,21 +234,21 @@ Additional observations:
 
 | Item | Required? | Status | Evidence |
 |---|---:|---|---|
-| UI reference image | **Yes** | **BLOCKED** | No image in the repository or supplied location; `REFERENCE_ASSETS.md` records none |
-| Agent-generated reference authorization | **Yes if no image** | **NOT GRANTED** | No explicit authorization in the Phase 0 instruction |
-| Reference provenance/usage rights | Yes when supplied | `PENDING` | Must be recorded before Phase 6 |
+| UI reference image | **Yes** | **VALIDATED (LICENSED)** | Four operator-supplied AVIF files at `design/reference/assayref1.avif`–`assayref4.avif`; inspected |
+| Agent-generated reference authorization | **Yes if no image** | `NOT NEEDED` | Operator-supplied assets exist |
+| Reference provenance/usage rights | Yes when supplied | `LICENSED — operator assertion` | Option A recorded in `REFERENCE_ASSETS.md`; exact license text still to be attached before external redistribution |
 | Responsive expectations | Yes | `DEFAULT` | Desktop-first operations UI; responsive to tablet/mobile; final composition from reference |
 
-**This is a hard blocker under the operator's stop conditions.**
+The reference asset gate is **PASSED** for implementation. Do not copy the source template's branding, proprietary copy, logo or trade dress.
 
 ### 2.11 Scope, budget and authority
 
 | Item | Required? | Status | Boundary |
 |---|---:|---|---|
-| Scope tier | **Yes** | **BLOCKED** | Tier A / full blueprint has not been explicitly confirmed |
-| Budget ceiling | **Yes** | `$0 new spend` | Free tiers and preloaded credits only; no paid plan, top-up, wallet funding or unexpected charge |
-| Production authority | **Yes** | `NO` | Preview/staging only; production requires explicit separate grant |
-| Preview authority | Yes | `BLOCKED` | Vercel CLI exists, but exact preview permission has not been granted |
+| Scope tier | **Yes** | **CONFIRMED** | Tier A / full blueprint authorized by operator |
+| Budget ceiling | **Yes** | `$0 new spend` | Existing NEAR AI ($1) and SERV ($1) credits only; no paid plan, top-up, wallet funding or unexpected charge |
+| Production authority | **Yes** | **AUTHORIZED** | Production deploy authorized after full regression/security pass and no unresolved critical/high issue |
+| Preview authority | Yes | **AUTHORIZED** | Vercel preview authorized; Render free API/Presidio authorized. Access credentials still required. |
 | Data policy | Yes | `SYNTHETIC ONLY` | No real borrower, lender, customer, employee or production data |
 | Secret storage | Yes | `SERVER-SIDE ONLY` | Provider environment settings/local process env; never in Git, logs or `NEXT_PUBLIC_*` |
 | Destructive actions | Yes | `PROHIBITED` | No deletion of repositories, buckets, credentials or existing resources without exact authority |
@@ -250,38 +266,35 @@ Additional observations:
 | Gate | Pass condition | Result |
 |---|---|---|
 | Repository | Correct repo/branch accessible; clean-start state confirmed; write access verified | **PASS** |
-| Reference asset | Image inspected or explicit generation authorization recorded | **BLOCKED** |
-| Scope tier | Tier A full blueprint explicitly confirmed | **BLOCKED** |
-| NEAR AI | Key, starter credit, TEE-verifiable model and fresh attestation test validated | **BLOCKED** |
-| OpenRouter | Key, model IDs, credits and live test validated | **BLOCKED** |
-| SERV / OpenServ | Key, catalog entry, credits and harmless call validated | **BLOCKED** |
-| Supabase | Project URL, keys, database URL and private bucket verified | **BLOCKED** |
-| Vercel | Project access and preview deployment permission verified | **BLOCKED** |
-| Render | API and Presidio service access verified; free-tier fit confirmed | **BLOCKED** |
+| Reference asset | Image inspected and license assertion recorded | **PASS (license text to attach)** |
+| Scope tier | Tier A full blueprint explicitly confirmed | **PASS** |
+| NEAR AI | Key, starter credit, TEE-verifiable model and fresh attestation test validated | **AUTHORIZED — credentials absent** |
+| OpenRouter | Key, model IDs, credits and live test validated | **AUTHORIZED — credentials absent** |
+| SERV / OpenServ | Key, catalog entry, credits and harmless call validated | **AUTHORIZED — credentials absent** |
+| Database/Neon | Connection string, auth/storage configuration and migrations verified | **AUTHORIZED — credentials absent** |
+| Vercel | Project access and preview deployment permission verified | **PASS (CLI access + authorization)** |
+| Render | API and Presidio service access verified; free-tier fit confirmed | **AUTHORIZED — credentials absent** |
 | Presidio | Deployment blocker resolved and recorded | **RESOLVED** |
-| Reppo | Disabled or enabled with verified access and synthetic-only payload policy | **DISABLED** |
-| Kite | Disabled or enabled with exact spend cap/asset/session | **ENABLED (TESTNET) — payment smoke test blocked** |
-| Budget | Numeric ceiling and billing boundary recorded | **$0 new spend; no paid authority** |
-| Production | Explicit authority recorded or staging-only constraint honored | **NOT AUTHORIZED** |
+| Reppo | Disabled or enabled with verified access and synthetic-only payload policy | **AUTHORIZED — credentials absent; optional** |
+| Kite | Disabled or enabled with exact spend cap/asset/session | **ENABLED (TESTNET) — payment provider-blocked** |
+| Budget | Numeric ceiling and billing boundary recorded | **PASS — $0 new spend** |
+| Production | Explicit authority recorded or staging-only constraint honored | **AUTHORIZED — release gate applies** |
 | Demo | Audience, pronunciation, redactions and output location set | **DEFAULTS RECORDED** |
 
-**Phase 0 does not pass until the `BLOCKED` rows are resolved.**
+**Phase 1 scaffolding may proceed. Live Phase 2/3 integration, full preview and release remain blocked until the authorized credentials are present.**
 
 ---
 
-## 4. Exact operator action required before Phase 1
+## 4. Exact operator action required
 
-1. **Confirm scope tier:** explicitly confirm **Tier A — full blueprint**.
-2. **UI reference:** supply an image with exact path/source/ownership/usage rights, or explicitly authorize agent-generated original reference imagery.
-3. **NEAR AI:** provide a dedicated `NEARAI_API_KEY` through the approved secret channel; confirm the starter-credit amount in the dashboard; confirm or replace the proposed extraction model `z-ai/glm-5.3-flash`; authorize the attestation test.
-4. **OpenRouter:** provide a dedicated `OPENROUTER_API_KEY`; confirm or replace `openai/gpt-5.4-mini` (judgement) and `deepseek/deepseek-v3.2` (generation); confirm available credits.
-5. **SERV / OpenServ:** provide `SERV_REASONING_API_KEY`; confirm the model catalog entry and credit balance; authorize one harmless graph/model test call.
-6. **Supabase:** provide the project URL, anon key, service-role key, database URL and private bucket name, or authorize creation of a free project.
-7. **Vercel:** confirm the Assay project and explicitly authorize preview deployment. Confirm Hobby/free-only.
-8. **Render:** provide service access or authorize creation of free API and Presidio services; confirm the reduced Presidio mode and 512 MB constraint.
-9. **Budget:** raise the ceiling only if a paid service is required. Otherwise confirm free-tier-only operation and no top-ups/payments.
-10. **Production:** confirm production remains **NOT AUTHORIZED**.
-11. **Optional integrations:** Reppo remains disabled. Kite testnet is enabled with session `agent_session_01a1dfc3-794e-70cb-bde8-90c6315736cf` (5/20 PIEUSD, 24h); resolve the provider internal error before relying on the x402 path in the Assay workflow.
-12. **Secrets:** deliver values only through a secure out-of-band channel — never in chat, Git, logs or `NEXT_PUBLIC_*` variables.
+Authorization is recorded. The remaining action is to restore the authorized credential values to `.env.local` (or the approved secret store), out-of-band:
 
-**No Phase 1 work — no monorepo scaffold, no application code, no deployment — may begin until the critical blockers above are resolved.**
+1. `NEARAI_API_KEY` + confirmed `NEARAI_MODEL` (proposed `z-ai/glm-5.3-flash`) and starter-credit amount.
+2. `OPENROUTER_API_KEY` + confirmed `OPENROUTER_MODEL_JUDGEMENT` and `OPENROUTER_MODEL_GENERATION`.
+3. `SERV_REASONING_API_KEY` + confirmed `SERV_MODEL` and credit balance.
+4. `DATABASE_URL`/`NEON_DATABASE_URL` (and any auth/storage/Supabase keys required by the chosen auth path).
+5. `RENDER_API_KEY`/service access for the free API and Presidio services.
+6. `REPPO_API_KEY` if Reppo is to be enabled (optional).
+7. Confirm the exact auth/storage architecture: the original blueprint specifies Supabase Auth/Storage; the authorization message names Neon. Record which provider supplies auth and object storage before Phase 2.
+
+Do not paste values into chat or commit them. Phase 1 local scaffolding may proceed, but live database/auth/provider integration, full preview and release cannot be honestly completed until the credentials and auth/storage choice are present.

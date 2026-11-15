@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #151515;
+  --color-ink-soft: #2a2a28;
+  --color-canvas: #f2eee4;
+  --color-paper: #fbf8f0;
+  --color-line: #d9d3c4;
+  --color-muted: #6f6b60;
+  --color-acid: #f2d313;
+  --color-acid-soft: #f8ea8c;
+  --color-positive: #067647;
+  --color-warning: #b54708;
+  --color-danger: #b42318;
+  --font-sans: "Inter", "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Inter", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
+
+:root {
+  color-scheme: light;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 84% 8%, rgba(242, 211, 19, 0.12), transparent 26rem),
+    var(--color-canvas);
+  font-family: var(--font-sans);
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--color-acid);
+  color: var(--color-ink);
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 3px;
+}
+
+@layer base {
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+}
+
+.display {
+  letter-spacing: -0.055em;
+  line-height: 0.92;
+}
+
+.hairline {
+  border-color: var(--color-line);
+}
+
+.paper-grain {
+  background-image:
+    linear-gradient(rgba(21, 21, 21, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(21, 21, 21, 0.025) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line) transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

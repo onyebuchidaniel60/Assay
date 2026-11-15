@@ -1,0 +1,12 @@
+.env
+.env.*
+.kite-passport
+design
+docs
+apps/api
+node_modules
+.next
+**/.next
+**/test-results
+**/playwright-report
+*.log

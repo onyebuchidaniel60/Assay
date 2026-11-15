@@ -1,6 +1,7 @@
 # Environment and secrets — never commit
 .env
 .env.*
+!.env.example
 .env.local
 .env.*.local
 *.pem
@@ -41,3 +42,4 @@ pids/
 
 # Generated artifacts that are environment-specific
 artifacts/demo/*.mp4.tmp
+.vercel
