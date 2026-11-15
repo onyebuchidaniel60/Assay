@@ -226,11 +226,34 @@ export function tokenize(
 
 export class PresidioClient {
   private readonly baseUrl: string;
+  private awake = false;
   constructor(private readonly config: PresidioClientConfig = {}) {
     this.baseUrl = (config.baseUrl ?? "http://127.0.0.1:5001").replace(/\/$/, "");
   }
 
+  /**
+   * Render free services sleep. Wake the redaction service before the real
+   * request and allow a cold start rather than treating it as a failed run.
+   */
+  private async ensureAwake(): Promise<void> {
+    if (this.awake) return;
+    for (let attempt = 0; attempt < 30; attempt += 1) {
+      try {
+        const response = await fetch(`${this.baseUrl}/health`, { signal: AbortSignal.timeout(15_000) });
+        if (response.ok) {
+          this.awake = true;
+          return;
+        }
+      } catch {
+        // Keep waiting through a cold start or a transient network failure.
+      }
+      await new Promise((resolve) => setTimeout(resolve, 3_000));
+    }
+    throw new PresidioUnavailableError("The redaction service did not wake up.");
+  }
+
   async analyze(text: string, scoreThreshold = 0.35): Promise<PresidioEntity[]> {
+    await this.ensureAwake();
     let lastError: unknown;
     for (let attempt = 0; attempt < 2; attempt += 1) {
       try {
