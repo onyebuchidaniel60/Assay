@@ -208,8 +208,9 @@
   - XSS probe: borrower alias `<script>alert(1)</script>` rendered escaped (`&lt;script&gt;…`) and the raw tag was absent; probe record deleted.
   - SQL-injection probe: reference token `BOR' OR '1'='1` rejected `422 VALIDATION_ERROR`.
   - Secret scan: no environment/credential files tracked; no key/private-key/connection-string patterns in tracked files. Added `scripts/check-secrets.sh` to CI.
-  - Production/demo shred denial, Kite over-cap/provider-blocked, CORS denial, upload magic bytes, auth/role boundaries, audit tamper and concurrent approval were previously verified.
-- **Remaining gaps:** proof-mutation on a fresh pending run, full cross-tenant IDOR matrix, token expiry/revocation, prompt-injection fixture, and concurrent-approval stress on the final deployed commit are documented as residual Phase 9 checks rather than claimed passing.
+  - Demo shred: an Admin (temporary role on the synthetic auditor) shredded a disposable synthetic `BOR-SHRED` borrower. Wrapped key material was deleted, the chain verified `VALID` before and after (2 events), and the probe record was removed. Preview-mode shred denial was verified separately (403).
+  - Kite over-cap/provider-blocked, CORS denial, upload magic bytes, auth/role boundaries, audit tamper and concurrent approval were previously verified.
+- **Remaining gaps:** proof-mutation on a fresh pending run, full cross-tenant IDOR matrix, token expiry/revocation, prompt-injection fixture, log-redaction review under provider failure, and Kite duplicate-payment/reconciliation are documented as residual Phase 9 checks rather than claimed passing.
 - **Final demo data:** BOR-004/005/006/013 approved; failed BOR-007–012/014 removed. BOR-013’s approval is the one captured in the video. No real borrower data exists.
 - **Final deploy:** commit `d608534` deployed to Render API and Vercel preview `https://assay-uhhh2.vercel.app`; authenticated dashboard/report smoke test passed. Root typecheck/build, unit suites and Playwright 18/18 passed on the final code.
 

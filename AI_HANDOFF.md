@@ -87,6 +87,7 @@
 - Unauthenticated 401; analyst/auditor/manager role boundaries; manager DTO excludes raw amounts.
 - Upload magic-byte, page, scan and size validation; Kite over-cap 422 and provider-blocked 503; demo-shred denial.
 - Audit tamper `VALID → INVALID → VALID`; concurrent approval one `201`, one `409`.
+- Demo crypto-shred verified: wrapped key deleted, chain `VALID` before and after; preview-mode shred denied 403.
 - XSS probe escaped; SQL-injection probe rejected 422; secret scan clean; CI secret-hygiene step added.
 - Public signup disabled (`400 EMAIL_PASSWORD_SIGN_UP_DISABLED`).
 
@@ -98,7 +99,7 @@
 4. Prompt-injection fixture against extraction (document text must not alter schema/policy).
 5. Log-redaction review under provider failures.
 6. Kite duplicate-payment/reconciliation policy test; no live payment without exact authority.
-7. Production-mode shred denial and final secret scan on the release commit.
+7. Final secret scan on the release commit (the demo-shred and preview-denial paths are verified).
 
 ## Next exact task
 
