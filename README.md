@@ -71,7 +71,7 @@ pnpm --filter @assay/web dev
 
 The web app runs on `http://localhost:3000`; Fastify on `http://localhost:3001`. Neon Postgres/Auth, private S3-compatible storage, envelope encryption, per-borrower signed audit chains, the Postgres job worker, the fixed-circuit proof worker and the `REDUCED_PII_MODE` Presidio service are wired. The analyst/manager/auditor workflow is implemented end-to-end against synthetic data. Start Presidio separately (see `docs/SETUP.md`). Use `.env.example` as a variable catalogue; copy it to `.env.local` only for local work and never commit the real file.
 
-Phase 1 preview: **https://assay-guyo5yh6z-uhhh2.vercel.app** (protected by Vercel Authentication). The authenticated Phase 3/4 preview is deployed in Phase 5 once the Render API is available; the current Vercel deployment is not a live covenant engine.
+Authenticated preview: **https://assay-uhhh2.vercel.app** (protected by Vercel Authentication), backed by the Render API `https://assay-api-7hy0.onrender.com` and the Neon demo database. Synthetic data only.
 
 ## Development operating modes
 
