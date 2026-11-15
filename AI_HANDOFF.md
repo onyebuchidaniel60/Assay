@@ -5,7 +5,7 @@
 **Repository:** `https://github.com/onyebuchidaniel60/Assay` — public, default branch `main`, Phase 1 commit `5deaa51491e322f5f5fe82b389a7b66206aad126`.  
 **Preview URL:** `https://assay-guyo5yh6z-uhhh2.vercel.app` (Vercel Authentication protected).  
 **Deployed commit:** `5deaa51` — `feat: establish app shell and preview deployment`.  
-**Production release authority:** Authorized by operator, but production release remains gated on the full Phase 5/9 test and security matrix. Three unverified Production deployments created during Phase 1 were removed; only the protected Preview remains. No production deployment is claimed.  
+**Production release authority:** Authorized by operator, but production release remains gated on the full Phase 5/9 test and security matrix. Unverified Production deployments created during Phase 1 were removed, and the Vercel Git link was disconnected to prevent further automatic production deploys. Only the protected Preview remains; no production deployment is claimed.  
 **Data boundary:** Synthetic data only; no real borrower, lender or production records.  
 **New spend authority:** `$0` beyond existing NEAR AI ($1) and SERV ($1) credits.
 
