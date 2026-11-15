@@ -659,7 +659,7 @@ export function registerAnalysisRoutes(app: FastifyInstance) {
       organizationId: user.organizationId,
       jobType: "analysis.extract",
       payload: { analysisRunId: id, organizationId: user.organizationId, actorId: user.userId },
-      idempotencyKey: `analysis-extract:${id}`,
+      idempotencyKey: `analysis-extract:${id}:${context.run.version}`,
       maxAttempts: 1,
     });
     reply.code(202);
