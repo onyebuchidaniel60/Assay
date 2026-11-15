@@ -231,8 +231,21 @@ export class PresidioClient {
   }
 
   async analyze(text: string, scoreThreshold = 0.35): Promise<PresidioEntity[]> {
+    let lastError: unknown;
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      try {
+        return await this.analyzeOnce(text, scoreThreshold);
+      } catch (error) {
+        lastError = error;
+        if (attempt === 0) await new Promise((resolve) => setTimeout(resolve, 2_000));
+      }
+    }
+    throw lastError instanceof PresidioUnavailableError ? lastError : new PresidioUnavailableError();
+  }
+
+  private async analyzeOnce(text: string, scoreThreshold: number): Promise<PresidioEntity[]> {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), this.config.timeoutMs ?? 20_000);
+    const timeout = setTimeout(() => controller.abort(), this.config.timeoutMs ?? 90_000);
     try {
       const headers: Record<string, string> = { "content-type": "application/json" };
       if (this.config.token) headers.authorization = `Bearer ${this.config.token}`;

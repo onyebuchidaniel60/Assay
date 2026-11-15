@@ -27,6 +27,54 @@ const SERV_PROMPT_VERSION = "serv-orchestration-v1";
 
 type PageText = { number: number; text: string };
 
+function asNumber(value: unknown): unknown {
+  if (typeof value === "string" && /^\d+(\.\d+)?$/.test(value.trim())) return Number(value);
+  return value;
+}
+
+function normalizeTermsCandidate(raw: unknown): unknown {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return raw;
+  const source = raw as Record<string, unknown>;
+  const addbacks = Array.isArray(source.permittedAddbacks)
+    ? source.permittedAddbacks.map((item) => {
+        if (!item || typeof item !== "object") return item;
+        const addback = item as Record<string, unknown>;
+        return {
+          ...addback,
+          code: typeof addback.code === "string" ? addback.code.trim() : addback.code,
+          conditions: Array.isArray(addback.conditions) ? addback.conditions : [],
+          capMinor:
+            addback.capMinor === null || addback.capMinor === undefined
+              ? null
+              : typeof addback.capMinor === "number"
+                ? String(addback.capMinor)
+                : addback.capMinor,
+        };
+      })
+    : source.permittedAddbacks;
+  const evidence = Array.isArray(source.evidence)
+    ? source.evidence.map((item) => {
+        if (!item || typeof item !== "object") return item;
+        const entry = item as Record<string, unknown>;
+        return {
+          ...entry,
+          page: asNumber(entry.page),
+        };
+      })
+    : source.evidence;
+  return {
+    ...source,
+    thresholdBps: asNumber(source.thresholdBps),
+    confidence: asNumber(source.confidence),
+    currency: typeof source.currency === "string" && source.currency.trim() ? source.currency.trim().toUpperCase() : undefined,
+    permittedAddbacks: addbacks,
+    evidence,
+    testingDate: source.testingDate === undefined ? null : source.testingDate,
+    cureRightsSummary: source.cureRightsSummary === undefined ? null : source.cureRightsSummary,
+    uncertaintyNotes: Array.isArray(source.uncertaintyNotes) ? source.uncertaintyNotes : [],
+  };
+}
+
 function parseJsonObject(content: string): unknown {
   const trimmed = content.trim().replace(/^```(?:json)?/i, "").replace(/```$/, "").trim();
   try {
@@ -116,9 +164,9 @@ If the document does not contain a maximum leverage covenant, return {"unsupport
         { role: "system", content: system },
         { role: "user", content: userPrompt },
       ],
-      1400,
+      6000,
     );
-    let parsedTerms = covenantTermsSchema.safeParse(parseJsonObject(extraction.chat.content));
+    let parsedTerms = covenantTermsSchema.safeParse(normalizeTermsCandidate(parseJsonObject(extraction.chat.content)));
     if (!parsedTerms.success) {
       extraction = await providers.nearai.attestedExtraction(
         [
@@ -133,9 +181,9 @@ If the document does not contain a maximum leverage covenant, return {"unsupport
               .join("; ")}. Return corrected strict JSON only.`,
           },
         ],
-        1400,
+        6000,
       );
-      parsedTerms = covenantTermsSchema.safeParse(parseJsonObject(extraction.chat.content));
+      parsedTerms = covenantTermsSchema.safeParse(normalizeTermsCandidate(parseJsonObject(extraction.chat.content)));
     }
     if (!parsedTerms.success) {
       await failExtraction(organizationId, runId, borrower.id, actorId, activeExtractionRunId, "EXTRACTION_INVALID");

@@ -25,7 +25,6 @@ import { loadBorrowerDek } from "@assay/db";
 
 const db = createDb();
 const storage = new PrivateObjectStorage();
-const presidio = presidioFromEnv();
 
 async function handleAnalysisParse(job: ClaimedJob): Promise<void> {
   const analysisRunId = String(job.payload.analysisRunId ?? "");
@@ -79,6 +78,7 @@ async function handleAnalysisParse(job: ClaimedJob): Promise<void> {
   };
 
   try {
+    const presidio = presidioFromEnv();
     const dek = await loadBorrowerDek(db, job.organizationId, run.borrowerId);
     const objectBytes = await storage.get(document.storageKey);
     const sealed = JSON.parse(new TextDecoder().decode(objectBytes)) as {
@@ -138,6 +138,7 @@ async function handleAnalysisParse(job: ClaimedJob): Promise<void> {
       return;
     }
     if (error instanceof PresidioUnavailableError) {
+      process.stderr.write(`analysis.parse redaction unavailable: ${error.message}\n`);
       await db
         .update(documents)
         .set({ status: "FAILED", failureCode: "REDACTION_SERVICE_UNAVAILABLE", updatedAt: new Date() })
