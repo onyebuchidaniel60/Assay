@@ -1,0 +1,15 @@
+# Assay Documentation Index
+
+- [Setup](SETUP.md)
+- [Configuration](CONFIGURATION.md)
+- [API](API.md)
+- [Data model](DATA_MODEL.md)
+- [Security](SECURITY.md)
+- [Integrations](INTEGRATIONS.md)
+- [Testing](TESTING.md)
+- [Deployment](DEPLOYMENT.md)
+- [Troubleshooting](TROUBLESHOOTING.md)
+- [Design notes](DESIGN_NOTES.md)
+- [Operator guide](OPERATOR_GUIDE.md)
+- [Research notes](RESEARCH_NOTES.md)
+- [Build log](BUILD_LOG.md)

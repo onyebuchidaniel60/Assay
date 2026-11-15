@@ -1,48 +1,29 @@
-# Configuration and environment variables
+# Configuration
 
-All secret values are server-side only. Never prefix secrets with `NEXT_PUBLIC_`; never expose them through page props, API responses, source maps, logs or client bundles. `.env.example` contains placeholders only.
+Use `.env.example` as the canonical environment variable list. The complete variable matrix is in `MASTER_BLUEPRINT.md` §23.
 
-| Variable | Required | Server/client | Purpose / validation |
-|---|---|---|---|
-| `NODE_ENV` | Yes | Server | `development`, `test` or `production`; production security flags must be on. |
-| `APP_BASE_URL` | Yes | Server | Canonical HTTPS origin used for auth, redirects and URL validation. |
-| `DATABASE_URL` | Yes | Server | PostgreSQL application connection, TLS where remote. |
-| `DATABASE_DIRECT_URL` | Optional | Server | Direct connection for migrations/admin tooling; never client-exposed. |
-| `BETTER_AUTH_SECRET` | Yes | Server | High-entropy session/signing secret; minimum length enforced; unique per environment. |
-| `BETTER_AUTH_URL` | Yes | Server | Canonical auth base URL; must match approved host. |
-| `SEED_ADMIN_EMAIL` | Dev/seed only | Server | Synthetic seed account identity; never enable public self-signup. |
-| `SEED_ADMIN_PASSWORD` | Dev/seed only | Server | Seed secret; do not commit or log. Rotate/disable after seed. |
-| `VULTR_INFERENCE_API_KEY` | AI mode | Server | Vultr inference bearer key; secret manager/runtime only. |
-| `VULTR_INFERENCE_BASE_URL` | Yes in AI mode | Server | Default `https://api.vultrinference.com/v1`; validate HTTPS and allowlisted host. |
-| `VULTR_INFERENCE_MODEL` | Yes in AI mode | Server | Proposed `deepseek-v4.1-flash-1017`; verify live catalog and response model ID. |
-| `VULTR_INFERENCE_TIMEOUT_MS` | Yes | Server | Bounded request timeout; set from tested latency, no infinite wait. |
-| `VULTR_INFERENCE_MAX_TOKENS` | Yes | Server | Output cap and cost control. |
-| `VULTR_INFERENCE_MAX_CONCURRENT` | Yes | Server | Worker concurrency cap. |
-| `S3_ENDPOINT` | Yes | Server | Vultr Object Storage HTTPS S3 endpoint for selected region. |
-| `S3_REGION` | Yes | Server | Region identifier required by the S3 client/signature. |
-| `S3_BUCKET` | Yes | Server | Private bucket name; validate expected environment prefix. |
-| `S3_ACCESS_KEY_ID` | Yes | Server | Restricted Object Storage credential. |
-| `S3_SECRET_ACCESS_KEY` | Yes | Server | Restricted Object Storage secret. |
-| `STORAGE_PROVIDER` | Yes | Server | `vultr` in deployed environment; local adapter only for dev/test. |
-| `MAX_UPLOAD_BYTES` | Yes | Server | Default 25 MiB hard limit; validate server-side. |
-| `MAX_PDF_PAGES` | Yes | Server | Bounded parser resource limit; initial default 200 pages. |
-| `PDF_PARSER_URL` | Yes | Server | Private internal parser endpoint; reject public/loopback bypass routes. |
-| `CLAMAV_HOST` | Yes | Server | Private scanner address; fail closed if scanner is mandatory and unavailable. |
-| `PG_BOSS_SCHEMA` | Yes | Server | Queue schema name; restrict privileges. |
-| `LOG_LEVEL` | Yes | Server | `info` default in prod; never enable sensitive payload logging. |
-| `AUDIT_HASH_VERSION` | Yes | Server | Versioned canonicalization/hash algorithm identifier; initial `sha256-v1`. |
-| `DEMO_MODE` | Yes | Server | Explicitly seeded synthetic demo behavior; never turns off auth or authorization. |
-| `PREVIEW_ALLOWED_ORIGIN` | Yes in preview | Server | Exact origin used for CORS/origin checks; no wildcard. |
-| `GOOGLE_TTS_API_KEY` | Optional | Server | Only if approved free Google TTS is validated; never assume free tier or spend. |
-| `APP_LOG_REDACT_PATHS` | Optional | Server | Additional Pino redaction fields, not a substitute for default redaction. |
-| `BACKUP_BUCKET_PREFIX` | Optional | Server | Private prefix for encrypted database backups; no public ACL. |
+## Client-safe values
 
-## Validation rules
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `NEXT_PUBLIC_APP_URL`
+- `API_PUBLIC_URL`
 
-- Parse and validate environment at process startup with Zod; fail startup on missing/invalid critical variables.
-- Reject production config that selects local filesystem/MinIO storage.
-- Reject non-HTTPS inference/storage endpoints in deployed environments.
-- Validate the exact inference response model identifier; do not accept provider fallback.
-- Use separate secrets, buckets and DBs for local, preview and production.
-- Keep secrets out of `.env.example`; list names and descriptions only.
-- Rotate credentials if exposed and record incident response.
+The anon key is not a secret, but table/storage access still requires RLS and server authorization.
+
+## Server-only secrets
+
+`SUPABASE_SERVICE_ROLE_KEY`, `DATABASE_URL`, `SERV_REASONING_API_KEY`, `DOLPHIN_API_KEY`, `REPPO_API_KEY`, `PRESIDIO_SERVICE_TOKEN`, `DATA_KEK_BASE64`, `AUDIT_SIGNING_PRIVATE_KEY_BASE64` and any optional Kite credentials. Never prefix them with `NEXT_PUBLIC_`.
+
+## Provider flags
+
+- `DOLPHIN_PRIVACY_TERMS_VERIFIED=false` by default. Only set true after official @dphnAI endpoint/model/terms have been reviewed and documented.
+- `REPPO_ENABLED=false` until key, quota and synthetic-only payload contract are verified.
+- `KITE_ENABLED=false` until CLI/SDK, testnet, owner-approved session and exact spend ceiling are verified.
+- `ENABLE_DEMO_SHRED=false` outside a controlled synthetic demo.
+
+## Environment separation
+
+Use separate Supabase projects and service keys for local development, preview and any production environment. Do not reuse a production key in a preview deployment. Preview must never connect to production borrower records. Production is out of scope and unauthorized by default.
+
+The app validates the environment with Zod at startup. Logs may show variable names that are missing, never values.

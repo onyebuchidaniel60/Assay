@@ -1,36 +1,27 @@
-# Design notes — pending supplied reference
+# Design Notes — Reference-led UI
 
 ## Status
 
-No reference image was supplied or verified when this blueprint was authored. Phase 0 must obtain the image(s) or express operator permission for generated reference imagery. No mockup phase exists.
+Pending Phase 0 reference image(s). No image has been received in the blueprint request. The temporary Phase 1 system is a neutral functional shell; it is not the final visual direction.
 
-## Intended visual character
+## Reference inventory
 
-An original, high-trust enterprise financial operations interface. Optimize for information clarity, source traceability, fast exception triage and safe review. The reference image governs concrete visual direction once supplied; this default must not be mistaken for an inspected reference.
+See root `REFERENCE_ASSETS.md`. Record exact path, source/ownership, routes informed and asset restrictions once supplied.
 
-## Principles to capture from the actual image
+## Interpretation template
 
-- Layout and navigation composition.
-- Information density and hierarchy.
-- Typography and number readability.
-- Spacing, grids and alignment.
-- Color semantics and restrained status treatment.
-- Table, card, detail-pane and form patterns.
-- Interaction states and feedback.
-- Responsive transformations.
+For each reference, document:
 
-## Product-specific requirements that visual inspiration cannot override
+- Composition and grid.
+- Information hierarchy and visual density.
+- Typography scale, weights and line lengths.
+- Color roles and contrast.
+- Spacing/rhythm and container widths.
+- Navigation and interaction patterns.
+- Component language: cards, tables, buttons, inputs, dialogs, status indicators.
+- Responsive interpretation at desktop/tablet/mobile.
+- Accessibility adjustments and intentional deviations.
 
-- Compliance states must be text-labelled, not color-only.
-- AT_RISK forecast and BREACHED actual must be unmistakably different.
-- Evidence source/page must be one interaction away from financial result.
-- Verification failure, stale approval and missing evidence must be explicit.
-- Critical approval action must display the exact version/payload being approved.
-- Avoid irreversible action controls that imply autonomous external execution.
-- Preserve WCAG 2.2 AA-oriented contrast, keyboard focus and semantics.
+## Implementation rule
 
-## Implementation record (fill during Phase 6)
-
-| Reference asset | Observed principle | CovenantOps adaptation | Intentional deviation and reason |
-|---|---|---|---|
-| Pending | Pending | Pending | Pending |
+Translate these design principles into an original Assay UI. Do not reproduce third-party branding, distinctive trade dress, copyrighted copy or protected assets. Do not create a mockup, prototype or approval milestone. Implement the real interface directly and record relevant decisions here.

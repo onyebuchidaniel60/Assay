@@ -1,35 +1,23 @@
-# REFERENCE_ASSETS.md — UI reference inventory
+# Assay — Reference Asset Register
 
-## Current verified inventory
+## Current status
 
-**No UI reference image was attached to the project brief or the current blueprint conversation.** No reference-image filename or repository path has been verified. The agent must not invent one, infer one from a screenshot description, or claim it was supplied.
+**No UI reference image was attached with the current blueprint request.** This is an explicit initial-intake blocker under the supplied workflow. Do not invent filenames, paths, provenance or design observations.
 
-## Intake requirement
+## Required operator-supplied asset(s)
 
-Before repository changes, obtain one of:
+| Asset ID | Exact filename/path | Source / owner | Intended use | Review status |
+|---|---|---|---|---|
+| UI-REF-01 | PENDING — operator to attach during Phase 0 | PENDING | Primary visual direction for dashboard and core screens | Not received |
+| UI-REF-02 | Optional | PENDING | Secondary screen/responsive reference if supplied | Not received |
 
-1. One or more operator-supplied reference images, with exact filenames/paths, source/ownership and intended use; or
-2. The operator's explicit authorization for the agent to generate a reference image, recorded verbatim or clearly summarized in `OPERATOR_INTAKE.md`.
+## Agent instructions
 
-If neither is available, Phase 0 remains blocked. Ask for all missing intake details in the same consolidated readiness interaction; do not ask later in a separate UI approval cycle.
+1. During the consolidated intake, request the missing reference image(s) once, together with the other critical missing inputs.
+2. Confirm the exact attachment filename and accessible path in the active environment; do not infer a path from the visible filename.
+3. Record source/ownership and any third-party brand/asset restrictions.
+4. Inspect the image itself and describe composition, hierarchy, color, spacing, typography, density, components, navigation, interaction cues and responsive implications.
+5. Implement the actual UI directly from these principles. Do not create mockups or ask for mockup approval.
+6. Record the interpretation and intentional deviations in `docs/DESIGN_NOTES.md`.
 
-## Inventory table
-
-| Asset path | Source/owner | Permission/usage | Intended screens | Inspected | Notes |
-|---|---|---|---|---|---|
-| None verified | N/A | N/A | N/A | No | Await operator input |
-
-## Inspection checklist
-
-For each supplied/generated asset, record:
-- Exact path and file type/dimensions.
-- Source and ownership/permission to use as visual guidance.
-- Product screens it should influence.
-- Composition, information hierarchy, density, spacing, typography, color, components, navigation and interaction patterns observed.
-- Responsive interpretation for desktop, tablet and mobile.
-- Which elements are visual inspiration only and must not be copied (logos, protected text, proprietary assets, trade dress).
-- Intentional deviations needed for CovenantOps workflows, accessibility and original product identity.
-
-## Output
-
-The implementation agent updates this file during Phase 0 and writes design decisions and deviations to `docs/DESIGN_NOTES.md` during Phase 6. No separate mockup/prototype artifact or approval gate is part of this workflow.
+If the operator explicitly authorizes agent-generated reference imagery, record that authorization and the generated asset's exact path and source. Never represent generated imagery as an operator-supplied reference.

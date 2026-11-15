@@ -1,64 +1,50 @@
-# AI_HANDOFF.md — Current implementation state
+# Assay — AI Handoff / Build State
 
-**Project:** CovenantOps — Financial Covenant Operations Platform  
-**Blueprint version:** 1.0  
-**Last updated:** 2026-11-08  
-**Implementation status:** Not started; blueprint and handoff package only  
-**Current phase:** Phase 0 — consolidated operator intake/readiness  
-**Application code written by this blueprint session:** No
+**Status:** Blueprint complete; implementation not started.  
+**Current phase:** Phase 0 — Operator Intake / Readiness pending.  
+**Repository:** `https://github.com/onyebuchidaniel60/Assay` (operator intends to clear existing contents first).  
+**Preview URL:** Not deployed.  
+**Deployed commit:** None.  
+**Production release authority:** Not granted.  
+**Data boundary:** Synthetic data only; no real borrower records.
 
-## Current state
+## Completed
 
-- Product specification: drafted in `PROJECT_SPEC.md`.
-- Business logic: fixed in `BUSINESS_LOGIC.md`.
-- Architecture and stack: fixed in `ARCHITECTURE.md`.
-- Data model/API/security/UI requirements: documented in their respective files.
-- Autonomous phases: documented in `IMPLEMENTATION_PLAN.md`.
-- Persistent agent rules: `AGENTS.md`.
-- Operator intake: see `OPERATOR_INTAKE.md`; not yet completed.
-- UI reference image: **not attached to this conversation and not verified in a repository**. Must be supplied or generated only with express operator authorization during intake.
-- Repository: not supplied/identified in this blueprint session. Existing repository and Git state must be inspected before modification.
-- Vultr account, credentials, quotas, region, domain and permissions: not verified.
-- Preview URL: **none**. No deployment has occurred.
-- Deployed commit: **none**.
-- Production release: **not authorized**.
-- Budget ceiling: **not supplied**; no paid provisioning or service use authorized.
-- `stageshow` skill: not installed or inspected yet; required attempt at start of UI phase.
-- Tests: none run; no application implementation exists.
-- Demo video: not produced; no capture/narration performed.
+- Product definition and MVP boundary documented.
+- Four staff roles and access matrix documented.
+- Primary analyst, manager, auditor, admin and partner journeys documented.
+- Deterministic covenant arithmetic and state machine defined.
+- Data model, API and transaction rules defined.
+- Architecture and stack fixed: Next.js, Fastify, Supabase, Render, Vercel, Presidio, Circom/SnarkJS.
+- Security, privacy, AI, provider and payment controls documented.
+- Autonomous implementation phases and checkpoint rules documented.
+- README/docs, reference asset inventory and final demo deliverables specified.
 
-## Fixed product/architecture constraints
+## Intake blockers
 
-- Product name: CovenantOps.
-- Customer: commercial lenders and private credit firms.
-- MVP: one contract-configurable maximum Debt/EBITDA covenant, deterministic assessment, separate forward-looking scenario, evidence trace, fail-closed verification, exception/case workflow, human approval, stale-decision invalidation and hash-linked audit history.
-- No universal covenant coverage claim; no OCR in MVP; scanned PDFs go to review.
-- AI proposes extraction and drafts prose only; it never performs authoritative arithmetic, activates formulas, approves, sends communications or changes audit history.
-- Fixed implementation stack and deployment are in `ARCHITECTURE.md`.
-- Preview uses synthetic data and isolated preview credentials. Production is prohibited without explicit authority.
+1. **UI reference image(s) not yet supplied.** Required before implementation begins under the workflow guide. Record exact filenames/paths and provenance once received.
+2. **OpenServ SERV key/model/catalog access** must be supplied/verified.
+3. **Dolphin @dphnAI** exact endpoint, model name, auth mechanism and privacy/service terms must be verified. Do not use the unrelated `api.dolphinllm.com` endpoint as a substitute.
+4. Vercel, Render and Supabase access must be verified. Confirm which plans are available and no new paid resource will be created without authorization.
+5. Reppo key is optional; no Reppo call until provided and synthetic-only policy verified.
+6. Kite Passport is optional; no wallet funding or testnet spend without exact per-payment/total cap, asset, session owner and allowed service explicitly authorized.
+7. Google TTS key/free quota is optional; check current free tier and terms. Use local free fallback if unavailable.
 
-## Next exact task
+## Known defaults / authority
 
-1. Read the complete handoff package and inspect the actual repository without modifying it.
-2. Complete every applicable row in `OPERATOR_INTAKE.md` in one consolidated operator interaction; do not ask questions whose answers are already in the repository or handoff.
-3. Verify the reference image asset or record express permission for agent-generated reference imagery.
-4. Validate repository write access, Vultr account and region, budget ceiling, Compute provisioning authority, Object Storage access, Inference key/model/catalog, domain/DNS/TLS, SSH/firewall access, preview authority and data policy.
-5. Verify the model with a safe test and confirm the response model ID exactly matches the configured ID.
-6. Do not begin implementation until all critical readiness inputs are validated. Then execute Phase 1 onward autonomously.
+- Synthetic data only.
+- No paid spend or top-ups by default.
+- No Kite wallet spend by default.
+- Preview deployment only after account access is verified.
+- Production deployment is not authorized unless explicitly granted in the completed intake.
+- `ENABLE_DEMO_SHRED=false` except during an explicitly authorized synthetic demo.
+- No public signup.
+- No live borrower information.
 
-## Checkpoint template
+## Verification evidence
 
-```text
-Current phase:
-Completed:
-Tests and evidence:
-Preview/staging URL:
-Deployed commit:
-Reference image and UI skill status:
-Documentation status:
-Demo video status:
-Known issues:
-Authorization boundaries:
-Next task:
-Blocked by (if any):
-```
+No implementation or test results exist yet. This file must be updated at every internal checkpoint with exact commands, results, URLs, commits, integration status and remaining issues.
+
+## Next task — exact start point
+
+Read `AGENTS.md`, `PROJECT_SPEC.md`, `ARCHITECTURE.md`, `IMPLEMENTATION_PLAN.md`, `OPERATOR_INTAKE.md`, `REFERENCE_ASSETS.md`, `DEMO_VIDEO_PLAN.md` and `MASTER_BLUEPRINT.md`. Inspect repository/Git status without changes. Complete the entire consolidated Operator Intake/Readiness Check in one pass; validate reference images, credentials, provider endpoints, account permissions, deployment access and budget/production boundaries. Do not modify the repository or begin Phase 1 while critical intake items remain unresolved. Once the intake passes, proceed to Phase 1 and execute all remaining phases autonomously.

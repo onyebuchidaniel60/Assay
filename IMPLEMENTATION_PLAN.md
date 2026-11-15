@@ -1,47 +1,85 @@
-# IMPLEMENTATION_PLAN.md — Autonomous implementation sequence
+# Assay — Autonomous Implementation Plan
 
-Phases are internal checkpoints. At each: implement, test, inspect, fix, commit, update `AI_HANDOFF.md` and `docs/BUILD_LOG.md`, then continue. No routine approval pauses.
+The phases below are internal engineering checkpoints, not human approval gates. After each checkpoint: test, inspect, fix, commit, update `AI_HANDOFF.md` and `docs/BUILD_LOG.md`, then continue automatically.
 
-## Phase 0 — One consolidated intake/readiness
-1. Read all handoff files and inspect repository without modifying code.
-2. Record Git status, remotes, stack, manifests, migrations, tests, CI/deploy configuration and environment presence without printing secret values.
-3. Complete all applicable inputs in `OPERATOR_INTAKE.md` in one conversation; do not ask already-answered questions.
-4. Inspect exact supplied UI reference image(s), update `REFERENCE_ASSETS.md`; if missing, request them or obtain express generation authorization.
-5. Verify repository write access, Vultr Compute/Object Storage/Inference access, DNS/domain, deploy method, cost limits and scope.
-6. Query live `/v1/models`, make safe inference request and verify returned `model` exactly matches configured ID. Mismatch is a readiness failure for AI mode.
-7. Confirm protected preview HTTPS domain and preview deployment authority; record production authority separately.
-8. No code changes until critical inputs pass. Safe planning/docs may continue if independent.
+## Mandatory sequence
 
-Critical inputs: repo write access; reference image or express generated-image authorization; Vultr/compute/storage/inference access; domain/HTTPS preview path; cost cap; secrets/data policy; deploy permission. Outputs: completed intake, repo baseline, service validation, asset inventory.
+**Complete operator intake → early skeletal frontend deployment → core functionality → end-to-end verification → reference-image-led UI implementation → frontend/docs/footer completeness → demo video → final regression and authorized release.**
 
-## Phase 1 — Foundation + skeletal frontend + early preview
-Create/preserve pnpm workspace; Next app shell; real route/nav structure; responsive placeholders explicitly labelled unfinished; health endpoints; Docker/Compose/Caddy files; `.env.example`, ignore/secrets rules. Provision only within cap. Secure VM/firewall and domain TLS. Deploy safe synthetic preview. Record exact URL and commit. Test install/lint/typecheck/build, route smoke, responsive shell, TLS and exposed ports. Commit `feat: establish app shell and Vultr preview deployment`.
+### Phase 0 — Consolidated Operator Intake / Readiness
 
-## Phase 2 — Backend/data/auth foundation
-Drizzle schema/migrations; Better Auth; seeded/invite access; session/membership/permission middleware; tenant repositories; Object Storage adapter; pg-boss boot; Pino redaction/request IDs; audit append/head; health readiness. Test migrations, auth, role matrix, IDOR, health, secrets absent in bundle/logs and atomic audit. Commit after passing.
+Read all handoff files and inspect repository/Git metadata without editing. Fill `OPERATOR_INTAKE.md` in one pass. Verify product inputs, missing image references, repository access, accounts, deployment, provider credentials, external permissions, costs, data restrictions, production authority and demo output. Verify endpoint/model and privacy terms for each activated provider. Do not begin implementation while a critical input or required reference image is missing. Optional integrations may remain disabled.
 
-## Phase 3 — Domain/API behavior
-Build in order: borrower/facility CRUD; document upload/version/hash/scan/parser/queue; covenant extraction and source quote validation; formula AST validation + manager activation; financial extraction/review/conflict handling; Decimal calculator/golden tests; independent verifier/classification; forecast scenario; case lifecycle/idempotency; memo drafting/approval; stale invalidation/audit verify; dashboard/export. Each route gets Zod contract, permission test, sanitised errors and audit behavior.
+**Commit:** `docs: complete operator intake and readiness`.
 
-## Phase 4 — Functional frontend integration
-Connect all P0 screens to working APIs; use consistent temporary design system. Implement loading/empty/error/denied states. Test forms, permission behavior, API wiring and keyboard navigation.
+### Phase 1 — Repository/platform foundation + early skeletal UI
 
-## Phase 5 — E2E functionality gate (before final styling)
-Critical demo E2E: analyst login → create borrower/facility → upload agreement/statement → extract covenant/metrics → submit covenant → manager approves → confirm evidence → actual 3.20x compliant and verified → forecast 3.63x at-risk but actual unchanged → update debt to 37m → verified 3.70x breached → create case → draft memo → manager approves → supersede evidence → mark dependent assessment stale/pending approval invalidated → reassess → inspect audit chain.
+Create clean pnpm monorepo, route-complete Next.js shell, responsive nav, login and role placeholder screens, Fastify health route, env validation, CI lint/typecheck/build, Vercel frontend preview and Render API placeholder. All unfinished areas must be visibly labelled. Record exact URL and deployed commit.
 
-Failure suite: scanned/malformed/encrypted PDF; oversized/wrong MIME; parser timeout; invalid extraction schema/citation; wrong model fallback; missing metric; wrong period/currency; divide by zero; unauthorized/self/concurrent approval; duplicate case/assessment; cross-tenant IDOR; prompt injection; audit tamper. Gate: unit/integration/E2E pass; no unresolved critical/high issue; preview URL+commit+evidence recorded. Diagnose/fix/retest automatically.
+**Acceptance:** navigable preview, safe test configuration, no production data/secrets.  
+**Commit:** `feat: establish app shell and preview deployment`.
 
-## Phase 6 — Reference-image UI + skill
-Attempt `npx skills add benjitaylor/skills --skill stageshow`; inspect instructions and apply relevant guidance. Optional additional relevant trustworthy skills. Directly implement actual UI from supplied images; no mockup or approval gate. Record design decisions/deviations. If install fails, record and continue with strong accessibility/design-system practices.
+### Phase 2 — Backend/data/auth foundation
 
-## Phase 7 — Frontend/docs/footer completeness
-Finish responsive and accessibility checks at 1440/1280/768/390/360 and 200% zoom; metadata/icons; loading/empty/error/success/denied/not-found/stale; no inert links/actions; README and docs; footer links to actual public Documentation and GitHub destinations only (never expose private repo). Commit.
+Create Drizzle schema/migrations, Supabase Auth verification, profile roles, private bucket, encryption envelope service, signed audit chain, Postgres job queue/worker, Presidio service/custom recognizers and readiness health checks.
 
-## Phase 8 — Demo video <=180 sec
-Capture real deterministic app interactions with Playwright. Check Google AI voice/TTS current free tier, terms, quota, region and credentials; no paid use without authority. If unavailable, use genuinely free licensed local TTS (e.g. Piper only after voice model license check) and document. Script narration tied to visible actions, synchronize naturally, captions where feasible, redact sensitive details, render and review full playback/audio/duration. Save video, script, capture steps and production notes in approved directory.
+**Acceptance:** auth/RBAC tests pass; sample file stored as ciphertext; queue survives service restart; audit tamper tests pass.  
+**Commit:** `feat: add auth data and security foundations`.
 
-## Phase 9 — Final regression/security/authorized release
-Run all regression/security tests, dependency/secret scans, TLS/firewall/bucket checks, backup/restore check and demo smoke tests. Deploy production only with explicit authority for exact environment/domain/actions; otherwise leave verified preview and exact release steps. Update final handoff/build log and docs.
+### Phase 3 — Core domain and APIs
+
+Implement borrower/facility, upload/parse/redaction, bounded SERV graph, verified Dolphin adapter, covenant term schema/review, financial inputs, deterministic engine/scenarios, Circom/SnarkJS proof, manager approval and audit APIs. Add Reppo/Kite only behind feature flags and only with authorized credentials.
+
+**Acceptance:** API-level MUST HAVE requirements pass; no pretend integration state.  
+**Commit:** `feat: implement covenant analysis workflow`.
+
+### Phase 4 — Functional frontend integration
+
+Connect upload, redaction, extraction, terms review, financial entry, calculation, proof, manager review, audit and provider states. Use a consistent temporary visual system. Build every relevant loading/empty/error/denied/success state.
+
+**Acceptance:** primary user journey works through real APIs; no inert controls.  
+**Commit:** `feat: connect analyst and manager workflows`.
+
+### Phase 5 — End-to-end functionality gate
+
+Seed deterministic synthetic demo data. Execute analyst and manager journeys, breach/proof failure, role denial, audit verification, provider outage and concurrency tests on the deployed preview. Review logs for raw data/secret leakage. Fix failures and rerun.
+
+**Acceptance:** unit/integration/E2E pass, no unresolved critical/high issue, deployed commit and test evidence recorded. Final UI refinement is blocked until this passes.  
+**Commit:** `test: verify primary covenant analysis journeys`.
+
+### Phase 6 — Reference-image-led final UI
+
+Run `npx skills add benjitaylor/skills --skill stageshow`; inspect instructions; inspect supplied reference image(s); implement the actual product UI directly. No mockups or approval cycle. Optional additional UI skills may be used if trustworthy and relevant.
+
+**Acceptance:** visual implementation reflects reference principles, preserves app behavior and accessibility; `docs/DESIGN_NOTES.md` updated.  
+**Commit:** `feat: implement reference-led product interface`.
+
+### Phase 7 — Frontend and documentation completeness
+
+Finish responsive behavior, navigation/footer, accessibility, metadata/icons, error/empty/not-found states, real verified links, comprehensive README, setup/configuration/testing/deployment/troubleshooting/operator/API/data/security docs, build log and final link checks.
+
+**Acceptance:** no dead links/inert controls; docs verified against the built app; private repo never linked publicly.  
+**Commit:** `docs: complete user and developer documentation`.
+
+### Phase 8 — Required demo video
+
+Record real app behavior through Playwright with deterministic synthetic data in a clean browser profile. Generate a concise 90–150 second script. Verify current free Google Gemini TTS model/availability/quota/terms; if unavailable or unsuitable, use a genuinely free permitted local TTS. Edit and synchronize, caption where feasible, redact sensitive information, render and review.
+
+**Outputs:** `artifacts/demo/assay-demo.mp4`, `assay-demo-script.md`, `assay-demo.srt`, `production-notes.md`.  
+**Acceptance:** final video <=180 seconds; no clipping, unexplained long gaps or mismatched narration; audio/video plays end-to-end.  
+**Commit:** `docs: add reviewed product demo`.
+
+### Phase 9 — Final regression/security/authorized release
+
+Run full tests, dependency/security scans, final preview smoke and production checks. Deploy production only when explicitly authorized in intake. Otherwise leave verified staging preview and write exact release instructions.
+
+**Acceptance:** no critical/high issues; final commit and environment evidence recorded; production boundary honored.  
+**Commit:** `chore: prepare verified release`.
+
+## Stop conditions
+
+Stop only for missing indispensable access/credentials with no safe fallback, serious security/data-loss risk, unavailable dependency with no safe fallback, budget/scope limit, or action beyond explicit authority. State exact blocker/evidence/completed work/minimum operator action. Continue unaffected work. Do not stop for a routine phase boundary, mockup approval or preference check.
 
 ## Checkpoint record
-At each checkpoint record phase, completed work, exact test commands/results, preview URL, deployed commit, migration state, reference/skill state, docs/demo state, issues/severity, authorization boundaries, next task and blocker/minimum operator action. Resume from Git + handoff + build log; do not redo completed work. Never claim a test passed without evidence.
+
+Every phase updates: current phase; completed work; test commands/results; preview URL; deployed commit; references/skill status; docs status; demo status; known issues; authority boundaries; next task; blocker (if any).

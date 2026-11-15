@@ -1,45 +1,83 @@
-# CovenantOps — Implementation Handoff Package
+# Assay
 
-**Version:** 1.0 | **Prepared:** 8 November 2026 | **Status:** Blueprint complete; operator readiness pending.
+**Privacy-conscious, AI-assisted covenant monitoring for credit teams.**
 
-## Start here
-1. Read `PROJECT_SPEC.md`.
-2. Read `ARCHITECTURE.md`, `BUSINESS_LOGIC.md`, `DATA_MODEL.md`, `API.md`, `SECURITY.md`, and `UI_UX.md`.
-3. Complete `OPERATOR_INTAKE.md` once, before editing the repository.
-4. Obtain the reference image(s) recorded in `REFERENCE_ASSETS.md` or receive express authorization to generate them.
-5. Execute `IMPLEMENTATION_PLAN.md` autonomously under `AGENTS.md`.
-6. Maintain `AI_HANDOFF.md` and `docs/BUILD_LOG.md` at every checkpoint.
+Assay helps a credit analyst review one maximum Debt / Adjusted EBITDA covenant from a credit agreement, calculate compliance using deterministic arithmetic, inspect two downside scenarios, and route an eligible result to a manager for approval with a verifiable proof and tamper-evident audit record.
 
-## Readiness status
-- Product, MVP, business rules and architecture: specified.
-- UI reference: **not attached**; required at intake or generated only with express authorization.
-- Repository, domain, Vultr access, credentials and cost ceiling: unknown; intake required.
-- Production release: **not authorized** by this blueprint.
-- Demo data: synthetic only.
+> **MVP limitation:** Assay is a demonstration/workflow prototype using synthetic data only. It is not a lending decision system, legal interpretation service, full credit-underwriting platform or production compliance certification. Do not upload real borrower information.
 
-## Fixed MVP promise
-A credit analyst onboards a borrower and facility; uploads a synthetic credit agreement and financial statement; reviews source-linked extraction; submits a contract-configurable Debt/EBITDA covenant for manager activation; confirms financial evidence; runs an actual and separate forecast scenario; gets deterministic calculation and independent verification; opens a breach case; drafts an escalation memo; gets manager approval; then changes evidence and demonstrates stale assessment/approval invalidation. The audit timeline shows the full chain.
+## What Assay does
 
-## Package files
-`IMPLEMENTATION_BLUEPRINT.md` (master sections 1–30), `PROJECT_SPEC.md`, `ARCHITECTURE.md`, `BUSINESS_LOGIC.md`, `DATA_MODEL.md`, `DATABASE_OPERATIONS.md`, `API.md`, `SECURITY.md`, `UI_UX.md`, `EDGE_CASE_MATRIX.md`, `IMPLEMENTATION_PLAN.md`, `AGENTS.md`, `AI_HANDOFF.md`, `OPERATOR_INTAKE.md`, `REFERENCE_ASSETS.md`, `DEMO_VIDEO_PLAN.md`, the full `docs/` operator guides and `reference/PROPER_VIBE_CODING_WORKFLOW_AUTONOMOUS.md`.
+1. A credit analyst creates a synthetic borrower and facility.
+2. The analyst uploads a text-based PDF or TXT agreement.
+3. Assay encrypts the document before private storage, parses its text and uses Presidio to detect/tokenize identifying fields.
+4. The analyst reviews redaction before any model call.
+5. AI extracts a single Debt / Adjusted EBITDA covenant, its threshold and permitted add-back definitions, with supporting quote/page evidence. SERV Reasoning handles bounded interpretation and routing; the analyst confirms the result.
+6. The analyst enters total debt, reported EBITDA and permitted add-backs.
+7. Assay calculates leverage and headroom deterministically, then runs an EBITDA-downside and debt-upside scenario.
+8. A fixed ZK circuit proves the baseline inequality when compliant. A manager approves or rejects from a restricted view; proof verification is required before approval.
+9. Assay records material events in an encrypted, signed hash chain that can be verified.
 
-## Current technical references (revalidate at implementation)
-- Vultr Serverless Inference: https://api.vultrinference.com/docs
-- Vultr Inference quickstart/model behavior: https://api.vultrinference.com/docs/get-started/quickstart
-- Vultr Object Storage compatibility: https://docs.vultr.com/products/storage/object-storage/s3-compatibility-matrix
-- Vultr Cloud Compute firewall: https://docs.vultr.com/products/compute/instances/cloud-compute/networking/enable-firewall
-- PostgreSQL version support: https://www.postgresql.org/support/versioning/
-- Node.js release/LTS status: https://nodejs.org/en/about/previous-releases
-- Better Auth Drizzle/PostgreSQL adapter: https://better-auth.com/docs/installation
-- Next.js support policy: https://nextjs.org/support-policy
+## What Assay does not do
 
-Provider pricing, regional availability, data-processing terms, credentials and limits are not assumed.
+- It does not decide whether to lend, underwrite the borrower or recommend a credit limit.
+- It does not support arbitrary covenant families.
+- It does not autonomously extract financial statement amounts from any arbitrary document; the analyst enters and attests those values.
+- It does not support production borrower data, multi-tenant access, a borrower portal or mobile apps.
+- It does not custody funds or make customer payments.
+- It does not claim TEE-grade security, legal compliance, absolute zero retention or differential privacy unless separately implemented and verified.
 
-## Reviewer/demo access
-The live preview should use synthetic-only records and pre-seeded demo roles. During intake, decide how hackathon reviewers are allowed to access the public URL (for example, a limited read-only reviewer account plus a separate resettable analyst/manager demo environment). Never publish infrastructure credentials or unrestricted admin credentials. Any demo credentials must be isolated, revocable, resettable and limited to synthetic data.
+## User roles
 
-## Source methodology
-The original operator-supplied workflow document is preserved in `reference/PROPER_VIBE_CODING_WORKFLOW_AUTONOMOUS.md`. The phase sequence, consolidated intake, autonomous checkpoints, early shell deployment, reference-image-led UI implementation, StageShow skill requirement, final documentation and <=3-minute reviewed demo are derived from that source. This blueprint applies the source methodology to CovenantOps rather than replacing it.
+- **Credit Analyst:** creates records, uploads agreements, reviews redaction/terms, enters figures and runs analysis.
+- **Credit Manager:** sees a limited compliance summary and approves/rejects eligible runs.
+- **Auditor:** reads audit metadata, signatures, proof and approval evidence.
+- **Workspace Admin:** manages staff access and integration health; no default access to financial content.
 
-## Important readiness blockers
-The package is design-complete but not deployment-ready until the operator intake is completed. In particular, no reference image, repository URL/access, numeric cost ceiling, Vultr account/service credentials, region, domain or preview deployment authority was supplied. Production deployment is expressly not authorized. No code, preview, tests or demo video have been created.
+## Getting started
+
+The repository is structured as a pnpm monorepo. The implementation team must complete the one-time `OPERATOR_INTAKE.md` before coding. Required access and secrets are never committed to Git.
+
+See:
+- [Complete implementation blueprint](MASTER_BLUEPRINT.md)
+- [Setup](docs/SETUP.md)
+- [Configuration](docs/CONFIGURATION.md)
+- [API](docs/API.md)
+- [Data model](docs/DATA_MODEL.md)
+- [Security](docs/SECURITY.md)
+- [Integrations](docs/INTEGRATIONS.md)
+- [Testing](docs/TESTING.md)
+- [Deployment](docs/DEPLOYMENT.md)
+- [Operator guide](docs/OPERATOR_GUIDE.md)
+- [Troubleshooting](docs/TROUBLESHOOTING.md)
+
+## Developer quick start
+
+Prerequisites: Node.js 24 LTS, pnpm, Python 3.12, Docker (for local Supabase/Presidio where used), Circom 2.x and SnarkJS. Exact patch versions are pinned in lockfiles and image definitions.
+
+```bash
+pnpm install
+pnpm db:generate
+pnpm db:migrate
+pnpm dev
+```
+
+The commands above become available after implementation. Use `.env.example` as a variable catalogue; copy it to `.env.local` only for local work and never commit the real file. The API validates required variables at startup.
+
+## Development operating modes
+
+- **Local development:** Supabase local or a dedicated development project, synthetic fixtures, provider calls disabled by default.
+- **Preview:** Vercel frontend + Render API/Presidio + Supabase demo project; sandbox providers only; `ENABLE_DEMO_SHRED=false` unless an explicitly authorized demo session requires it.
+- **Production:** not part of this MVP. Production deployment requires separate operator authorization and a production security/retention review.
+
+## Documentation and demo
+
+README and `docs/` are maintained alongside functionality. The final submission includes a real, reviewed demo video under `artifacts/demo/` (maximum 180 seconds), its script, captions and production notes. The video must show real application behavior and must not present fixtures as live provider results.
+
+## Project status
+
+This repository is intended to be rebuilt from a clean state. The initial handoff is a blueprint, not proof that code, deployment, tests or demo artifacts already exist. Check `AI_HANDOFF.md` and `docs/BUILD_LOG.md` for verified progress.
+
+## License
+
+To be selected by the repository owner before public release. Do not invent or add a license without operator authorization.

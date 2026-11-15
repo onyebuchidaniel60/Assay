@@ -1,67 +1,60 @@
-# DEMO_VIDEO_PLAN.md — Final product video
+# Assay — Demo Video Production Plan
 
-## Objective and hard limits
+**Required output:** actual rendered MP4, no longer than 180 seconds.  
+**Target:** 90–150 seconds.  
+**Output directory:** `artifacts/demo/`.
 
-Produce a polished walkthrough of the working product, **maximum 180 seconds; target 120–150 seconds**. It must show real application behavior captured by Playwright or equivalent browser automation using deterministic synthetic data. Do not stage fake success states or narrate features that are not visible and working.
+## Audience and objective
 
-## Proposed story and timing (target 140 seconds)
+Audience: hackathon judges and technically informed product reviewers. Explain the real user problem, show the real covenant workflow, make SERV's role visible, prove the arithmetic is deterministic, show proof-gated manager control and demonstrate the audit/privacy boundary. Do not spend time on unsupported claims or feature areas not implemented.
 
-| Time | On-screen action | Narration purpose |
-|---|---|---|
-| 0–10s | CovenantOps title and dashboard | Explain the operational problem: contractual covenant compliance is fragmented across agreements, spreadsheets and evidence. |
-| 10–28s | Open synthetic borrower/facility; show agreement record | Explain facility onboarding and source-linked covenant terms. |
-| 28–48s | Review extracted Debt/EBITDA rule and activate after manager validation | Explain AI proposes; an authorized human validates contractual meaning. |
-| 48–68s | Upload synthetic statement; inspect source-linked debt and EBITDA evidence | Explain financial inputs remain traceable to pages/quotes. |
-| 68–88s | Run 3.20x deterministic calculation and verified COMPLIANT assessment | Explain deterministic arithmetic and independent verification. |
-| 88–104s | Show separate forecast scenario at about 3.63x / AT_RISK | Emphasize forecast risk is not misrepresented as an actual breach. |
-| 104–122s | Update evidence to 3.70x, verify BREACHED, create case | Show changed financial facts trigger reassessment and structured investigation. |
-| 122–138s | Draft memo, manager approval, then show stale-version invalidation | Explain human authorization and approval binding to evidence version. |
-| 138–150s | Audit history/integrity view and closing line | Show evidence/decision chain and core promise. |
+## Storyboard (target 130 seconds)
 
-Timing may be shortened to keep within 180s. If all actions cannot be shown clearly, prioritize one verified end-to-end scenario over a montage.
+| Time | Scene | On-screen behavior | Narration intent |
+|---|---|---|---|
+| 0:00–0:12 | Hook | Real app dashboard and a synthetic credit review queue | “A covenant review is not just a calculation. It is contract interpretation, evidence, controls and sign-off.” |
+| 0:12–0:28 | Upload + redaction | Analyst uploads synthetic agreement; redaction results and tokenized preview appear | Explain that identified fields are tokenized before model submission; show the actual result. |
+| 0:28–0:52 | SERV + extraction | Show workflow node/status and real extraction evidence quotes/page numbers; show Dolphin provider state accurately | Explain SERV's bounded reasoning role and the provider's extraction task; do not claim unverified privacy guarantees. |
+| 0:52–1:12 | Confirm + calculate | Analyst confirms clause terms, enters synthetic figures, calculation results appear | Explain deterministic calculation and the exact supported covenant. |
+| 1:12–1:28 | Scenarios + proof | Show baseline and two stress scenarios; show proof verification result | Explain proof proves the fixed inequality, not truth of source figures. |
+| 1:28–1:48 | Manager control | Switch to manager account; restricted view; manager approves eligible result and records risk acknowledgement if required | Explain separate manager decision gate; no raw figures shown in manager view. |
+| 1:48–2:05 | Audit | Verify chain; demo-only shred if authorized; verify chain again | Explain tamper-evident chain and key deletion without overstating legal erasure. |
+| 2:05–2:10 | Close | Brand/summary end card | “Assay: structured covenant analysis, verifiable controls, human authority.” |
 
-## Capture requirements
+If optional Reppo/Kite integrations are genuinely live and provide clear value, replace a short segment or extend within 180 seconds; do not squeeze essential screens or invent live responses. The video may omit an unavailable optional integration.
 
-- Use a fresh browser context and deterministic seeded borrower/facility/docs.
-- Use Playwright with fixed viewport (1920×1080 or 1600×900) and capture clean app behavior; also separately validate responsive layout.
-- No browser devtools, secrets, API keys, database data, real customer names, personal emails or private console URLs in footage.
-- Use the real deployed preview after end-to-end gate. If only local capture is possible due a documented deployment blocker, disclose internally and do not call it a public-demo capture.
-- Use stable test fixtures and reset command; record deployed commit and seed version.
-- Avoid cursor wandering, long waits, loading stalls and unplanned navigation.
+## Capture rules
 
-## Narration/TTS procedure
+- Use Playwright against the deployed preview with a clean browser profile.
+- Use deterministic synthetic fixtures and pre-created test accounts with role-specific access.
+- Use real application behavior, not static mock screens. If a provider result is fixture-backed, visibly label it `Fixture` in the capture or do not narrate it as live.
+- Hide browser bookmarks/password manager, private URLs, console secrets, API keys, customer names and any non-synthetic information.
+- Avoid UI states that reveal private raw values while showing the Manager role.
+- Capture in 1080p landscape (16:9), stable zoom, no cursor wandering; use a deliberate cursor highlight only if it improves comprehension.
 
-1. Write a 120–150 second narration script tied to visible events; include pronunciation guide for “CovenantOps” and financial terms.
-2. At video-production time, verify Google AI voice/TTS availability for the account and region, current free-tier quota, terms, model access, credential scopes and whether usage would create charges. Do not assume availability, unlimited free use or that a pasted key authorizes costs.
-3. If Google AI TTS is unavailable within the approved free budget, select a genuinely free permitted fallback. A local Piper option is acceptable only after checking the exact voice/model licence and distribution/use terms. Document the provider, model/voice, licence and reason for fallback.
-4. Generate narration in short scene-aligned clips where feasible. Review pronunciation and pacing.
-5. Synchronize speech with the matching visible event. Do not describe unseen functionality. Avoid clipped words, long silent gaps, rushed delivery and awkward pauses.
-6. Add captions/subtitles where feasible and ensure captions match the final audio.
-7. Balance narration and system audio; keep background audio optional and licence-cleared.
+## Voice generation
 
-## Editing and final quality review
+1. Check current Google AI Studio/Gemini TTS model availability, free-tier quota, terms and usage conditions.
+2. Current public pricing indicates a free tier for Gemini TTS, but indicates free-tier input may be used to improve Google products. The narration must therefore contain only public product copy and synthetic examples.
+3. Use a natural, professional voice with conversational pacing; adjust pronunciation of “Assay” and technical terms.
+4. Do not enable billing or use paid quota without explicit permission.
+5. If Google free TTS is unavailable or unsuitable, use a genuinely free local TTS model/tool with a license checked for the voice/model asset. Record exact tool/version/license in production notes.
 
-- Use a free permitted editing tool; do not purchase a subscription or stock assets without explicit authority.
-- Use clean cuts and concise on-screen labels; avoid unsupported performance claims.
-- Redact private URLs, secrets, personal data and any accidental account identifiers.
-- Render MP4 H.264/AAC (or broadly compatible equivalent), 1080p preferred.
-- Verify total duration <=180 seconds; inspect the entire video and listen to the complete soundtrack.
-- Confirm playback, synchronization, caption accuracy, audio levels, no clipping, no hidden secrets and that all narrated features are real.
-- Save a copy and checksums after review.
+## Editing and synchronization
 
-## Output location and files
+- Generate narration in short scene-aligned segments.
+- Record the visual clips with timestamps and align each phrase to the relevant action.
+- Trim pauses and dead time; leave enough time to inspect key UI states.
+- Use understated transitions, legible captions, restrained sound design and consistent audio level.
+- No background music is required; any music used must be original or properly licensed.
+- Captions in `.srt` or burned-in captions with high contrast and safe margins.
 
-Use the operator-approved output location recorded in `OPERATOR_INTAKE.md`. Default proposal: `artifacts/demo/`.
+## Render and QA
 
-```text
-artifacts/demo/
-  covenantops-demo.mp4
-  narration-script.md
-  captions.srt                 # when feasible
-  capture-playwright.spec.ts    # or equivalent recording script
-  production-notes.md
-  tts-provider-and-license.md
-  review-checklist.md
-```
+Output files:
+- `artifacts/demo/assay-demo.mp4`
+- `artifacts/demo/assay-demo-script.md`
+- `artifacts/demo/assay-demo.srt`
+- `artifacts/demo/production-notes.md`
 
-The video is not complete until the rendered file has been reviewed and duration/playback evidence is recorded in `AI_HANDOFF.md` and `docs/BUILD_LOG.md`.
+Review the complete render from beginning to end. Verify MP4 container, video and audio streams, 16:9 aspect ratio, 1080p target, duration <=180 seconds, narration sync, clear voice, captions, no black gaps, no clipped words, no redacted values/secrets/private URL and no inaccurate claims. Record `ffprobe` output and reviewer checklist in production notes. If a critical flow changes after capture, recapture and rerender.

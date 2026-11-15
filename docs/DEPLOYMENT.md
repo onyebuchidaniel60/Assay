@@ -1,42 +1,40 @@
-# Deployment — Vultr
+# Deployment
 
-## Target topology
+## Environments
 
-CovenantOps is deployed as a Docker Compose modular monolith on Vultr Cloud Compute. Caddy is the public TLS edge. Next.js, worker, PostgreSQL, pg-boss, ClamAV and the isolated parser are private containers. Source documents and exports use a private Vultr Object Storage bucket. Server-side worker/services call Vultr Serverless Inference over HTTPS.
+- **Local:** local Supabase or dedicated development project, synthetic fixtures, provider calls disabled by default.
+- **Preview:** Vercel frontend, Render API/Presidio, Supabase demo project. Synthetic fixtures only. Sandbox integrations. No production secrets/data/payments.
+- **Production:** not part of the MVP; not authorized by default. Requires explicit operator approval and separate security/retention review.
 
-## Provisioning authority
+## Platform allocation
 
-No paid resources may be provisioned until the operator records an explicit numeric cost ceiling, billing period, region and permission in `OPERATOR_INTAKE.md`. The proposed initial VM size (4 vCPU / 8 GB / 160 GB NVMe) is a planning recommendation, not an authorization or guaranteed price. Recheck Vultr pricing, credits, region capacity, quotas and service terms at intake.
+- Vercel hosts the Next.js frontend and preview deployments.
+- Render hosts Fastify API and Presidio service. The MVP worker loop runs in the API service and uses Postgres as its durable queue.
+- Supabase provides Postgres, Auth and private Storage.
+- Do not use Render free Postgres for persistent application data; its free database has a 30-day limit. Do not use local Render filesystem for documents; use private Supabase Storage.
+- Free service sleep/pause and quotas must be considered. A sleeping Render service can delay a demo; warm it before recording. Supabase free projects may pause after inactivity and have storage/egress limits. Record actual plans during intake.
 
-## Network exposure
+## Preview deployment order
 
-- Public: TCP 80 and 443 to Caddy.
-- SSH: TCP 22 restricted to the operator-approved source IP/CIDR or approved secure management path.
-- Never expose PostgreSQL, pg-boss, ClamAV or parser ports publicly.
-- Docker services run non-root, without privileged mode, with least capabilities and resource limits.
-- Parser container has no internet egress.
-- Web/worker outbound access is restricted to required DB/internal services, Vultr Object Storage and Vultr Inference as necessary.
+1. Confirm Vercel/Render/Supabase access and no-cost limits during Phase 0.
+2. Deploy skeletal frontend and API health route in Phase 1.
+3. Record exact URL, commit SHA and environment name in `AI_HANDOFF.md`.
+4. Configure CORS to the exact Vercel preview origin.
+5. Add only synthetic test data and sandbox secrets.
+6. Redeploy and smoke-test after verified checkpoints.
 
-## Preview deployment
+## Secrets
 
-- Use a dedicated preview DB, bucket and credentials.
-- Use only seeded synthetic borrowers, agreements and statements.
-- Protect preview via invite-only auth and/or access controls.
-- Disable external messages, payments, destructive actions and production integrations.
-- Deploy a navigable shell early in Phase 1; record exact URL and deployed commit.
-- Validate TLS, firewall exposure, health/readiness and demo reset before use.
+Store secrets in provider environment settings. Never commit `.env`, credentials, bearer tokens, service role keys, encryption keys or signing keys. Validate variable presence without printing values. Keep preview/prod secrets separated.
 
-## Production release
+## Database migration and rollback
 
-Production is not authorized by this blueprint. Deploy to production only after explicit operator authorization naming the exact environment/domain, allowed migrations/actions, release window and rollback authority. Otherwise leave the verified preview deployed and provide exact release instructions.
+- Use committed migrations; no manual schema drift.
+- Backup/confirm database before destructive migration in any persistent environment.
+- Run migrations as a separate deploy step; fail deploy if migration fails.
+- Prefer additive migrations; do not drop columns/data as part of an ordinary deploy.
+- Seed scripts must refuse production unless an explicit special flag and authority exist.
 
-## Operations
+## Release gate
 
-- Use pinned image digests and patched dependency versions; never `latest` in production.
-- Health checks distinguish liveness and readiness without exposing secrets.
-- Encrypted PostgreSQL backups to private storage; initial demo retention 7 days unless operator policy differs.
-- Prove restore in a separate test environment before claiming recoverability.
-- Configure VM firewall and Vultr firewall consistently.
-- Monitor disk, memory, worker queue depth, failed jobs and certificate expiry.
-- Rotate secrets using separate environment credentials.
-- Document rollback and migration compatibility.
+Production deploy only with recorded operator authority in `OPERATOR_INTAKE.md`. If not granted, finish on preview and write precise release instructions. A preview deployment permission does not imply production permission.

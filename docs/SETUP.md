@@ -1,33 +1,30 @@
-# Local setup
+# Local Setup
 
-This repository is intended to be implemented as a pnpm workspace with Node.js 24 LTS and Docker Compose. The handoff package does not contain application source yet.
+## Requirements
 
-## Prerequisites
+- Node.js 24 LTS and pnpm (exact version pinned in `package.json`/Corepack field).
+- Python 3.12 for the Presidio service.
+- Docker if using local Supabase and containerized Presidio.
+- Circom 2.x and SnarkJS for proof compilation and local verification.
+- Access to a Supabase development project or local Supabase stack.
 
-- Node.js 24 LTS (pin exact patch in `.node-version`/tooling when repository is initialized).
-- pnpm version pinned via `packageManager` in root `package.json`.
-- Docker Engine and Docker Compose plugin.
-- Git.
-- A local `.env` based on `.env.example` (never commit it).
+## First-time setup
 
-## First-run sequence (after implementation)
+1. Clone the approved Assay repository.
+2. Install pinned dependencies: `pnpm install --frozen-lockfile`.
+3. Copy `.env.example` to the local environment file and fill only development/test values.
+4. Start local Supabase or select the dedicated development project.
+5. Run database migrations and seed synthetic users/borrowers.
+6. Start the Presidio service; verify `/health` using its internal service token.
+7. Start API and frontend workspaces.
+8. Run unit tests and Playwright smoke tests.
 
-1. Clone the repository and inspect `README.md`, `AGENTS.md` and the current `AI_HANDOFF.md`.
-2. Copy `.env.example` to `.env`; provide local-only secrets. Do not use production credentials locally.
-3. Install the lockfile-pinned dependencies using `pnpm install --frozen-lockfile`.
-4. Start local dependencies with the documented Compose profile (PostgreSQL 18, pg-boss shares PostgreSQL, ClamAV and local S3-compatible development storage if enabled).
-5. Apply Drizzle migrations using the repository's migration script.
-6. Seed synthetic demo organization/users/borrower/facility/documents only through an explicit seed command.
-7. Run unit, integration and E2E tests.
-8. Start Next.js and the worker using documented scripts.
-9. Open the local URL and confirm the health/readiness routes.
+The implementation agent must write exact commands to match actual workspace scripts and verify each command before publishing this guide. Do not document commands that were not tested.
 
-## Safety
+## Demo fixture setup
 
-- Do not import real borrower/credit documents into development or preview by default.
-- Do not put secrets in source control, client environment variables, browser storage or logs.
-- The deployed environment must use Vultr Object Storage; local storage/MinIO is development only.
-- The local parser and ClamAV services must run in isolated containers and never as privileged containers.
-- Do not expose PostgreSQL, parser or scanner ports to the host/network unless a documented local-only reason exists.
+Use `scripts/seed-demo` to create synthetic borrower/facility/agreement/financial input fixtures and role-specific accounts. Demo fixture passwords and credentials must be provided through secure local env or generated interactively; never commit them. Reset scripts must operate only on a dedicated demo project and must refuse production environment names.
 
-Exact commands must be added to the implemented `package.json` and verified; do not invent scripts or claim these commands exist before implementation.
+## Known service constraints
+
+The MVP is not production-ready. Supabase free projects may pause after inactivity and have constrained database/storage limits. Render free services may sleep and have no persistent local disk; all durable files belong in Supabase Storage. The Render free Postgres offering is not used because it expires after 30 days.

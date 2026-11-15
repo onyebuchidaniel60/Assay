@@ -1,172 +1,89 @@
-# ARCHITECTURE.md — Fixed technical architecture
+# Assay — Architecture Specification
 
-## 1. Architectural decision
+## Architecture decision
 
-Use a **modular monolith plus one background worker**, with a separate isolated PDF parser. This is the simplest structure that supports financial transactions, async document/AI workloads, audit, and Vultr's role as the central platform without microservices/Kubernetes.
+A pnpm monorepo containing a Next.js web UI, Fastify API, Python Presidio service, domain/contract/crypto/AI/proof packages and tests. Backend jobs use a PostgreSQL table with `FOR UPDATE SKIP LOCKED`; no Redis/Kafka/Kubernetes.
 
-- `apps/web`: Next.js UI, server-side REST route handlers, Better Auth integration.
-- `apps/worker`: Node.js worker and pg-boss consumers.
-- `apps/pdf-parser`: private parser container; no public ingress and no internet egress.
-- `packages/domain`: business rules, state transitions, formula DSL, calculations and verification.
-- `packages/db`: Drizzle schema, migrations and tenant-scoped repositories.
-- `packages/contracts`: shared Zod request/response/AI schemas.
-- `packages/ai`: Vultr inference client, prompts, extraction schemas and output validation.
-- `packages/storage`: S3-compatible private storage adapter and local development adapter.
-
-The browser only talks to Next.js API routes. Web and worker use shared domain code. Route handlers are thin and do not contain finance rules.
-
-## 2. Fixed stack
-
-| Layer | Choice | Responsibility / reason |
-|---|---|---|
-| Runtime | Node.js 24 LTS | Supported LTS runtime; pin exact patch/image. |
-| Package manager | pnpm workspaces | Single lockfile, shared typed packages. |
-| Web | Next.js 16 App Router, React 19, TypeScript | UI + REST endpoints in one deployable app. Next 16 is Active LTS as of 8 Nov 2026. |
-| Styling | Tailwind CSS 4, shadcn/ui, Radix, Lucide | Accessible, consistent UI components. |
-| Forms | React Hook Form + Zod | Shared form/API validation. |
-| Tables | TanStack Table | Sort/filter/paginate operational tables. |
-| Charts | Recharts | Limited portfolio trends; not sole source of information. |
-| Auth | Better Auth, email/password, invite/seed controlled | Avoid paid auth dependency; server sessions and DB persistence. Pin patched stable version and test config. |
-| DB | PostgreSQL 18+ | ACID, JSONB snapshots, NUMERIC, row locks. Initial container major: 18. |
-| ORM/migrations | Drizzle ORM + drizzle-kit | Explicit SQL/migrations and typed schema. |
-| Queue | pg-boss | Durable Postgres-backed jobs; no Redis required. |
-| PDF text | pdfjs-dist in isolated parser container | Page-indexed text extraction; no OCR MVP. |
-| Malware scan | ClamAV container/service | Scan before parsing; fail closed if enabled scanner is unavailable. |
-| File storage | Vultr Object Storage, S3-compatible | Private source docs and generated exports. |
-| AI | Vultr Serverless Inference via OpenAI-compatible SDK | Extraction and memo wording, not calculations. |
-| Decimal | decimal.js | Exact financial arithmetic vs JS binary floating point. |
-| Logging | Pino | Structured logs with redaction/correlation IDs. |
-| Proxy/TLS | Caddy | HTTPS termination/reverse proxy. |
-| Runtime deployment | Docker Compose on Vultr Cloud Compute, Ubuntu 24.04 LTS | App/backend control plane hosted on Vultr. |
-| Tests | Vitest, API integration tests, Playwright | Unit/API/E2E. |
-| CI | GitHub Actions | Lint, typecheck, tests, build and authorized deploy. |
-
-Pin exact patched dependencies and container digests at implementation. Do not use `latest`, canary or floating tags in deployment. Recheck support/security notices at build start.
-
-## 3. Vultr deployment topology
-
-One Vultr Cloud Compute VM for the hackathon MVP. Starting capacity recommendation: **4 vCPU / 8 GB RAM / 160 GB NVMe**, subject to live quote, region availability, available credits and the operator's hard cost ceiling. This is not authorization to provision/spend. Load-test before reducing capacity.
+## Runtime topology
 
 ```text
-Internet
-  |
-Vultr Firewall (80/443; SSH 22 only from approved operator IP)
-  |
-Caddy container (public HTTPS)
-  |
-Next.js web container (private port 3000)
-  |-- REST/API + auth + server-side services
-  |-- PostgreSQL container (private only; not host-published)
-  |-- pg-boss job queue in PostgreSQL
-  |-- Worker container (private)
-       |-- ClamAV scanner (private)
-       |-- PDF parser container (private, no external egress)
-       |-- Vultr Object Storage (outbound HTTPS)
-       |-- Vultr Serverless Inference (outbound HTTPS)
+Browser / Next.js 16.x (Vercel)
+  -> HTTPS API + Supabase Auth JWT
+Fastify API / Node.js 24 LTS (Render)
+  -> Supabase Postgres (canonical data + queue)
+  -> Supabase private Storage (ciphertext only)
+  -> Presidio Python service (server-to-server token)
+  -> OpenServ SERV reasoning API
+  -> verified @dphnAI inference API (tokenized text only)
+  -> optional Reppo Evaluation API (synthetic-only)
+  -> optional Kite Passport/x402 (testnet, explicit spending authority)
+Worker loop inside API deployment
+  -> PDF text extraction / PII redaction / provider calls / ZK proof / polling
 ```
 
-Vultr product roles:
-- **Cloud Compute:** web app, API, DB, worker and orchestration; central application/control plane.
-- **Object Storage:** private original documents and generated reports; no public access or CDN.
-- **Serverless Inference:** model extraction/memo assistance; called server-side only.
+## Application ownership
 
-No Vercel frontend, Supabase backend, external DB, Redis, Kubernetes, payments, vector DB, email or bank integration in MVP.
+- Frontend owns layout, user interaction, form-level feedback and role-shaped display only.
+- API owns every authorization check, business rule, state transition, transaction, provider integration and audit write.
+- Worker owns long-running steps and retries; it receives database IDs, not document text in job payloads.
+- SERV is the bounded reasoning/model layer. The application owns its explicit workflow state machine, contracts and deterministic checks.
+- No LLM is authoritative for numeric calculations, approval or spending policy.
 
-## 4. Network and runtime security
+## Fixed stack
 
-- Public ingress only 80/443. Restrict SSH to operator-approved source IP or other approved secure access.
-- Never publish PostgreSQL, pg-boss, parser or ClamAV ports.
-- Separate Docker networks: public edge only Caddy; application-private web/worker/db; parser/scanner-private. Parser has no internet egress.
-- Run services non-root; read-only filesystem where practical; drop Linux capabilities; no privileged containers; CPU/memory/PID limits on parser and worker.
-- Web and worker require outbound HTTPS to Vultr Object Storage for authorized upload/download/processing. Worker additionally requires outbound HTTPS to Vultr Serverless Inference. Restrict egress to documented destinations where provider networking permits; parser has no internet egress.
-- Secrets in runtime env/secret store with restrictive permissions; never in repository, image, client bundle or logs.
-- Preview uses synthetic seed data, preview DB/bucket and restricted credentials. Never production data/secrets/real external actions.
+- Web: Next.js 16.x, React, TypeScript, Tailwind CSS 4.x, shadcn/ui/Radix, Lucide, TanStack Query, Zod.
+- API: Fastify 5.x, TypeScript, Drizzle ORM, `pg`.
+- Data/Auth/Storage: Supabase Postgres, Supabase Auth, private Supabase Storage.
+- Worker: Postgres jobs table; custom row-locking worker and leases.
+- PII: Python 3.12, Microsoft Presidio Analyzer/Anonymizer, custom recognizers.
+- PDF: `pdfjs-dist`, text layer only; scanned PDFs rejected.
+- Crypto: Node crypto AES-256-GCM, SHA-256, Ed25519.
+- Proof: Circom 2.x + SnarkJS fixed circuit.
+- Hosting: Vercel web preview; Render API and Presidio; Supabase Postgres/Auth/Storage. Railway is prohibited.
+- Tests: Vitest, API integration tests, Playwright E2E, static/dependency/security scans.
 
-## 5. Document processing data flow
+## SERV reasoning graph
 
-1. Browser submits multipart PDF to Next API.
-2. API authenticates, checks org/facility permission, streams with 25MB max, verifies PDF signature/MIME and computes SHA-256.
-3. API uploads to private staging key in Vultr Object Storage.
-4. DB transaction inserts document/version metadata and pg-boss job. If DB commit fails, compensation deletes staged object; orphan reconciliation detects failures.
-5. Worker downloads object and performs ClamAV scan.
-6. Worker passes bytes to isolated parser container. Parser returns page-indexed text, page count and parser diagnostics; no network access.
-7. Worker sends minimal relevant page text to Vultr inference with strict extraction schema. Document text is untrusted data.
-8. Worker checks Zod schema, returned model ID, page references and quote excerpts. Invalid/ambiguous output -> NEEDS_REVIEW.
-9. UI exposes candidate to analyst; manager activates approved covenant.
+The application graph contains explicit nodes/contracts:
 
-## 6. Assessment data flow
+1. `INTERPRET_COVENANT`: structured extraction facts → `SUPPORTED`, `NEEDS_ANALYST_REVIEW`, or `UNSUPPORTED`.
+2. `CLASSIFY_ADDBACKS`: analyst-entered lines and confirmed add-back list → eligible/ineligible/uncertain classification with evidence.
+3. `ROUTE_RESULT`: deterministic calculation result + scenario flags → compliant/breach/uncertain routing.
 
-1. API validates user permission and expected versions.
-2. Domain service freezes approved formula/evidence snapshot and its canonical hash.
-3. Formula engine evaluates allow-listed AST with Decimal.js.
-4. Independent verifier reloads exact immutable versions, validates dimensions and recomputes through a separately implemented reference evaluator; it must not call the primary calculator function.
-5. Actual classification saved only if verification passes.
-6. Audit event and business-state mutation commit in same database transaction.
+The provider/model for each reasoning call is configured through the SERV endpoint. The graph and outputs are versioned. Each node output passes Zod schema validation and deterministic invariants before the next step. SERV does not mutate the database directly and cannot call arbitrary tools.
 
-## 7. Memo/approval flow
+Current OpenServ public materials identify `https://inference-api.openserv.ai/v1` as an OpenAI-compatible SERV endpoint. The operator must verify the current model catalog, key permissions, credits and any graph/Shadow Agent/PromptGuard capability in the account before enabling claims about those capabilities.
 
-1. Service builds deterministic fact packet from verified assessment and evidence references.
-2. AI may improve prose only; it cannot add/change factual values or legal conclusions.
-3. Server checks all metrics/statements against fact packet; unsupported claim rejected or sent to review.
-4. Approval request hashes immutable memo/action payload and dependency versions.
-5. Manager decision uses transaction and compare-and-set; changed dependencies invalidate request.
-6. Approved memo can be exported; there is no external send integration.
+## Provider routing and privacy boundaries
 
-## 8. Vultr Serverless Inference
+- Dolphin partner receives tokenized agreement text only, after Presidio review and after exact @dphnAI endpoint/model/privacy terms are verified.
+- SERV receives structured, non-identifying inputs; use it for the reasoning graph.
+- Reppo receives synthetic/de-identified correction records only.
+- Kite receives payment/service metadata; no borrower payload is sent to Kite services by default.
+- Token-to-identity maps never leave backend storage.
+- Do not use `api.dolphinllm.com` as a substitute for the @dphnAI partner without explicit verification; it is a separate service in current public results.
 
-- Base URL: `https://api.vultrinference.com/v1`.
-- Chat endpoint: `POST /chat/completions` with bearer key, using OpenAI-compatible SDK.
-- Initial configured model: `deepseek-v4.1-flash-1017`, subject to live catalog/key access, structured-output support, quality fixture and cost checks at intake.
-- Vultr's current quickstart documents the endpoint, model catalog and warns that an unrecognized model ID on chat routes may fall back to its default model. **Always verify the `model` returned in each response equals `VULTR_INFERENCE_MODEL`; mismatch means failure, not accepted output.**
-- Use structured JSON if supported; validate with Zod regardless. If model does not support constrained schema response, request strict JSON and reject parse/schema failure.
-- Store model ID, prompt version, provider request ID, usage counters and output hash; do not log full sensitive prompts.
-- Model changes require updated eval and explicit intake authority if cost/access/data terms change.
-- No vector DB/RAG for MVP; chunk selected page text deterministically. Do not send other facilities or tenants' content.
+## Jobs
 
-## 9. AI workflow pattern
+`jobs` rows include job type, IDs-only payload, state, attempt count, lease timestamp, next run time and last safe error code. Worker claims with `FOR UPDATE SKIP LOCKED`. Expired leases can be reclaimed. Retry only idempotent operations. For uncertain payment outcome, reconcile provider receipt before retry.
 
-Use bounded deterministic workflow orchestration, not open-ended agent loops. Logical capabilities:
-- Contract clause extractor: proposes terms and exact source quote/page.
-- Financial extractor: proposes metric, amount, unit, period and source.
-- Memo writer: produces language strictly from verified facts packet.
+## Encryption and audit
 
-The model has no privileged action tools. No approve, send, delete, activate, alter audit or arbitrary URL-fetch tools. All model output is proposal data.
+Generate one random 32-byte DEK per borrower; wrap it using `DATA_KEK_BASE64` with AES-256-GCM. Encrypt documents, token maps and private audit payloads. Unique random 12-byte nonce per encryption. Delete wrapped DEK to demonstrate crypto-shred; do not claim all provider backups are erased.
 
-## 10. Jobs and retries
+Audit entries are sequential per borrower. Canonicalize non-sensitive metadata + previous hash + ciphertext/nonce/tag, hash with SHA-256, sign with Ed25519 private key stored only in secret manager. Verification recomputes the chain and verifies signatures. Chain is tamper-evident, not immutable against compromise of DB and signing key together.
 
-pg-boss queues: `document.scan-and-extract`, `document.ai-extract`, optional `export.generate`, P1 `audit.checkpoint`. For small MVP assessments, calculate and verify synchronously; if later async, queue versioned snapshot only.
+## ZK predicate
 
-Job payload includes organization ID, entity/version ID and idempotency key—not file path or user-supplied command. Retry only transient rate limit/5xx/network errors with exponential backoff+jitter, max 3 attempts. Do not indefinitely retry malformed document, unsupported PDF or invalid output. Persist sanitized failure reason.
+Private witness: total debt and adjusted EBITDA minor units. Public input: covenant threshold in basis points, circuit version and public outcome semantics. Constraint: `debt * 10000 <= adjustedEbitda * thresholdBps`, with range checks (64-bit debt/EBITDA, bounded threshold) so intermediate products remain safely within the Circom field. The proof proves only that the supplied witness satisfies the inequality; it does not prove source-document authenticity or accuracy of entered figures. Manager sees verified predicate, not private witness.
 
-## 11. Database and object storage
+## Hosting
 
-PostgreSQL stores relational metadata, formula/evidence snapshots, calculations, approvals, audit and queue state. Vultr Object Storage stores originals/exports with opaque random key, private bucket and TLS. Only server-side S3 credentials. Authorize download first, then issue presigned GET <=60 seconds; never persist/log signed URL. API-proxied upload is preferred for validation, hashing and scanning. Local development may use MinIO/local adapter; deployed config must reject local storage.
+- Vercel: frontend routes and static assets; preview deployment first.
+- Render: Fastify API and Presidio service; use free services only if sufficient. The API worker runs in the same API service to avoid a separate paid worker tier for the MVP; Postgres is the durable queue.
+- Supabase: DB/Auth/Storage; free plan only for demo and subject to pause/size limits. Render free Postgres is not used because free DBs expire after 30 days.
+- No production release or paid-plan activation without explicit operator authorization.
 
-Current Vultr compatibility matrix lists presigned URLs supported but bucket access logging unsupported. App must therefore record authorized download activity itself; this is not a substitute for provider storage logs. Vultr also documents a possible `Content-Length` discrepancy on downloads due to gzip compression; compare the retrieved bytes against the stored SHA-256 and stored size metadata rather than trusting the HTTP header as the sole integrity check.
+## Failure handling
 
-## 12. Auth, jobs, observability
-
-Better Auth email/password invite/seed controlled; secure HTTP-only, SameSite, Secure cookies; CSRF/origin checks. Membership RBAC is separate from login session. Every repository query is tenant-scoped. No JWT localStorage.
-
-Pino JSON logs use request/job/org/user IDs where appropriate, with sensitive field redaction. Health endpoints `/api/health/live` and `/api/health/ready` expose no secrets. Docker health checks/restart policy. Nightly encrypted PostgreSQL dump to private Object Storage, default 7-day demo retention; test restore before claiming backups work. No external telemetry stack in MVP.
-
-## 13. Fixed exclusions / rejected alternatives
-
-- Vercel + Vultr as a thin backend: rejected; Vultr must host actual app/control plane.
-- Microservices/Kubernetes: rejected as unnecessary complexity.
-- Redis/BullMQ: rejected; pg-boss/Postgres sufficient.
-- Supabase hosted DB: rejected for this hackathon architecture.
-- Open-ended agent framework: rejected due unnecessary autonomy/risk.
-- LLM arithmetic: prohibited.
-- OCR in MVP: deferred; scanned PDF requires manual review.
-- Payments, emails, banking APIs, webhook integrations: not applicable.
-
-## 14. Version selection and source references
-
-PostgreSQL 18 is selected as the newest stable major in the current official version table; PostgreSQL 19 is still an RC on the blueprint date and is not selected for the demo deployment. Keep PostgreSQL 18 patched to the latest supported minor and revalidate at implementation. Node.js 24 is an LTS line with mature ecosystem support; pin a security-patched 24.x release. Next.js 16 is an LTS major; use its stable latest patch, never canary.
-
-- Vultr Inference docs: https://api.vultrinference.com/docs
-- Vultr Inference quickstart/model behavior: https://api.vultrinference.com/docs/get-started/quickstart
-- Vultr Object Storage matrix: https://docs.vultr.com/products/storage/object-storage/s3-compatibility-matrix
-- Vultr firewall guidance: https://docs.vultr.com/products/compute/instances/cloud-compute/networking/enable-firewall
-- Next.js support policy: https://nextjs.org/support-policy
+Providers are behind adapters. A provider outage changes integration state and analysis state visibly; it must not generate a fake output or trigger an unapproved substitute. Keep manual term entry as an explicit fallback if extraction is unavailable. If SERV is unavailable, do not label the run SERV-complete.
