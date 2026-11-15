@@ -1,6 +1,6 @@
 # Assay — AI Handoff / Build State
 
-**Status:** Phase 1 complete (local shell + Vercel preview). Phase 2 is blocked by absent provider/database credentials.  
+**Status:** Phase 1 complete (local shell + Vercel preview). Phase 3 domain core implemented as unblocked work. Phase 2/live integration is blocked by absent provider/database credentials.  
 **Current phase:** Phase 1 checkpoint complete; Phase 2 not started.  
 **Repository:** `https://github.com/onyebuchidaniel60/Assay` — public, default branch `main`, Phase 1 commit `5deaa51491e322f5f5fe82b389a7b66206aad126`.  
 **Preview URL:** `https://assay-guyo5yh6z-uhhh2.vercel.app` (Vercel Authentication protected).  
@@ -27,14 +27,25 @@
 - Deployed the shell to Vercel: `https://assay-guyo5yh6z-uhhh2.vercel.app`.
 - Verified the deployment with `vercel curl` for `/`, `/dashboard`, `/facilities/demo`, `/integrations` and `/audit`.
 
+## Unblocked Phase 3 domain core completed
+
+- `packages/domain` implements Decimal.js leverage calculation, exact boundary comparison (3.20x/3.50x/3.50000010x/3.70x), eligible add-back enforcement, zero/negative EBITDA rejection, currency/period validation and two sensitivity scenarios.
+- Restricted formula AST rejects executable/unknown nodes, uncited constants, depth/node overflow and divide-by-zero.
+- A separate BigInt-based reference evaluator recomputes the exact predicate and detects tampered ratios/classifications or stale snapshot/formula hashes.
+- Maker-checker approval binds payload and dependency hashes, blocks self-approval, and invalidates on material dependency change.
+- Append-only canonical audit events use SHA-256 chaining; tamper detection is tested.
+- Kite policy rejects per-tx over-cap (`session_rule_exceeded`), total-budget, asset, expiry and missing-idempotency cases deterministically.
+- `packages/contracts` provides strict Zod schemas for borrower/facility, formula AST, covenant drafts, financial inputs, assessments, approvals and Kite sessions/payments.
+- Tests: domain 18/18, contracts 6/6, API 4/4; root typecheck/build pass.
+
 ## Verification evidence
 
 | Command | Result |
 |---|---|
 | `pnpm install` | Passed |
 | `pnpm typecheck` | Passed |
-| `pnpm test` | Passed — API 4/4; web no unit tests (passWithNoTests) |
-| `pnpm build` | Passed — Next.js 16 production build, 16 routes |
+| `pnpm test` | Passed — domain 18/18, contracts 6/6, API 4/4; web no unit tests (passWithNoTests) |
+| `pnpm build` | Passed — Next.js 16 production build, 16 routes; API, domain and contracts builds |
 | `pnpm --filter @assay/web exec playwright test` | Passed — 10/10 desktop + mobile shell tests |
 | `vercel --yes` | Preview deployment ready; URL recorded above |
 | `vercel curl <preview>/...` | 200 with expected titles for five routes |

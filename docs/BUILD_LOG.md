@@ -102,6 +102,26 @@
 - **Blocker:** Phase 2 provider/database credentials are absent from `.env.local` (only Kite keys present). See `OPERATOR_INTAKE.md` §0.7 and `AI_HANDOFF.md`. No live provider/database/auth work can be honestly completed until they are restored.
 - **Next exact task:** restore credentials and confirm auth/storage provider; run Phase 2 migrations/auth/storage/audit/PII foundations; then Phase 3 adapters.
 
+## 15 November 2026 — Phase 3 unblocked domain core
+
+- **Phase:** 3 partial — deterministic domain core and shared contracts (independent of absent database/auth/provider credentials).
+- **Packages added:** `packages/domain`, `packages/contracts`.
+- **Domain engine:** Decimal.js leverage calculation; exact boundary comparison; eligible add-back enforcement; zero/negative EBITDA rejection; currency/period checks; two sensitivity scenarios; forecast/actual classification separation.
+- **Restricted formula AST:** metric/sum/subtract/min/max/divide/cited-constant nodes; depth/node limits; unknown metric and executable-node rejection; division-by-zero rejection.
+- **Independent verification:** a separate BigInt reference evaluator recomputes debt/EBITDA/add-backs and the predicate; detects tampered primary results, stale snapshot or formula hashes.
+- **Controls:** maker-checker approval with self-approval denial, payload/dependency hash binding, expiry/version checks; append-only canonical audit events with SHA-256 chain and tamper detection.
+- **Kite policy:** deterministic per-tx/total/asset/expiry/idempotency checks; 6 PIEUSD over a 5 PIEUSD cap returns `session_rule_exceeded`; total/asset/expiry violations covered.
+- **Shared contracts:** strict Zod schemas for borrowers, facilities, recursive formula AST, covenant drafts, financial inputs, assessment/idempotency, approval decisions and Kite session/payment shapes.
+- **Tests:**
+  - `pnpm --filter @assay/domain test` → 18/18 passed.
+  - `pnpm --filter @assay/contracts test` → 6/6 passed.
+  - Root `pnpm typecheck` → passed.
+  - Root `pnpm test` → passed (domain 18, contracts 6, API 4).
+  - Root `pnpm build` → passed.
+- **Not implemented / not claimed:** database migrations, Supabase/Neon auth, private storage, job queue, live NEAR AI/OpenRouter/SERV adapters, Presidio service, ZK proof generation, API route integration and E2E application flows. These require the missing credentials and Phase 2 foundation.
+- **Blocker:** `.env.local` still contains only Kite variables; see `OPERATOR_INTAKE.md` §0.7. No live provider/database call was made.
+- **Next exact task:** restore credentials and auth/storage choice; implement Phase 2 schema/auth/storage/audit/jobs/PII; then verify NEAR AI attestation and OpenRouter model IDs before adapters.
+
 ## Build log entry template
 
 For every checkpoint add:
