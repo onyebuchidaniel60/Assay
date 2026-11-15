@@ -1,4 +1,4 @@
-import { and, eq, lte, sql } from "drizzle-orm";
+import { and, eq, inArray, lte, sql } from "drizzle-orm";
 import type { AssayDb } from "./client.js";
 import { jobs } from "./schema.js";
 
@@ -8,6 +8,7 @@ export type EnqueueJobInput = {
   payload: Record<string, unknown>;
   idempotencyKey: string;
   maxAttempts?: number;
+  nextRunAt?: Date;
 };
 
 export type ClaimedJob = {
@@ -21,7 +22,11 @@ export type ClaimedJob = {
 };
 
 export async function enqueueJob(db: AssayDb, input: EnqueueJobInput): Promise<{ id: string; duplicate: boolean }> {
-  const existing = await db.select({ id: jobs.id }).from(jobs).where(eq(jobs.idempotencyKey, input.idempotencyKey)).limit(1);
+  const existing = await db
+    .select({ id: jobs.id })
+    .from(jobs)
+    .where(eq(jobs.idempotencyKey, input.idempotencyKey))
+    .limit(1);
   if (existing[0]) return { id: existing[0].id, duplicate: true };
   const [created] = await db
     .insert(jobs)
@@ -31,18 +36,19 @@ export async function enqueueJob(db: AssayDb, input: EnqueueJobInput): Promise<{
       payload: input.payload,
       idempotencyKey: input.idempotencyKey,
       maxAttempts: input.maxAttempts ?? 3,
+      ...(input.nextRunAt ? { nextRunAt: input.nextRunAt } : {}),
     })
     .returning({ id: jobs.id });
   if (!created) throw new Error("Job insert did not return an id.");
   return { id: created.id, duplicate: false };
 }
 
-export async function claimJob(db: AssayDb, leaseSeconds = 300): Promise<ClaimedJob | null> {
+export async function claimJob(db: AssayDb, workerId = "assay-worker", leaseSeconds = 300): Promise<ClaimedJob | null> {
   const result = await db.execute(sql`
     WITH next_job AS (
       SELECT id
       FROM jobs
-      WHERE status = 'QUEUED' AND next_run_at <= now()
+      WHERE status IN ('QUEUED', 'RETRY') AND next_run_at <= now()
       ORDER BY next_run_at, created_at
       LIMIT 1
       FOR UPDATE SKIP LOCKED
@@ -50,6 +56,8 @@ export async function claimJob(db: AssayDb, leaseSeconds = 300): Promise<Claimed
     UPDATE jobs
     SET status = 'RUNNING',
         attempts = jobs.attempts + 1,
+        locked_at = now(),
+        locked_by = ${workerId},
         lease_until = now() + (${leaseSeconds} * interval '1 second'),
         updated_at = now()
     FROM next_job
@@ -70,31 +78,37 @@ export async function claimJob(db: AssayDb, leaseSeconds = 300): Promise<Claimed
 }
 
 export async function completeJob(db: AssayDb, jobId: string): Promise<void> {
-  await db.update(jobs).set({ status: "SUCCEEDED", leaseUntil: null, updatedAt: new Date() }).where(eq(jobs.id, jobId));
+  await db
+    .update(jobs)
+    .set({ status: "SUCCEEDED", leaseUntil: null, lockedAt: null, lockedBy: null, updatedAt: new Date() })
+    .where(eq(jobs.id, jobId));
 }
 
-export async function failJob(db: AssayDb, jobId: string, errorCode: string): Promise<"QUEUED" | "DEAD"> {
+export async function failJob(db: AssayDb, jobId: string, errorCode: string): Promise<"RETRY" | "FAILED"> {
   const [job] = await db.select().from(jobs).where(eq(jobs.id, jobId)).limit(1);
   if (!job) throw new Error("Job not found.");
-  const dead = job.attempts >= job.maxAttempts;
+  const exhausted = job.attempts >= job.maxAttempts;
+  const nextStatus = exhausted ? "FAILED" : "RETRY";
   await db
     .update(jobs)
     .set({
-      status: dead ? "DEAD" : "QUEUED",
-      lastErrorCode: errorCode,
+      status: nextStatus,
+      lastErrorCode: errorCode.slice(0, 120),
       leaseUntil: null,
+      lockedAt: null,
+      lockedBy: null,
       nextRunAt: new Date(Date.now() + Math.min(300, 2 ** job.attempts) * 1000),
       updatedAt: new Date(),
     })
     .where(and(eq(jobs.id, jobId), eq(jobs.status, "RUNNING")));
-  return dead ? "DEAD" : "QUEUED";
+  return nextStatus;
 }
 
 export async function reclaimExpiredJobs(db: AssayDb): Promise<number> {
   const result = await db
     .update(jobs)
-    .set({ status: "QUEUED", leaseUntil: null, updatedAt: new Date() })
-    .where(and(eq(jobs.status, "RUNNING"), lte(jobs.leaseUntil, new Date())))
+    .set({ status: "QUEUED", leaseUntil: null, lockedAt: null, lockedBy: null, updatedAt: new Date() })
+    .where(and(inArray(jobs.status, ["RUNNING"]), lte(jobs.leaseUntil, new Date())))
     .returning({ id: jobs.id });
   return result.length;
 }

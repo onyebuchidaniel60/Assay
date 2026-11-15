@@ -51,3 +51,6 @@ packages/proof/build/
 __pycache__/
 *.pyc
 .venv/
+
+# Operator-supplied reference images (license text pending; not redistributed)
+design/

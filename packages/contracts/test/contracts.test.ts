@@ -1,68 +1,85 @@
 import { describe, expect, it } from "vitest";
 import {
-  assessmentCreateSchema,
   borrowerCreateSchema,
-  covenantDraftSchema,
+  covenantTermsSchema,
   facilityCreateSchema,
-  financialInputsSchema,
-  formulaAstSchema,
-  kitePaymentIntentSchema,
+  financialInputsRequestSchema,
+  redactionReviewSchema,
+  termsReviewSchema,
 } from "../src/index.js";
 
+const validTerms = {
+  covenantType: "DEBT_TO_ADJUSTED_EBITDA" as const,
+  comparator: "LTE" as const,
+  thresholdBps: 35000,
+  totalDebtDefinition: "Consolidated Total Debt as defined in clause 1.1.",
+  ebitdaDefinition: "Consolidated EBITDA for the trailing twelve months.",
+  permittedAddbacks: [
+    {
+      code: "RESTRUCTURING",
+      description: "Non-recurring restructuring costs",
+      conditions: ["Incurred in the period"],
+      capMinor: "500000000",
+    },
+  ],
+  testingDate: "2026-09-30",
+  cureRightsSummary: null,
+  evidence: [{ page: 12, quote: "shall not exceed 3.50:1.00", field: "thresholdBps" }],
+  confidence: 0.91,
+  uncertaintyNotes: [],
+};
+
 describe("shared request contracts", () => {
-  it("accepts a valid borrower and rejects extra fields", () => {
-    expect(borrowerCreateSchema.parse({ legalName: "Northwind", referenceCode: "NWC-1" })).toMatchObject({
-      classification: "CORPORATE",
-    });
-    expect(() => borrowerCreateSchema.parse({ legalName: "X", referenceCode: "X", organizationId: "other" })).toThrow();
-  });
-
-  it("rejects a facility with maturity before agreement", () => {
+  it("accepts a valid synthetic borrower and rejects extra fields", () => {
+    expect(borrowerCreateSchema.parse({ displayAlias: "Borrower Demo 01", referenceToken: "BOR-001" })).toBeTruthy();
     expect(() =>
-      facilityCreateSchema.parse({
-        name: "Term Loan A",
-        referenceCode: "FAC-1",
-        facilityType: "TERM_LOAN",
-        currency: "USD",
-        committedAmount: "50000000",
-        agreementDate: "2026-01-01",
-        maturityDate: "2025-12-31",
-      }),
-    ).toThrow(/Maturity/);
-  });
-
-  it("validates the recursive formula AST", () => {
-    const ast = {
-      kind: "divide",
-      numerator: { kind: "metric", key: "gross_debt" },
-      denominator: { kind: "metric", key: "ltm_ebitda" },
-    };
-    expect(formulaAstSchema.parse(ast)).toBeTruthy();
-    expect(() => formulaAstSchema.parse({ kind: "call", name: "fetch" })).toThrow();
-    expect(() => formulaAstSchema.parse({ kind: "constant", value: "1" })).toThrow();
-  });
-
-  it("requires a source reference for covenant drafts", () => {
-    expect(() =>
-      covenantDraftSchema.parse({
-        name: "Maximum leverage",
-        thresholdBps: 35000,
-        operator: "LTE",
-        formulaAst: { kind: "metric", key: "gross_debt" },
-        effectiveFrom: "2026-01-01",
-        sourceRefs: [],
-      }),
+      borrowerCreateSchema.parse({ displayAlias: "Borrower", referenceToken: "BOR-1", organizationId: "other" }),
     ).toThrow();
   });
 
-  it("rejects implicit or malformed financial inputs", () => {
-    expect(() => financialInputsSchema.parse({ debt: "32", reportedEbitda: "10" })).toThrow();
-    expect(financialInputsSchema.parse({ debt: "32", reportedEbitda: "10", currency: "USD", testDate: "2026-09-30" })).toBeTruthy();
-    expect(() => financialInputsSchema.parse({ debt: "32", reportedEbitda: "10", currency: "usd", testDate: "2026-09-30" })).toThrow();
+  it("validates facility currency and reference shape", () => {
+    expect(
+      facilityCreateSchema.parse({ facilityReferenceToken: "FAC-001", label: "Revolving Facility", currency: "USD" }),
+    ).toBeTruthy();
+    expect(() =>
+      facilityCreateSchema.parse({ facilityReferenceToken: "FAC-001", label: "Facility", currency: "usd" }),
+    ).toThrow();
   });
 
-  it("validates assessment and Kite idempotency shapes", () => {
-    expect(() => assessmentCreateSchema.parse({ testDate: "2026-09-30", evidenceMap: {}, idempotencyKey: "short" })).toThrow();
-    expect(kitePaymentIntentSchema.parse({ amount: "0.1", asset: "PIEUSD", idempotencyKey: "assay-kite-smoke-1" })).toBeTruthy();
+  it("accepts the normative covenant terms schema and requires evidence", () => {
+    expect(covenantTermsSchema.parse(validTerms).thresholdBps).toBe(35000);
+    expect(() => covenantTermsSchema.parse({ ...validTerms, evidence: [] })).toThrow();
+  });
+
+  it("requires a confirmed review reason on rejection", () => {
+    expect(() => termsReviewSchema.parse({ revision: 1, decision: "REJECT" })).toThrow(/reason/i);
+    expect(termsReviewSchema.parse({ revision: 1, decision: "CONFIRM", edits: { thresholdBps: 32500 } })).toBeTruthy();
+  });
+
+  it("rejects malformed spans and unsupported redaction decisions", () => {
+    expect(() =>
+      redactionReviewSchema.parse({ revision: 1, decision: "CONFIRM", falsePositiveSpans: [{ page: 1, start: 4, end: 2 }] }),
+    ).toThrow();
+    expect(
+      redactionReviewSchema.parse({
+        revision: 2,
+        decision: "CONFIRM",
+        additionalSpans: [{ page: 1, start: 4, end: 10, entityType: "ASSAY_REFERENCE" }],
+      }),
+    ).toBeTruthy();
+  });
+
+  it("requires integer minor units and explicit attestation", () => {
+    const base = {
+      currency: "USD",
+      reportedEbitdaMinor: "100000000",
+      totalDebtMinor: "325000000",
+      addbacks: [{ code: "RESTRUCTURING", amountMinor: "5000000" }],
+      attest: true as const,
+      termsVersion: 1,
+    };
+    expect(financialInputsRequestSchema.parse(base)).toBeTruthy();
+    expect(() => financialInputsRequestSchema.parse({ ...base, totalDebtMinor: "32.5" })).toThrow();
+    expect(() => financialInputsRequestSchema.parse({ ...base, attest: false })).toThrow();
   });
 });

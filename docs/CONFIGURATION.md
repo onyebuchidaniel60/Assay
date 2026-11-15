@@ -55,9 +55,15 @@ Do not add `DOLPHIN_BASE_URL`, `DOLPHIN_API_KEY`, `DOLPHIN_MODEL` or `DOLPHIN_PR
 - `KITE_SESSION_ID=agent_session_01a1dfc3-794e-70cb-bde8-90c6315736cf`
 - `KITE_MAX_PER_PAYMENT_MINOR=500`
 - `KITE_MAX_TOTAL_MINOR=2000`
+- `KITE_SPENT_TOTAL_MINOR=0` — locally recorded spent total; no receipt is fabricated
 - `KITE_SESSION_EXPIRY=2026-11-16T15:11:32.17177Z`
 
 The adapter must enforce `KITE_MAX_PER_PAYMENT_MINOR` and `KITE_MAX_TOTAL_MINOR` deterministically before calling Kite. The current session is an approved testnet grant; it is not a production payment authorization. No Kite API key or wallet material is stored in the repository.
+
+## Jobs and auth
+
+- `WORKER_ENABLED=true` runs the in-process Postgres job poller. The worker claims `analysis.parse` and `analysis.extract` jobs with `FOR UPDATE SKIP LOCKED`.
+- Public sign-up is disabled in Neon Auth (`email_and_password.disableSignUp=true`). Provision staff accounts in Neon, then run `ALLOW_DEMO_SEED=true pnpm seed:workspace` to create profiles/memberships. Seed scripts refuse `APP_ENV=production`.
 
 ## Environment separation
 

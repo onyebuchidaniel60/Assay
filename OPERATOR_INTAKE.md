@@ -269,20 +269,20 @@ The reference asset gate is **PASSED** for implementation. Do not copy the sourc
 | Repository | Correct repo/branch accessible; clean-start state confirmed; write access verified | **PASS** |
 | Reference asset | Image inspected and license assertion recorded | **PASS (license text to attach)** |
 | Scope tier | Tier A full blueprint explicitly confirmed | **PASS** |
-| NEAR AI | Key, starter credit, TEE-verifiable model and fresh attestation test validated | **AUTHORIZED — credentials absent** |
-| OpenRouter | Key, model IDs, credits and live test validated | **AUTHORIZED — credentials absent** |
-| SERV / OpenServ | Key, catalog entry, credits and harmless call validated | **AUTHORIZED — credentials absent** |
-| Database/Neon | Connection string, auth/storage configuration and migrations verified | **PASS — connectivity verified; migrations pending** |
+| NEAR AI | Key, TEE-verifiable model and fresh TDX/NRAS attestation validated | **PASS — live** |
+| OpenRouter | Key, model IDs and live exact-model test validated | **PASS — live** |
+| SERV / OpenServ | Key, `serv-standard` exact model and live call validated | **PASS — live** |
+| Database/Neon | Connection string, auth/storage configuration and migrations verified | **PASS — 22 tables migrated** |
 | Vercel | Project access and preview deployment permission verified | **PASS (CLI access + authorization)** |
-| Render | API and Presidio service access verified; free-tier fit confirmed | **AUTHORIZED — credentials absent** |
+| Render | API key present; deployment intentionally deferred to Phase 5 | **AUTHORIZED — deployment pending** |
 | Presidio | Deployment blocker resolved and recorded | **RESOLVED** |
-| Reppo | Disabled or enabled with verified access and synthetic-only payload policy | **AUTHORIZED — credentials absent; optional** |
+| Reppo | Disabled until synthetic-only contract/quota verified | **DISABLED** |
 | Kite | Disabled or enabled with exact spend cap/asset/session | **ENABLED (TESTNET) — payment provider-blocked** |
 | Budget | Numeric ceiling and billing boundary recorded | **PASS — $0 new spend** |
 | Production | Explicit authority recorded or staging-only constraint honored | **AUTHORIZED — release gate applies** |
 | Demo | Audience, pronunciation, redactions and output location set | **DEFAULTS RECORDED** |
 
-**Phase 1 scaffolding may proceed. Live Phase 2/3 integration, full preview and release remain blocked until the authorized credentials are present.**
+**Phases 1–4 are complete locally. The remaining gate is Phase 5 deployment/preview verification, the full regression/security matrix and the operator follow-ups below.**
 
 ---
 
@@ -296,6 +296,8 @@ Credentials are now present in `.env.local`. Verified on 15 November 2026:
 - OpenRouter judgement `openai/gpt-4o-mini` and generation `deepseek/deepseek-v3.2` exist in the catalog.
 - NEAR AI `z-ai/glm-5.3-flash` is present, `verifiable=true`, `attestationSupported=true`; a model attestation passed Intel TDX and NVIDIA NRAS checks.
 - Internal secrets generated locally: `NEON_AUTH_COOKIE_SECRET`, `BETTER_AUTH_SECRET`, `DATA_KEK_BASE64`, `AUDIT_SIGNING_PRIVATE_KEY_BASE64`, `AUDIT_SIGNING_PUBLIC_KEY_BASE64`, `PRESIDIO_SERVICE_TOKEN`.
+- Public sign-up is disabled (`disableSignUp=true`); a direct probe returned `400 EMAIL_PASSWORD_SIGN_UP_DISABLED`.
+- Full synthetic workflow, proof verification, manager approval, role restrictions and per-borrower audit verification passed; Playwright 18/18 desktop/mobile.
 
 **Render decision:** Option B — defer Render to Phase 5. Phases 2–4 run the API locally against Neon. No Render deployment is claimed yet.
 

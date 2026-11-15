@@ -1,16 +1,19 @@
+import { and, eq } from "@assay/db";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { createAuthServer } from "@neon/auth/server";
-import { and, createDb, eq, memberships, organizations, profiles } from "@assay/db";
+import { createDb, memberships, organizations, profiles } from "@assay/db";
 
 const db = createDb();
 
-type AuthUser = {
+export type AuthRole = "ANALYST" | "MANAGER" | "AUDITOR" | "ADMIN";
+
+export type AuthUser = {
   userId: string;
   email: string | null;
   name: string | null;
   organizationId: string;
   organizationName: string;
-  role: string;
+  role: AuthRole;
 };
 
 function cookieHeader(request: FastifyRequest): string {
@@ -74,15 +77,16 @@ export async function resolveAuthUser(request: FastifyRequest, reply: FastifyRep
       organizationId: organizations.id,
       organizationName: organizations.name,
       displayName: profiles.displayName,
+      profileStatus: profiles.status,
     })
     .from(memberships)
     .innerJoin(organizations, eq(organizations.id, memberships.organizationId))
-    .leftJoin(profiles, eq(profiles.userId, memberships.userId))
-    .where(and(eq(memberships.userId, user.id), eq(memberships.status, "ACTIVE"), eq(organizations.status, "active")))
+    .innerJoin(profiles, eq(profiles.userId, memberships.userId))
+    .where(and(eq(memberships.userId, user.id), eq(memberships.status, "ACTIVE"), eq(organizations.status, "ACTIVE")))
     .limit(1);
 
   const row = rows[0];
-  if (!row) return null;
+  if (!row || row.profileStatus !== "ACTIVE") return null;
   return {
     userId: row.userId,
     email: user.email ?? null,

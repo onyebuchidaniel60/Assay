@@ -1,9 +1,19 @@
 import "./env.js";
-import Fastify, { type FastifyError, type FastifyInstance } from "fastify";
+import Fastify, { type FastifyInstance } from "fastify";
 import cors from "@fastify/cors";
-import { createDb, sql, verifyOrganizationAudit } from "@assay/db";
+import multipart from "@fastify/multipart";
+import rateLimit from "@fastify/rate-limit";
+import { createDb, sql } from "@assay/db";
+import { MAX_UPLOAD_BYTES } from "@assay/document";
 import { loadConfig } from "./config.js";
 import { resolveAuthUser } from "./auth.js";
+import { safeErrorPayload } from "./lib/errors.js";
+import { meta } from "./lib/http.js";
+import { registerBorrowerRoutes } from "./routes/borrowers.js";
+import { registerAnalysisRoutes } from "./routes/analysis.js";
+import { registerAuditRoutes } from "./routes/audit.js";
+import { registerIntegrationRoutes } from "./routes/integrations.js";
+import { registerDemoRoutes } from "./routes/demo.js";
 
 const db = createDb();
 
@@ -16,17 +26,21 @@ export function buildServer(options: { env?: NodeJS.ProcessEnv } = {}): FastifyI
         paths: [
           "req.headers.authorization",
           "req.headers.cookie",
+          "req.headers['idempotency-key']",
           "res.headers.set-cookie",
           "*.apiKey",
           "*.token",
           "*.secret",
           "*.password",
+          "*.content",
+          "*.text",
         ],
         censor: "[REDACTED]",
       },
     },
     requestIdHeader: "x-request-id",
     trustProxy: true,
+    bodyLimit: 1024 * 1024,
   });
 
   const allowedOrigins = config.CORS_ALLOWED_ORIGINS.split(",")
@@ -45,49 +59,46 @@ export function buildServer(options: { env?: NodeJS.ProcessEnv } = {}): FastifyI
     methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
   });
 
-  app.get("/", async () => ({
+  app.register(multipart, {
+    limits: { fileSize: MAX_UPLOAD_BYTES, files: 1, fields: 5, parts: 8 },
+  });
+
+  app.register(rateLimit, {
+    max: 240,
+    timeWindow: "1 minute",
+    allowList: (request) => request.url.startsWith("/health/"),
+    keyGenerator: (request) => `${request.ip}:${request.headers["x-forwarded-for"] ? "proxied" : "direct"}`,
+  });
+
+  app.addHook("onSend", async (_request, reply, payload) => {
+    reply.header("x-content-type-options", "nosniff");
+    reply.header("referrer-policy", "no-referrer");
+    reply.header("x-frame-options", "DENY");
+    return payload;
+  });
+
+  app.get("/", async (request) => ({
     data: {
       service: "assay-api",
-      status: "phase-1-shell",
-      message: "Assay API foundation. Domain routes are implemented in Phase 3.",
+      status: "phase-3",
+      message: "Assay covenant operations API. Authentication is required for all /v1 resources.",
     },
-    meta: { requestId: "request-id-placeholder" },
+    meta: meta(request),
   }));
 
-  app.get("/health/live", async () => ({
-    status: "ok",
-    service: "assay-api",
-    environment: config.APP_ENV,
-    timestamp: new Date().toISOString(),
-  }));
+  app.get("/health/live", async () => ({ status: "ok", timestamp: new Date().toISOString() }));
 
   app.get("/health/ready", async (_request, reply) => {
-    const checks: Record<string, string> = {
-      config: "ok",
-      database: "not_checked",
-      layer2: config.NEARAI_API_KEY ? "configured" : "not_configured",
-      generalInference: config.OPENROUTER_API_KEY ? "configured" : "not_configured",
-      serv: config.SERV_REASONING_API_KEY ? "configured" : "not_configured",
-      pii: config.PRESIDIO_MODE,
-    };
-
     let ready = Boolean(config.DATABASE_URL);
     if (ready) {
       try {
         await db.execute(sql`select 1`);
-        checks.database = "ok";
       } catch {
-        checks.database = "unavailable";
         ready = false;
       }
     }
     if (!ready) reply.code(503);
-
-    return {
-      status: ready ? "ready" : "degraded",
-      checks,
-      timestamp: new Date().toISOString(),
-    };
+    return { status: ready ? "ready" : "degraded", timestamp: new Date().toISOString() };
   });
 
   app.get("/v1/me", async (request, reply) => {
@@ -102,44 +113,44 @@ export function buildServer(options: { env?: NodeJS.ProcessEnv } = {}): FastifyI
         },
       };
     }
-    return { data: { user, capabilities: {} }, meta: { requestId: String(request.id) } };
+    return {
+      data: {
+        user,
+        capabilities: {
+          writeCovenant: ["ANALYST", "ADMIN"].includes(user.role),
+          approve: user.role === "MANAGER",
+          verifyAudit: true,
+          administrate: user.role === "ADMIN",
+        },
+      },
+      meta: meta(request),
+    };
   });
 
-  app.get("/v1/audit/verify", async (request, reply) => {
-    const user = await resolveAuthUser(request, reply);
-    if (!user) {
-      reply.code(401);
-      return { error: { code: "UNAUTHENTICATED", message: "Sign in first.", requestId: String(request.id) } };
-    }
-    if (!["CREDIT_MANAGER", "ORG_ADMIN", "AUDITOR"].includes(user.role)) {
-      reply.code(403);
-      return { error: { code: "FORBIDDEN", message: "Audit verification permission is required.", requestId: String(request.id) } };
-    }
-    const result = await verifyOrganizationAudit(db, user.organizationId);
-    return { data: result, meta: { requestId: String(request.id) } };
-  });
+  registerBorrowerRoutes(app);
+  registerAnalysisRoutes(app);
+  registerAuditRoutes(app);
+  registerIntegrationRoutes(app);
+  registerDemoRoutes(app);
 
-  app.setNotFoundHandler(async (_request, reply) => {
+  app.setNotFoundHandler(async (request, reply) => {
     reply.code(404);
     return {
       error: {
         code: "NOT_FOUND",
         message: "The requested resource is not available.",
-        requestId: "request-id-placeholder",
+        requestId: String(request.id),
       },
     };
   });
 
-  app.setErrorHandler(async (error: FastifyError, _request, reply) => {
-    const statusCode = error.statusCode && error.statusCode >= 400 ? error.statusCode : 500;
-    reply.code(statusCode);
-    return {
-      error: {
-        code: statusCode === 500 ? "INTERNAL_ERROR" : "REQUEST_ERROR",
-        message: statusCode === 500 ? "The request could not be processed." : error.message,
-        requestId: "request-id-placeholder",
-      },
-    };
+  app.setErrorHandler(async (error, request, reply) => {
+    const payload = safeErrorPayload(error, String(request.id));
+    if (payload.statusCode >= 500) {
+      request.log.error({ err: error }, "request failed");
+    }
+    reply.code(payload.statusCode);
+    return payload.body;
   });
 
   return app;

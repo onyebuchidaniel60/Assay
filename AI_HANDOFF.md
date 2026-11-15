@@ -1,83 +1,84 @@
 # Assay — AI Handoff / Build State
 
-**Status:** Phase 2 complete (Neon data/auth/storage foundation). Phase 3 domain/API implementation is next.  
-**Current phase:** Phase 2 checkpoint complete; Phase 3 not started.  
+**Status:** Phases 1–4 implemented and tested locally against Neon. Phase 5 deployment/regression gate is next.  
 **Repository:** `https://github.com/onyebuchidaniel60/Assay` — public, default branch `main`.  
-**Latest app commit:** `5deaa51` (`feat: establish app shell and preview deployment`) plus domain/proof and Phase 2 foundation commits.  
-**Preview URL:** `https://assay-guyo5yh6z-uhhh2.vercel.app` — protected Phase 1 shell; authenticated Phase 2 preview not yet deployed.  
-**Production release authority:** Authorized by operator, but release remains gated on the full Phase 5/9 test and security matrix. No production deployment is claimed.  
+**Preview URL:** `https://assay-guyo5yh6z-uhhh2.vercel.app` — protected Phase 1 shell only; authenticated Phase 4 preview not yet deployed.  
+**Production release authority:** Authorized by the operator, but release remains gated on the full Phase 5/9 test and security matrix. No production deployment is claimed.  
 **Data boundary:** Synthetic data only; no real borrower, lender or production records.  
 **New spend authority:** `$0` beyond existing NEAR AI and SERV credits.
 
 ## Phase 1 — complete
 
-- pnpm workspace with `apps/web`, `apps/api`, `packages/domain`, `packages/contracts`, `packages/proof`.
-- Next.js 16.4.6 / React 19.3.1 / Tailwind 4 responsive shell; 16 routes; labelled placeholders; actual/forecast separation.
-- Fastify health routes, safe error envelopes, CORS allowlist, Pino redaction.
-- Vercel protected preview `https://assay-guyo5yh6z-uhhh2.vercel.app`; `vercel curl` verified five routes.
-- Shell Playwright suite 10/10; root typecheck/build pass.
+- pnpm workspace with apps/web, apps/api, packages/domain, contracts, proof, plus Phase 2/3 packages crypto, storage, db, document, ai.
+- Next.js 16.4.6 / React 19 / Tailwind 4 responsive shell; Fastify health foundation; CI; Vercel protected preview; shell Playwright tests.
 
 ## Phase 2 — complete
 
-- **Neon connectivity:** PostgreSQL 18.7 via `DATABASE_URL`; `NEON_AUTH_BASE_URL/ok` HTTP 200; private S3 bucket `assay-private-documents` listed.
-- **Schema:** Drizzle schema with 24 tables/enums; migration applied to Neon. Includes tenant tables, documents/versions, extraction runs, covenants, evidence, assessments, verification, cases, memos, approvals, signed audit events/head, idempotency and jobs.
-- **Auth:** Neon managed Better Auth wired in Next.js (`/api/auth/[...path]`, login action, proxy protection) and Fastify (`/v1/me` session/role/org resolution). Analyst sign-in/session verified; unauth 401; analyst audit verify 403; manager audit verify `VALID`.
-- **Storage:** AWS SDK client with `forcePathStyle=true` and `requestChecksumCalculation="WHEN_REQUIRED"`; real private bucket put/read/head/presign/delete passed.
-- **Encryption:** per-borrower AES-256-GCM DEK wrapped by `DATA_KEK_BASE64`; document encryption; Ed25519 audit signing; tests pass.
-- **Audit:** append-only per-org sequence with row lock, SHA-256 chain and Ed25519 signature; DB append/verify `VALID`.
-- **Jobs:** Postgres `jobs` queue with idempotent enqueue, `FOR UPDATE SKIP LOCKED`, leases, retries; worker completed a healthcheck job.
-- **Presidio:** `REDUCED_PII_MODE` FastAPI service using `en_core_web_sm` and custom financial recognizers; health/tokenize verified; RSS ≈ 176 MB.
-- **Supabase removal:** no Supabase variables, dependencies or code/docs references remain. Neon is the sole data layer; storage is private S3-compatible.
-- **Render:** Option B — deferred to Phase 5; API runs locally against Neon for Phases 2–4.
+- Neon PostgreSQL 18.7, managed Better Auth, private S3-compatible bucket `assay-private-documents`.
+- Envelope encryption, per-borrower wrapped DEK, keyed document HMAC.
+- Per-borrower Ed25519-signed audit chain with row-locked sequence.
+- Postgres jobs queue with `FOR UPDATE SKIP LOCKED`, leases, retry/dead-letter.
+- `REDUCED_PII_MODE` Presidio service (`en_core_web_sm` + custom financial recognizers, ~176 MB RSS).
+- Supabase fully removed. Render deferred to Phase 5 (Option B). Live provider connectivity and model/attestation checks recorded.
 
-## Provider and integration status
+## Phase 3 — complete
 
-| Provider | Status | Evidence |
-|---|---|---|
-| Neon Postgres/Auth | `LIVE (LOCAL/PREVIEW DATA)` | 18.7; `/ok` 200; bucket accessible; schema migrated |
-| NEAR AI Cloud | `LIVE` | `z-ai/glm-5.3-flash`; exact model response; TDX + NRAS attestation pass; evidence report hash recorded |
-| OpenRouter | `LIVE` | `openai/gpt-4o-mini` exact; generation `deepseek/deepseek-v3.2` found |
-| SERV / OpenServ | `LIVE` | `serv-standard` exact model ID; small live call 200 |
-| Presidio | `LIVE (LOCAL REDUCED MODE)` | `/tokenize` verified; RSS 176 MB |
-| Vercel | `PREVIEW READY` | Protected Phase 1 shell only |
-| Render | `DEFERRED TO PHASE 5` | Option B recorded |
-| Kite | `ENABLED (TESTNET) — payment provider-blocked` | Active 5/20 PIEUSD session; over-cap rejection `session_rule_exceeded`; no retry |
-| Reppo | `DISABLED` | Optional; key present but synthetic-only contract not enabled |
+- Canonical schema realigned to `MASTER_BLUEPRINT.md` §7: borrowers, borrower keys, facilities, documents, analysis runs, covenant terms, sealed financial inputs, scenario results, proof artifacts, approvals, redaction revisions, extraction runs, feedback/Reppo evaluations, per-borrower audit events/heads, jobs, idempotency records. Roles are `ANALYST | MANAGER | AUDITOR | ADMIN`.
+- Full Fastify domain/API surface: borrower/facility CRUD; encrypted upload with PDF/TXT magic-byte, 10 MiB, 40-page and scanned-PDF rejection; in-memory preview; run create/list/detail; redaction read/review; asynchronous extraction; terms review; financial inputs with deterministic add-back caps; calculation + independent BigInt verifier + SERV gate; fixed-circuit proof; role-shaped reports; manager approval queue/decision; cancellation; audit read/verify/payload; feedback; integration status; Reppo disabled; Kite local policy → provider-blocked; demo shred.
+- NEAR AI extraction is attested per request: exact model, `verifiable`/`attestationSupported`, fresh 32-byte nonce, Intel TDX via `@phala/dcap-qvl`, NVIDIA NRAS, signer/nonce binding, response ECDSA signature, request/response hashes, compose-manager quote. Failure blocks terms.
+- Extraction runs as a background Postgres job (`analysis.extract`), returning `202`; parse also runs as `analysis.parse`.
+- Proof generation runs in a one-shot child process; witness is passed over stdin and never persisted. Server checks public signals `["1","35000"]` before storing a verified artifact.
 
-## Verification evidence
+## Phase 4 — complete
 
-| Command | Result |
+- Authenticated API-backed UI: dashboard, borrowers list/detail/new, facilities list/detail, document preview, analysis run list/detail, approvals queue/decision, audit timeline/verify, covenant register, exception cases derived from immutable run state, integrations, settings/sign-out.
+- Role-shaped analyst/manager/auditor views; manager view excludes raw amounts, names, agreement text and token map.
+- Loading/empty/error/forbidden states, auto-refresh during background jobs, responsive desktop/mobile layouts, keyboard-focus styles, no fake provider success.
+- Document preview, redaction review, terms confirmation, financial attestation, calculation, proof, approval and cancellation all call real APIs.
+
+## Verified evidence
+
+| Check | Result |
 |---|---|
 | `psql "$DATABASE_URL" -c "select version();"` | PostgreSQL 18.7 |
 | `curl "$NEON_AUTH_BASE_URL/ok"` | HTTP 200 |
 | `aws s3 ls --endpoint-url "$AWS_ENDPOINT_URL_S3"` | `assay-private-documents` |
-| OpenRouter catalog check | both configured IDs FOUND |
-| NEAR AI model list + live extraction | verifiable/attestationSupported true; exact model + JSON |
-| NEAR AI official verifier | TDX true, NRAS true, nonce binding true, compose hashes match |
-| SERV live call | `serv-standard` exact, HTTP 200 |
-| `pnpm typecheck` | Passed |
-| `pnpm test` | domain 18/18, contracts 6/6, proof 3/3, API 4/4 |
-| `pnpm build` | Passed |
-| Playwright shell suite | 10/10 with authenticated demo users |
-| Storage healthcheck | put/read/presign/delete pass |
-| Audit healthcheck | chain `VALID`, signature present |
-| Job healthcheck | status `SUCCEEDED` |
-| Presidio healthcheck | `/health` and `/tokenize` pass; RSS 176 MB |
+| NEAR AI model list | `z-ai/glm-5.3-flash`, `verifiable=true`, `attestationSupported=true` |
+| NEAR AI attested live call | TDX `UpToDate`, NRAS true, signature + nonce + hashes verified |
+| OpenRouter live call | exact `openai/gpt-4o-mini` |
+| SERV live call | exact `serv-standard` |
+| Storage healthcheck | put/read/head/presign/delete pass |
+| Audit chain | `VALID`, 13 events, signatures verified |
+| Parse/redaction | 4-page PDF, 7 entities, covenant clause preserved |
+| Full workflow BOR-004 | 3.0660x compliant → proof `VERIFIED` → manager `APPROVED` |
+| Stressed BOR-005 | baseline 3.475x; stress 3.861x/3.823x breached; no-ack 422; acknowledged approve 201 |
+| Root typecheck/build | Passed |
+| Unit tests | domain 18/18, crypto 4/4, contracts 6/6, document 8/8, proof 3/3, AI 10/10, API 4/4 |
+| Playwright | 18/18 desktop + mobile |
+| Kite | Testnet session active; payment path provider-blocked; no retry; no receipt claimed |
+| Public signup | Disabled at the auth service; direct probe returned `400 EMAIL_PASSWORD_SIGN_UP_DISABLED` |
+| Reppo | Disabled; no synthetic-feedback contract enabled |
 
-## Next exact task — Phase 3
+## Current data state (synthetic demo)
 
-Implement the domain/API workflow:
-1. Borrower/facility CRUD with tenant scoping, normalized references and audit events.
-2. Document upload/version/hash, private encrypted storage, parser and `REDUCED_PII_MODE` redaction review.
-3. NEAR AI extraction adapter with model + attestation checks; OpenRouter/SERV structured reasoning nodes; source quote/page validation.
-4. Covenant draft/review/activation with manager maker-checker; financial evidence confirmation/supersession.
-5. Deterministic assessment + independent verification + fixed-circuit proof; actual/forecast separation; stale invalidation.
-6. Case/memo/approval and audit APIs; Phase 4 UI integration; Phase 5 E2E gate before Phase 6.
+- Organizations: `Assay Demo Credit Partners` (`00000000-0000-4000-8000-000000000001`).
+- Demo staff: `analyst@assay.test` (Maya Chen, ANALYST), `manager@assay.test` (Jon Bell, MANAGER), `auditor@assay.test` (Priya Raman, AUDITOR). Credentials live only in `/root/assay-secrets/demo-users.env`.
+- Borrowers BOR-004 and BOR-005 exist. Both runs are manager-approved; BOR-004 baseline and stress cases compliant; BOR-005 baseline compliant with two acknowledged stress breaches.
+- Old BOR-001/2/3 test runs were deleted before the final schema/workflow checks. No real data was involved.
+
+## Next exact task — Phase 5
+
+1. Deploy Fastify and Presidio to Render; record exact service URLs, deployed commit and environment-variable names (never values).
+2. Point `API_PUBLIC_URL` on Vercel at the Render API; keep Git-triggered production releases disabled; deploy a protected preview.
+3. Verify the authenticated preview end-to-end with analyst/manager/auditor accounts, including upload, job polling, extraction attestation, proof, approval and audit verification.
+4. Run the Phase 5/9 regression and security matrix: IDOR matrix, role forgery, XSS, SQL injection, upload validation, prompt injection, CORS, token expiry, secret scanning, log redaction, concurrent approval, audit tampering, proof mutation, production-mode shred denial and Kite duplicate-payment policy.
+5. Update `AI_HANDOFF.md`, `docs/BUILD_LOG.md`, `docs/DEPLOYMENT.md` and `docs/TESTING.md`, commit and push.
+6. Then attempt Phase 6 `npx skills add benjitaylor/skills --skill stageshow`, apply only trustworthy guidance, refine visuals and produce the demo video under `artifacts/demo/`.
 
 ## Authorization boundaries
 
-- Synthetic data only.
-- No public signup; invite-only staff.
-- No Kite wallet spend beyond the approved testnet session.
-- Production release only after the full regression/security matrix passes.
-- Never fabricate provider output, receipts or verification results.
+- Synthetic data only; no public signup.
+- No Kite wallet spend beyond the approved testnet session; payment path is provider-blocked and must not be retried.
+- No production deployment claim until the full gate passes.
+- Never fabricate provider output, receipts, attestation or verification results.
+- Do not expose secrets. `.env.local`, `.kite-passport/` and `/root/assay-secrets/` are outside Git.

@@ -11,6 +11,10 @@
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
-    "lint": "pnpm -r lint"
+    "lint": "pnpm -r lint",
+    "seed:workspace": "node --env-file=.env.local scripts/seed-demo-workspace.mjs"
+  },
+  "dependencies": {
+    "pg": "8.23.1"
   }
 }

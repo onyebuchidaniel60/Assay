@@ -1,0 +1,47 @@
+SYNTHETIC CREDIT AGREEMENT - DEMO FIXTURE
+This document is fabricated for the Assay product demonstration. It contains no real borrower, lender or financial information.
+
+Borrower: Northwind Components Ltd.
+Facility reference: NWC-2026-001
+Facility account: 123456789012
+Relationship contact: maya.chen@example.test
+
+Article 1 - Facility
+The Lenders make available a revolving credit facility in an aggregate committed amount of USD 50,000,000. The Facility is available in US dollars only. The Borrower may borrow, repay and reborrow subject to the terms of this Agreement.
+
+Article 2 - Interest and Fees
+Interest accrues at the applicable benchmark rate plus a margin of 2.25% per annum. Undrawn amounts carry a commitment fee of 0.35% per annum. Interest is payable quarterly in arrears.
+
+Article 3 - Representations
+The Borrower represents that its financial statements have been prepared in accordance with generally accepted accounting principles consistently applied. No material adverse change has occurred as of the date of this Agreement.
+
+Article 4 - Reporting
+The Borrower shall deliver audited annual financial statements within 120 days after each fiscal year end and quarterly management accounts within 45 days after each fiscal quarter end.
+
+Article 5 - Negative Pledge
+The Borrower shall not create or permit any security interest over its assets other than permitted security interests described in Schedule 3.
+
+Article 6 - Events of Default
+Each of the following constitutes an Event of Default: failure to pay principal when due, failure to observe the financial covenant in Article 7, or a material misrepresentation.
+
+Article 7 - Financial Covenant
+7.1 Maximum Leverage. The Borrower shall ensure that Consolidated Total Debt to Consolidated EBITDA does not exceed 3.50:1.00 for each Test Period.
+7.2 Definitions. Consolidated Total Debt means all drawn borrowings, finance leases and guarantee obligations of the Borrower and its subsidiaries, determined on a consolidated basis. Consolidated EBITDA means consolidated net income before interest, taxes, depreciation and amortisation, determined for the trailing twelve months.
+7.3 Permitted Addbacks. Consolidated EBITDA may include restructuring costs incurred in the ordinary course, capped at USD 5,000,000 in aggregate, and non-cash share-based compensation.
+7.4 Testing. The covenant is tested on the last day of each fiscal quarter. The first Test Date is 30 September 2026.
+7.5 Cure Rights. The Borrower may cure a breach by contributing equity within fifteen business days after delivery of the compliance certificate.
+
+Article 8 - Governing Law
+This Agreement is governed by the laws of the State of New York. The parties submit to the exclusive jurisdiction of the courts located in New York County.
+
+Schedule 1 - Commitments
+Lender A: USD 30,000,000
+Lender B: USD 20,000,000
+
+Schedule 2 - Notice Details
+Notices to the Borrower shall be sent to the relationship contact named above. Notices to the Lenders shall be sent to the administrative agent.
+
+Schedule 3 - Permitted Security
+Permitted security includes liens arising by operation of law, purchase money security interests and liens over cash collateral securing the Facility.
+
+Signature page follows.

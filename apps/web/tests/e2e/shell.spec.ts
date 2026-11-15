@@ -11,7 +11,7 @@ async function signIn(page: import("@playwright/test").Page) {
   expect(response.ok()).toBeTruthy();
 }
 
-test.describe("Assay Phase 1 shell", () => {
+test.describe("Assay authenticated shell", () => {
   test("landing page exposes the product and entry points", async ({ page }) => {
     await page.goto("/");
     await expect(page).toHaveTitle(/Assay/);
@@ -26,29 +26,21 @@ test.describe("Assay Phase 1 shell", () => {
     await page.goto("/dashboard");
     await expect(page.getByRole("heading", { name: /Every covenant/i })).toBeVisible();
     await expect(page.getByText("Actual breaches").first()).toBeVisible();
-    await expect(page.getByText("Scenario at risk").first()).toBeVisible();
-    await expect(page.getByRole("link", { name: /Harborline Logistics/i }).first()).toBeVisible();
-    await page.getByRole("link", { name: /Open queue/i }).click();
+    await expect(page.getByText("Runs in review").first()).toBeVisible();
+    await expect(page.getByRole("link", { name: /Open analysis queue/i })).toBeVisible();
+    await page.getByRole("link", { name: /Open analysis queue/i }).click();
     await expect(page.getByRole("heading", { name: /Analysis runs/i })).toBeVisible();
   });
 
-  test("facility and covenant detail routes render", async ({ page }) => {
+  test("facility and covenant registers render real records", async ({ page }) => {
     test.skip(!demoEmail || !demoPassword, "Demo analyst credentials are not configured.");
     await signIn(page);
-    await page.goto("/facilities/demo");
-    await expect(page.getByRole("heading", { name: /Term Loan A/i })).toBeVisible();
-    await page.goto("/covenants/demo");
-    await expect(page.getByRole("heading", { name: /Maximum leverage/i })).toBeVisible();
-    await expect(page.getByText(/Source clause/i).first()).toBeVisible();
-  });
-
-  test("audit verification fixture is a real interaction", async ({ page }) => {
-    test.skip(!demoEmail || !demoPassword, "Demo analyst credentials are not configured.");
-    await signIn(page);
-    await page.goto("/audit");
-    await expect(page.getByRole("heading", { name: /Audit trail/i })).toBeVisible();
-    await page.getByRole("link", { name: /Run chain check/i }).click();
-    await expect(page.getByText(/Fixture chain check complete/i)).toBeVisible();
+    await page.goto("/facilities");
+    await expect(page.getByRole("heading", { name: "Facilities", level: 1 })).toBeVisible();
+    await page.locator('a[href^="/facilities/"]').first().click();
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await page.goto("/covenants");
+    await expect(page.getByRole("heading", { name: /Covenant register/i })).toBeVisible();
   });
 
   test("login form is a real Neon Auth sign-in form", async ({ page }) => {

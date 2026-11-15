@@ -4,7 +4,7 @@
 
 ## OpenServ SERV Reasoning — mandatory orchestration
 
-Use the current OpenServ inference base URL confirmed in public materials: `https://inference-api.openserv.ai/v1`. An unauthenticated probe returned HTTP 401, confirming the endpoint responds; verify the actual key, model catalog, graph features and credits in the account before implementation. SERV is the bounded reasoning/orchestration layer; its nodes call NEAR AI or OpenRouter. SERV does not itself perform inference. Application code owns the domain state machine and deterministic checks. Never claim a graph, Shadow Agent or PromptGuard feature was executed unless account/runtime evidence confirms it.
+Live endpoint: `https://inference-api.openserv.ai/v1`. The account catalog was verified and `serv-standard` returns the exact configured model ID. Extraction and calculation each call SERV with an explicit system prompt and strict JSON contract; a missing system prompt or invalid contract fails the run. SERV is the bounded reasoning/orchestration layer; application code owns the state machine and deterministic checks. Never claim a graph, Shadow Agent or PromptGuard feature was executed without runtime evidence.
 
 ## NEAR AI Cloud — Layer 2 confidential inference
 
@@ -13,7 +13,8 @@ Use the current OpenServ inference base URL confirmed in public materials: `http
 - Confidential compute: Intel TDX confidential VMs and NVIDIA H200 GPUs in confidential-computing mode.
 - Attestation: request fresh evidence with a client-supplied nonce; verify against Intel TDX and NVIDIA NRAS. Public deployment manifests: `github.com/nearai/cvm-compose-files`.
 - Model catalog: `GET https://cloud-api.near.ai/v1/model/list`. Select only models whose metadata reports both `verifiable: true` and `attestationSupported: true` for Layer 2 extraction.
-- Selected/proposed extraction model: `z-ai/glm-5.3-flash` (TEE-verifiable metadata, 1M context, structured outputs). Alternative: `deepseek-ai/DeepSeek-V4.1-Flash-1017` (verifiable, no structured-output metadata).
+- Selected extraction model: `z-ai/glm-5.3-flash` (`verifiable=true`, `attestationSupported=true`, exact model ID returned).
+- Runtime attestation: `NearAIClient.attestedExtraction()` fetches a fresh report, verifies Intel TDX via `@phala/dcap-qvl`, verifies NVIDIA NRAS, binds the TDX report data to the response signer + nonce, verifies the response ECDSA signature and request/response hashes, and checks the compose-manager quote. Failure blocks terms.
 - Routing: only tokenized credit-agreement text and structured financial figures. Never send token maps, borrower identities or raw documents.
 - Starter credit: advertised, but the exact amount must be verified in the dashboard before Phase 3.
 - Required wording: “Sensitive inference is routed to NEAR AI Cloud's TEE-attested gateway. Each request can be verified against Intel TDX and NVIDIA NRAS attestation evidence.”
@@ -24,7 +25,7 @@ Use the current OpenServ inference base URL confirmed in public materials: `http
 - Base URL: `https://openrouter.ai/api/v1` (OpenAI-compatible).
 - Auth: bearer token via `OPENROUTER_API_KEY`.
 - Two configurable model IDs: `OPENROUTER_MODEL_JUDGEMENT` and `OPENROUTER_MODEL_GENERATION`.
-- Proposed models: `openai/gpt-5.4-mini` for judgement and `deepseek/deepseek-v3.2` for generation.
+- Verified models: `openai/gpt-4o-mini` for judgement and `deepseek/deepseek-v3.2` for generation. Both exist in the catalog and returned exact IDs in live calls.
 - Routing: SERV judgement and generation nodes receive only structured, already-extracted data — never raw documents.
 - This is not the confidential Layer 2 path. Do not send tokenized agreement text, token maps, borrower identities or raw documents here.
 
@@ -34,7 +35,7 @@ Dolphin was evaluated and rejected because its confidentiality mechanism is unve
 
 ## Reppo — optional
 
-Current public Evaluation API documentation advertises bearer authentication, `POST /api/v1/agents/eval-requests/submit`, `GET /{evalId}`, structured score/decision/confidence/critique/route, 10 free evaluations and then launch pricing of $0.01 per evaluation. Confirm current docs/quota/terms at setup time. Send only synthetic/de-identified content; do not send original credit agreements or actual financials. Disabled by default.
+Reppo remains disabled. The API surface returns `503 PROVIDER_DISABLED` for submission and stores only synthetic correction records locally. No score, decision or cost is fabricated. Enable only after the current synthetic-only contract, quota and terms are verified.
 
 ## Kite Passport / x402 — optional
 
@@ -47,7 +48,7 @@ Kite documentation describes passkey-approved spending sessions with a per-payme
 - Active session: `agent_session_01a1dfc3-794e-70cb-bde8-90c6315736cf`.
 - Delegation: `5 PIEUSD` per transaction, `20 PIEUSD` total, `24h` TTL, asset `PIEUSD`; expires `2026-11-16T15:11:32.17177Z`.
 - The Phase 3 adapter must use this approved session (or a newly approved successor) and enforce the same caps in the deterministic policy engine before any payment call. It must never auto-approve a session or bypass the caps.
-- The x402 smoke payment is **provider-blocked**: two identical calls with idempotency key `assay-kite-smoke-1457e791-3c4f-45f9-ade5-16e0749b117c` returned `internal error`; no activity event, receipt or spend exists.
+- The x402 smoke payment is **provider-blocked**: the approved call returned an upstream provider internal error; no activity event, receipt or spend exists. The API performs the deterministic local session/asset/cap/expiry check and then returns `503 PROVIDER_BLOCKED` without calling x402.
 - The over-cap policy test succeeded: a temporary `0.05 PIEUSD` session rejected a `0.1 PIEUSD` request with `session_rule_exceeded` (exit 6) and no payment event.
 - Do not represent the provider-blocked smoke payment as successful. Do not retry again without a provider change or new operator instruction.
 

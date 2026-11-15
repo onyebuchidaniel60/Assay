@@ -2,9 +2,9 @@
 
 ## Environments
 
-- **Local:** Neon development branch or dedicated development project, synthetic fixtures, provider calls disabled by default.
+- **Local:** Neon development branch/project, synthetic fixtures, live providers only through verified server-side adapters.
 - **Preview:** Vercel frontend, Render API/Presidio, Neon demo project. Synthetic fixtures only. Sandbox integrations. No production secrets/data/payments.
-- **Production:** not part of the MVP; not authorized by default. Requires explicit operator approval and separate security/retention review.
+- **Production:** release authority is recorded, but deployment remains gated on the full Phase 5/9 test and security matrix. No production deployment is claimed.
 
 ## Platform allocation
 
@@ -20,10 +20,11 @@
 ## Current preview
 
 - **URL:** `https://assay-guyo5yh6z-uhhh2.vercel.app`
-- **Commit:** `5deaa51491e322f5f5fe82b389a7b66206aad126`
+- **Commit:** the Phase 1 shell commit (`5deaa51…`); the Phase 3/4 authenticated UI is local until Phase 5.
 - **Protection:** Vercel Authentication.
-- **State:** Phase 1 shell only; read-only synthetic views; no database, auth or live provider calls.
-- **Verification:** `vercel curl` returned expected titles for `/`, `/dashboard`, `/facilities/demo`, `/integrations` and `/audit`.
+- **State:** Phase 1 shell only; it is not the current authenticated workspace.
+- **Local verified state:** API `http://localhost:3001`, web `http://localhost:3000`, 18/18 Playwright desktop/mobile, full run lifecycle and manager approval.
+- **Phase 5 target:** Render API + Presidio, Vercel preview with `API_PUBLIC_URL` pointing at Render, Neon demo project, sign-up disabled, exact commit/URL recorded here and in `AI_HANDOFF.md`.
 
 ## Preview deployment order
 
@@ -34,7 +35,7 @@
 5. Add only synthetic test data and sandbox secrets.
 6. Redeploy and smoke-test after verified checkpoints.
 
-An unverified Production build was auto-triggered by the GitHub connection during Phase 1 and removed before release. Production remains gated on the Phase 5/9 test and security matrix.
+An unverified Production build was auto-triggered by the GitHub connection during Phase 1 and the Git integration was disconnected. Production remains gated on the Phase 5/9 test and security matrix.
 
 ## Secrets
 

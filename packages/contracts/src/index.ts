@@ -1,127 +1,199 @@
 import { z } from "zod";
 
-export const decimalStringSchema = z
-  .string()
-  .regex(/^\d+(\.\d{1,8})?$/, "Use a non-negative decimal string with at most 8 decimal places.");
+/**
+ * Canonical request/response contracts.
+ *
+ * All financial amounts are integer minor units encoded as decimal strings so
+ * no JavaScript floating-point value or BigInt-unfriendly JSON number can
+ * become authoritative.
+ */
 
-export const signedDecimalStringSchema = z
+export const minorUnitsSchema = z
   .string()
-  .regex(/^-?\d+(\.\d{1,8})?$/, "Use a decimal string with at most 8 decimal places.");
+  .regex(/^(0|[1-9]\d{0,17})$/, "Use a non-negative integer string of at most 18 digits (minor units).");
+
+export const signedMinorUnitsSchema = z
+  .string()
+  .regex(/^-?(0|[1-9]\d{0,17})$/, "Use an integer string of at most 18 digits (minor units).");
 
 export const currencySchema = z.string().regex(/^[A-Z]{3}$/, "Use a three-letter uppercase currency code.");
 export const isoDateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use an ISO date (YYYY-MM-DD).");
 
-export const roleSchema = z.enum(["CREDIT_ANALYST", "CREDIT_MANAGER", "PORTFOLIO_MANAGER", "AUDITOR", "ORG_ADMIN"]);
+export const referenceTokenSchema = z
+  .string()
+  .trim()
+  .min(2)
+  .max(64)
+  .regex(/^[A-Za-z0-9][A-Za-z0-9_-]*$/, "Use letters, digits, dashes or underscores.");
+
+export const roleSchema = z.enum(["ANALYST", "MANAGER", "AUDITOR", "ADMIN"]);
 
 export const borrowerCreateSchema = z
   .object({
-    legalName: z.string().trim().min(1).max(240),
-    referenceCode: z.string().trim().min(1).max(80),
-    classification: z.enum(["CORPORATE", "OTHER"]).default("CORPORATE"),
+    displayAlias: z.string().trim().min(1).max(120),
+    referenceToken: referenceTokenSchema,
   })
   .strict();
+
+export const borrowerPatchSchema = z
+  .object({
+    displayAlias: z.string().trim().min(1).max(120).optional(),
+    status: z.enum(["ACTIVE", "ARCHIVED"]).optional(),
+    expectedVersion: z.number().int().positive(),
+  })
+  .strict()
+  .refine((value) => value.displayAlias !== undefined || value.status !== undefined, {
+    message: "Provide at least one editable field.",
+  });
 
 export const facilityCreateSchema = z
   .object({
-    name: z.string().trim().min(1).max(160),
-    referenceCode: z.string().trim().min(1).max(80),
-    facilityType: z.string().trim().min(1).max(80),
+    facilityReferenceToken: referenceTokenSchema,
+    label: z.string().trim().min(1).max(160),
     currency: currencySchema,
-    committedAmount: decimalStringSchema,
-    outstandingAmount: decimalStringSchema.optional(),
-    agreementDate: isoDateSchema,
-    maturityDate: isoDateSchema.optional(),
+  })
+  .strict();
+
+export const analysisCreateSchema = z
+  .object({
+    facilityId: z.string().uuid(),
+    documentId: z.string().uuid(),
+  })
+  .strict();
+
+export const permittedAddbackSchema = z
+  .object({
+    code: z.string().trim().min(1).max(64),
+    description: z.string().trim().min(1).max(500),
+    conditions: z.array(z.string().min(1).max(500)).max(20),
+    capMinor: minorUnitsSchema.nullable(),
+  })
+  .strict();
+
+export const covenantEvidenceSchema = z
+  .object({
+    page: z.number().int().positive(),
+    quote: z.string().min(1).max(500),
+    field: z.string().min(1).max(120),
+  })
+  .strict();
+
+/** Normative extraction schema from MASTER_BLUEPRINT §5. */
+export const covenantTermsSchema = z
+  .object({
+    covenantType: z.literal("DEBT_TO_ADJUSTED_EBITDA"),
+    comparator: z.literal("LTE"),
+    thresholdBps: z.number().int().min(1).max(100_000),
+    currency: currencySchema.optional(),
+    totalDebtDefinition: z.string().min(1).max(2000),
+    ebitdaDefinition: z.string().min(1).max(2000),
+    permittedAddbacks: z.array(permittedAddbackSchema).max(50),
+    testingDate: isoDateSchema.nullable(),
+    cureRightsSummary: z.string().max(2000).nullable(),
+    evidence: z.array(covenantEvidenceSchema).min(1).max(50),
+    confidence: z.number().min(0).max(1),
+    uncertaintyNotes: z.array(z.string().max(500)).max(20),
+  })
+  .strict();
+
+export const termsReviewSchema = z
+  .object({
+    revision: z.number().int().positive(),
+    decision: z.enum(["CONFIRM", "REJECT"]),
+    rationale: z.string().max(2000).optional(),
+    edits: z
+      .object({
+        thresholdBps: z.number().int().min(1).max(100_000).optional(),
+        totalDebtDefinition: z.string().min(1).max(2000).optional(),
+        ebitdaDefinition: z.string().min(1).max(2000).optional(),
+        permittedAddbacks: z.array(permittedAddbackSchema).max(50).optional(),
+        testingDate: isoDateSchema.nullable().optional(),
+        cureRightsSummary: z.string().max(2000).nullable().optional(),
+      })
+      .strict()
+      .optional(),
   })
   .strict()
   .superRefine((value, ctx) => {
-    if (value.maturityDate && value.maturityDate < value.agreementDate) {
-      ctx.addIssue({ code: "custom", path: ["maturityDate"], message: "Maturity must be on or after the agreement date." });
+    if (value.decision === "REJECT" && !value.rationale?.trim()) {
+      ctx.addIssue({ code: "custom", path: ["rationale"], message: "A rejection reason is required." });
     }
   });
 
-export const metricKeySchema = z.enum([
-  "gross_debt",
-  "ltm_ebitda",
-  "unrestricted_cash",
-  "eligible_ebitda_addback",
-  "other_contractual_adjustment",
-]);
-
-export type FormulaAst =
-  | { kind: "metric"; key: z.infer<typeof metricKeySchema> }
-  | { kind: "constant"; value: string; sourceRef: string }
-  | { kind: "sum"; terms: FormulaAst[] }
-  | { kind: "subtract"; left: FormulaAst; right: FormulaAst }
-  | { kind: "min"; left: FormulaAst; right: FormulaAst }
-  | { kind: "max"; left: FormulaAst; right: FormulaAst }
-  | { kind: "divide"; numerator: FormulaAst; denominator: FormulaAst };
-
-export const formulaAstSchema: z.ZodType<FormulaAst> = z.lazy(() =>
-  z.discriminatedUnion("kind", [
-    z.object({ kind: z.literal("metric"), key: metricKeySchema }).strict(),
-    z.object({ kind: z.literal("constant"), value: decimalStringSchema, sourceRef: z.string().min(1) }).strict(),
-    z.object({ kind: z.literal("sum"), terms: z.array(formulaAstSchema).min(1).max(12) }).strict(),
-    z.object({ kind: z.literal("subtract"), left: formulaAstSchema, right: formulaAstSchema }).strict(),
-    z.object({ kind: z.literal("min"), left: formulaAstSchema, right: formulaAstSchema }).strict(),
-    z.object({ kind: z.literal("max"), left: formulaAstSchema, right: formulaAstSchema }).strict(),
-    z.object({ kind: z.literal("divide"), numerator: formulaAstSchema, denominator: formulaAstSchema }).strict(),
-  ]),
-);
-
-export const covenantDraftSchema = z
+export const spanSchema = z
   .object({
-    name: z.string().trim().min(1).max(160),
-    thresholdBps: z.number().int().positive().max(1_000_000),
-    operator: z.enum(["LTE", "GTE", "LT", "GT"]),
-    formulaAst: formulaAstSchema,
-    effectiveFrom: isoDateSchema,
-    sourceRefs: z
-      .array(
-        z.object({
-          documentVersionId: z.string().uuid(),
-          page: z.number().int().positive(),
-          quote: z.string().min(1).max(4000),
-        }),
-      )
-      .min(1),
+    page: z.number().int().positive(),
+    start: z.number().int().nonnegative(),
+    end: z.number().int().positive(),
+    entityType: z.string().min(1).max(64).optional(),
   })
-  .strict();
+  .strict()
+  .refine((value) => value.end > value.start, { message: "Span end must be after start." });
 
-export const financialInputsSchema = z
+export const redactionReviewSchema = z
   .object({
-    debt: decimalStringSchema,
-    reportedEbitda: decimalStringSchema,
-    addBacks: z
+    revision: z.number().int().positive(),
+    decision: z.enum(["CONFIRM", "REJECT"]),
+    falsePositiveSpans: z.array(spanSchema).max(200).optional(),
+    additionalSpans: z.array(spanSchema.required({ entityType: true })).max(200).optional(),
+    rationale: z.string().max(2000).optional(),
+  })
+  .strict()
+  .superRefine((value, ctx) => {
+    if (value.decision === "REJECT" && !value.rationale?.trim()) {
+      ctx.addIssue({ code: "custom", path: ["rationale"], message: "A rejection reason is required." });
+    }
+  });
+
+export const financialInputsRequestSchema = z
+  .object({
+    currency: currencySchema,
+    reportedEbitdaMinor: minorUnitsSchema,
+    totalDebtMinor: minorUnitsSchema,
+    addbacks: z
       .array(
-        z.object({
-          label: z.string().min(1).max(160),
-          amount: decimalStringSchema,
-          eligible: z.boolean(),
-          sourceRef: z.string().max(160).optional(),
-        }),
+        z
+          .object({
+            code: z.string().trim().min(1).max(64),
+            amountMinor: minorUnitsSchema,
+            sourceReference: z.string().trim().max(160).optional(),
+          })
+          .strict(),
       )
       .max(50)
       .default([]),
-    currency: currencySchema,
-    testDate: isoDateSchema,
-    periodStart: isoDateSchema.optional(),
-    periodEnd: isoDateSchema.optional(),
+    attest: z.literal(true),
+    termsVersion: z.number().int().positive(),
   })
   .strict();
 
-export const assessmentCreateSchema = z
+export const proofRequestSchema = z
   .object({
-    testDate: isoDateSchema,
-    evidenceMap: z.record(metricKeySchema, z.string().uuid()),
-    idempotencyKey: z.string().min(8).max(200),
+    analysisVersion: z.number().int().positive(),
   })
   .strict();
 
 export const approvalDecisionSchema = z
   .object({
-    decision: z.enum(["APPROVE", "REJECT", "CHANGES_REQUESTED"]),
-    reason: z.string().max(2000).optional(),
-    expectedVersion: z.number().int().nonnegative(),
+    decision: z.enum(["APPROVE", "REJECT"]),
+    proofArtifactId: z.string().uuid(),
+    analysisVersion: z.number().int().positive(),
+    riskAcknowledged: z.boolean().default(false),
+    rationale: z.string().max(2000).optional(),
+  })
+  .strict()
+  .superRefine((value, ctx) => {
+    if (value.decision === "REJECT" && !value.rationale?.trim()) {
+      ctx.addIssue({ code: "custom", path: ["rationale"], message: "A rejection reason is required." });
+    }
+  });
+
+export const feedbackCreateSchema = z
+  .object({
+    correctionType: z.enum(["TERMS", "FINANCIAL_INPUT", "REDACTION", "OTHER"]),
+    beforeValue: z.record(z.string(), z.unknown()),
+    afterValue: z.record(z.string(), z.unknown()),
+    note: z.string().max(1000).optional(),
   })
   .strict();
 
@@ -130,19 +202,20 @@ export const kiteSessionSchema = z
     sessionId: z.string().min(8),
     status: z.enum(["active", "expired", "used_up", "revoked"]),
     asset: z.string().min(1),
-    maxPerTransaction: decimalStringSchema,
-    maxTotal: decimalStringSchema,
-    spentTotal: decimalStringSchema,
-    reservedTotal: decimalStringSchema,
+    maxPerTransaction: minorUnitsSchema,
+    maxTotal: minorUnitsSchema,
+    spentTotal: minorUnitsSchema,
+    reservedTotal: minorUnitsSchema,
     expiresAt: z.string().datetime(),
   })
   .strict();
 
 export const kitePaymentIntentSchema = z
   .object({
-    amount: decimalStringSchema,
+    amountMinor: minorUnitsSchema,
     asset: z.string().min(1),
     idempotencyKey: z.string().min(8).max(200),
+    serviceId: z.string().min(1).max(120),
   })
   .strict();
 
@@ -154,3 +227,7 @@ export const safeErrorSchema = z.object({
     details: z.unknown().optional(),
   }),
 });
+
+export type CovenantTerms = z.infer<typeof covenantTermsSchema>;
+export type FinancialInputsRequest = z.infer<typeof financialInputsRequestSchema>;
+export type RedactionReviewRequest = z.infer<typeof redactionReviewSchema>;

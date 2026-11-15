@@ -1,9 +1,11 @@
 import {
   createCipheriv,
   createDecipheriv,
+  createHmac,
   createPrivateKey,
   createPublicKey,
   generateKeyPairSync,
+  hkdfSync,
   randomBytes,
   sign,
   verify,
@@ -83,6 +85,43 @@ export function decryptBytes(payload: EncryptedPayload, dek: Buffer): Buffer {
   const decipher = createDecipheriv(ALGORITHM, dek, nonce);
   decipher.setAuthTag(tag);
   return Buffer.concat([decipher.update(ciphertext), decipher.final()]);
+}
+
+export type SealedColumns = {
+  ciphertext: string;
+  nonce: string;
+  tag: string;
+};
+
+export function toSealedColumns(payload: EncryptedPayload): SealedColumns {
+  return { ciphertext: payload.ciphertext, nonce: payload.nonce, tag: payload.tag };
+}
+
+export function fromSealedColumns(columns: SealedColumns): EncryptedPayload {
+  return { version: 1, ciphertext: columns.ciphertext, nonce: columns.nonce, tag: columns.tag };
+}
+
+export function sealJson(value: unknown, dek: Buffer): SealedColumns {
+  return toSealedColumns(encryptBytes(new TextEncoder().encode(JSON.stringify(value)), dek));
+}
+
+export function unsealJson<T>(columns: SealedColumns, dek: Buffer): T {
+  const plaintext = decryptBytes(fromSealedColumns(columns), dek);
+  return JSON.parse(plaintext.toString("utf8")) as T;
+}
+
+/**
+ * Document content HMAC uses a key derived from the data KEK rather than the
+ * borrower DEK, so the keyed digest stays stable across DEK rotation and can
+ * be used for duplicate-ciphertext detection without exposing a plaintext hash.
+ */
+export function documentHmacKey(kek: Buffer): Buffer {
+  if (kek.length !== 32) throw new Error("KEK must be 32 bytes.");
+  return Buffer.from(hkdfSync("sha256", kek, Buffer.alloc(0), "assay/document-hmac/v1", 32));
+}
+
+export function documentContentHmac(content: Uint8Array, kek: Buffer): string {
+  return createHmac("sha256", documentHmacKey(kek)).update(content).digest("hex");
 }
 
 export type AuditKeyPair = {

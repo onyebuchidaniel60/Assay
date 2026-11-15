@@ -71,7 +71,7 @@ export default function LandingPage() {
             </Link>
           </div>
           <p className="mt-5 max-w-xl text-xs leading-5 text-muted">
-            Preview uses synthetic borrower records only. Provider connections and production data are disabled.
+            Synthetic borrower records only. Live provider calls happen only inside an authorized analyst run; no real borrower data or production credit decision is used.
           </p>
         </div>
 
@@ -79,7 +79,7 @@ export default function LandingPage() {
           <div className="absolute -left-4 -top-4 size-24 rounded-full bg-acid blur-[1px]" aria-hidden />
           <div className="relative overflow-hidden rounded-[2rem] border border-ink/10 bg-ink p-6 text-paper shadow-2xl">
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/50">Attention queue</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/50">Illustrative attention queue</p>
               <StatusBadge tone="danger">1 actual breach</StatusBadge>
             </div>
             <div className="mt-5 space-y-4">

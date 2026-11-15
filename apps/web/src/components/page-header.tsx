@@ -30,14 +30,3 @@ export function PageHeader({
 export function SectionLabel({ children }: { children: React.ReactNode }) {
   return <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted">{children}</p>;
 }
-
-export function PlaceholderNote({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="rounded-2xl border border-dashed border-ink/20 bg-paper/60 p-4 text-sm leading-6 text-muted">
-      <span className="mr-2 inline-block rounded-full bg-acid px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-ink">
-        Phase 1 shell
-      </span>
-      {children}
-    </div>
-  );
-}

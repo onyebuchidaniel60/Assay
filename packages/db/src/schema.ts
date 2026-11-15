@@ -16,99 +16,64 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
-const money = (name: string) => numeric(name, { precision: 24, scale: 8 });
 const createdAt = () => timestamp("created_at", { withTimezone: true }).defaultNow().notNull();
 const updatedAt = () => timestamp("updated_at", { withTimezone: true }).defaultNow().notNull();
+const sealed = (name: string) => ({
+  ciphertext: text(`${name}_ciphertext`).notNull(),
+  nonce: text(`${name}_nonce`).notNull(),
+  tag: text(`${name}_tag`).notNull(),
+});
 
-export const organizationStatus = pgEnum("organization_status", ["active", "suspended"]);
-export const membershipRole = pgEnum("membership_role", [
-  "ORG_ADMIN",
-  "CREDIT_ANALYST",
-  "CREDIT_MANAGER",
-  "PORTFOLIO_MANAGER",
-  "AUDITOR",
-]);
+export const organizationStatus = pgEnum("organization_status", ["ACTIVE", "SUSPENDED"]);
+export const membershipRole = pgEnum("membership_role", ["ANALYST", "MANAGER", "AUDITOR", "ADMIN"]);
 export const membershipStatus = pgEnum("membership_status", ["INVITED", "ACTIVE", "SUSPENDED", "REVOKED"]);
 export const invitationStatus = pgEnum("invitation_status", ["PENDING", "ACCEPTED", "REVOKED", "EXPIRED"]);
-export const borrowerClassification = pgEnum("borrower_classification", ["CORPORATE", "OTHER"]);
-export const borrowerStatus = pgEnum("borrower_status", ["ACTIVE", "INACTIVE"]);
-export const facilityStatus = pgEnum("facility_status", ["DRAFT", "ACTIVE", "MATURED", "CLOSED"]);
-export const documentCategory = pgEnum("document_category", [
-  "CREDIT_AGREEMENT",
-  "AMENDMENT",
-  "FINANCIAL_STATEMENT",
-  "MANAGEMENT_ACCOUNTS",
-  "DEBT_SCHEDULE",
-  "OTHER_SUPPORT",
-]);
+export const profileStatus = pgEnum("profile_status", ["ACTIVE", "DISABLED"]);
+export const borrowerStatus = pgEnum("borrower_status", ["ACTIVE", "ARCHIVED"]);
+export const facilityStatus = pgEnum("facility_status", ["ACTIVE", "CLOSED"]);
 export const documentStatus = pgEnum("document_status", [
-  "RECEIVED",
-  "QUARANTINED",
-  "SCANNING",
-  "EXTRACTING_TEXT",
-  "AI_EXTRACTION",
-  "NEEDS_REVIEW",
-  "PROCESSED",
-  "UNSUPPORTED_SCANNED_PDF",
+  "UPLOADED",
+  "PROCESSING",
+  "REDACTION_REVIEW",
+  "READY",
+  "FAILED",
+  "SHREDDED",
+]);
+export const analysisStatus = pgEnum("analysis_status", [
+  "DRAFT",
+  "FILE_UPLOADED",
+  "PARSING",
+  "REDACTION_REVIEW",
+  "REDACTION_CONFIRMED",
+  "EXTRACTION_PENDING",
+  "TERMS_REVIEW",
+  "TERMS_CONFIRMED",
+  "FINANCIALS_PENDING",
+  "FINANCIALS_CONFIRMED",
+  "CALCULATION_PENDING",
+  "CALCULATED",
+  "CALCULATED_SERV_PENDING",
+  "BREACH_REVIEW",
+  "PROOF_PENDING",
+  "PROOF_VERIFIED",
+  "PROOF_FAILED",
+  "READY_FOR_MANAGER",
+  "APPROVED",
   "REJECTED",
   "FAILED",
+  "CANCELLED",
 ]);
-export const extractionType = pgEnum("extraction_type", ["COVENANT", "FINANCIAL_METRIC"]);
-export const extractionStatus = pgEnum("extraction_status", ["STARTED", "SUCCEEDED", "NEEDS_REVIEW", "FAILED"]);
-export const covenantType = pgEnum("covenant_type", ["MAX_LEVERAGE"]);
-export const covenantStatus = pgEnum("covenant_status", [
-  "DRAFT",
-  "PENDING_APPROVAL",
-  "APPROVED",
-  "ACTIVE",
-  "NEEDS_REVIEW",
-  "REJECTED",
-  "SUPERSEDED",
-]);
-export const evidenceStatus = pgEnum("evidence_status", [
-  "SUGGESTED",
-  "CONFIRMED",
-  "REJECTED",
-  "SUPERSEDED",
-  "MANUAL_CONFIRMED",
-]);
-export const assessmentKind = pgEnum("assessment_kind", ["ACTUAL", "FORECAST"]);
-export const verificationStatus = pgEnum("verification_status", ["VERIFYING", "VERIFIED", "FAILED", "INCOMPLETE", "STALE"]);
-export const complianceStatus = pgEnum("compliance_status", [
-  "COMPLIANT",
-  "BREACHED",
-  "INDETERMINATE",
-  "NOT_ASSESSED",
-  "AT_RISK",
-  "NO_PROJECTED_BREACH",
-]);
-export const scenarioStatus = pgEnum("scenario_status", ["DRAFT", "SAVED", "ARCHIVED"]);
-export const caseType = pgEnum("case_type", ["BREACH", "POTENTIAL_BREACH", "MISSING_EVIDENCE", "CONFLICTING_EVIDENCE", "CONTRACT_REVIEW"]);
-export const caseSeverity = pgEnum("case_severity", ["LOW", "MEDIUM", "HIGH", "CRITICAL"]);
-export const caseStatus = pgEnum("case_status", [
-  "OPEN",
-  "ASSIGNED",
-  "INVESTIGATING",
-  "AWAITING_INFORMATION",
-  "AWAITING_APPROVAL",
-  "ESCALATED",
-  "RESOLUTION_IN_PROGRESS",
-  "RESOLVED",
-  "CLOSED",
-]);
-export const memoStatus = pgEnum("memo_status", ["DRAFT", "PENDING_APPROVAL", "APPROVED", "REJECTED", "INVALIDATED"]);
-export const approvalAction = pgEnum("approval_action", ["ACTIVATE_COVENANT", "APPROVE_MEMO", "CLOSE_CASE"]);
-export const approvalStatus = pgEnum("approval_status", [
-  "PENDING",
-  "APPROVED",
-  "REJECTED",
-  "CHANGES_REQUESTED",
-  "INVALIDATED",
-  "EXPIRED",
-]);
-export const decisionStatus = pgEnum("decision_status", ["APPROVED", "REJECTED", "CHANGES_REQUESTED"]);
+export const covenantReviewStatus = pgEnum("covenant_review_status", ["PENDING", "CONFIRMED", "REJECTED"]);
+export const scenarioKind = pgEnum("scenario_kind", ["BASELINE", "EBITDA_DOWN_10", "DEBT_UP_10"]);
+export const scenarioOutcome = pgEnum("scenario_outcome", ["COMPLIANT", "BREACH"]);
+export const riskBand = pgEnum("risk_band", ["LOW", "MEDIUM", "HIGH"]);
+export const resultCode = pgEnum("result_code", ["COMPLIANT", "BREACH", "UNKNOWN"]);
+export const proofState = pgEnum("proof_state", ["VERIFYING", "VERIFIED", "FAILED"]);
+export const approvalDecision = pgEnum("approval_decision", ["APPROVE", "REJECT"]);
 export const actorType = pgEnum("actor_type", ["USER", "SYSTEM"]);
-export const jobStatus = pgEnum("job_status", ["QUEUED", "RUNNING", "SUCCEEDED", "FAILED", "DEAD", "CANCELLED"]);
+export const extractionStatus = pgEnum("extraction_status", ["STARTED", "SUCCEEDED", "FAILED"]);
+export const jobStatus = pgEnum("job_status", ["QUEUED", "RUNNING", "RETRY", "SUCCEEDED", "FAILED", "CANCELLED"]);
+export const borrowerKeyStatus = pgEnum("borrower_key_status", ["ACTIVE", "SHREDDED"]);
 
 export const organizations = pgTable(
   "organizations",
@@ -116,7 +81,7 @@ export const organizations = pgTable(
     id: uuid("id").defaultRandom().primaryKey(),
     name: text("name").notNull(),
     slug: text("slug").notNull(),
-    status: organizationStatus("status").default("active").notNull(),
+    status: organizationStatus("status").default("ACTIVE").notNull(),
     defaultCurrency: char("default_currency", { length: 3 }).default("USD").notNull(),
     timezone: text("timezone").default("UTC").notNull(),
     createdAt: createdAt(),
@@ -129,19 +94,26 @@ export const profiles = pgTable(
   "profiles",
   {
     userId: text("user_id").primaryKey(),
-    displayName: text("display_name"),
-    status: text("status").default("active").notNull(),
+    email: text("email").notNull(),
+    displayName: text("display_name").notNull(),
+    status: profileStatus("status").default("ACTIVE").notNull(),
+    lastLoginAt: timestamp("last_login_at", { withTimezone: true }),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
+  (table) => [uniqueIndex("profiles_email_uq").on(table.email)],
 );
 
 export const memberships = pgTable(
   "memberships",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "restrict" }),
-    userId: text("user_id").notNull(),
+    organizationId: uuid("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "restrict" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => profiles.userId, { onDelete: "restrict" }),
     role: membershipRole("role").notNull(),
     status: membershipStatus("status").default("INVITED").notNull(),
     invitedBy: text("invited_by"),
@@ -159,7 +131,9 @@ export const organizationInvitations = pgTable(
   "organization_invitations",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "restrict" }),
+    organizationId: uuid("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "restrict" }),
     normalizedEmail: text("normalized_email").notNull(),
     targetRole: membershipRole("target_role").notNull(),
     tokenSha256: char("token_sha256", { length: 64 }).notNull(),
@@ -183,11 +157,12 @@ export const borrowers = pgTable(
   "borrowers",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "restrict" }),
-    legalName: text("legal_name").notNull(),
-    referenceCode: text("reference_code").notNull(),
-    normalizedReferenceCode: text("normalized_reference_code").notNull(),
-    classification: borrowerClassification("classification").default("CORPORATE").notNull(),
+    organizationId: uuid("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "restrict" }),
+    displayAlias: text("display_alias").notNull(),
+    referenceToken: text("reference_token").notNull(),
+    normalizedReferenceToken: text("normalized_reference_token").notNull(),
     status: borrowerStatus("status").default("ACTIVE").notNull(),
     createdBy: text("created_by").notNull(),
     version: integer("version").default(1).notNull(),
@@ -195,34 +170,52 @@ export const borrowers = pgTable(
     updatedAt: updatedAt(),
   },
   (table) => [
-    uniqueIndex("borrowers_org_ref_uq").on(table.organizationId, table.normalizedReferenceCode),
-    index("borrowers_org_name_idx").on(table.organizationId, table.legalName),
+    uniqueIndex("borrowers_org_reference_uq").on(table.organizationId, table.normalizedReferenceToken),
+    index("borrowers_org_alias_idx").on(table.organizationId, table.displayAlias),
   ],
+);
+
+export const borrowerKeys = pgTable(
+  "borrower_keys",
+  {
+    borrowerId: uuid("borrower_id")
+      .primaryKey()
+      .references(() => borrowers.id, { onDelete: "restrict" }),
+    organizationId: uuid("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "restrict" }),
+    wrappedDek: text("wrapped_dek").notNull(),
+    wrapNonce: text("wrap_nonce").notNull(),
+    wrapTag: text("wrap_tag").notNull(),
+    keyVersion: integer("key_version").default(1).notNull(),
+    status: borrowerKeyStatus("status").default("ACTIVE").notNull(),
+    createdAt: createdAt(),
+    shreddedAt: timestamp("shredded_at", { withTimezone: true }),
+  },
 );
 
 export const facilities = pgTable(
   "facilities",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "restrict" }),
-    borrowerId: uuid("borrower_id").notNull().references(() => borrowers.id, { onDelete: "restrict" }),
-    name: text("name").notNull(),
-    referenceCode: text("reference_code").notNull(),
-    facilityType: text("facility_type").notNull(),
+    organizationId: uuid("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "restrict" }),
+    borrowerId: uuid("borrower_id")
+      .notNull()
+      .references(() => borrowers.id, { onDelete: "restrict" }),
+    facilityReferenceToken: text("facility_reference_token").notNull(),
+    normalizedFacilityReferenceToken: text("normalized_facility_reference_token").notNull(),
+    label: text("label").notNull(),
     currency: char("currency", { length: 3 }).notNull(),
-    committedAmount: money("committed_amount").notNull(),
-    outstandingAmount: money("outstanding_amount"),
-    agreementDate: date("agreement_date").notNull(),
-    maturityDate: date("maturity_date"),
-    contractTimezone: text("contract_timezone").default("UTC").notNull(),
-    status: facilityStatus("status").default("DRAFT").notNull(),
+    status: facilityStatus("status").default("ACTIVE").notNull(),
     createdBy: text("created_by").notNull(),
     version: integer("version").default(1).notNull(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
   (table) => [
-    uniqueIndex("facilities_org_ref_uq").on(table.organizationId, table.referenceCode),
+    uniqueIndex("facilities_borrower_reference_uq").on(table.borrowerId, table.normalizedFacilityReferenceToken),
     index("facilities_org_borrower_status_idx").on(table.organizationId, table.borrowerId, table.status),
   ],
 );
@@ -231,374 +224,358 @@ export const documents = pgTable(
   "documents",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "restrict" }),
-    facilityId: uuid("facility_id").notNull().references(() => facilities.id, { onDelete: "restrict" }),
-    category: documentCategory("category").notNull(),
-    displayName: text("display_name").notNull(),
-    currentVersionId: uuid("current_version_id"),
-    status: text("status").default("ACTIVE").notNull(),
-    createdBy: text("created_by").notNull(),
+    organizationId: uuid("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "restrict" }),
+    borrowerId: uuid("borrower_id")
+      .notNull()
+      .references(() => borrowers.id, { onDelete: "restrict" }),
+    facilityId: uuid("facility_id")
+      .notNull()
+      .references(() => facilities.id, { onDelete: "restrict" }),
+    uploadedBy: text("uploaded_by").notNull(),
+    originalFilename: text("original_filename").notNull(),
+    mimeType: text("mime_type").notNull(),
+    sizeBytes: bigint("size_bytes", { mode: "number" }).notNull(),
+    pageCount: integer("page_count"),
+    storageKey: text("storage_key").notNull(),
+    sha256Ciphertext: char("sha256_ciphertext", { length: 64 }).notNull(),
+    contentHmac: char("content_hmac", { length: 64 }).notNull(),
+    status: documentStatus("status").default("UPLOADED").notNull(),
+    failureCode: text("failure_code"),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>().default({}).notNull(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
-  (table) => [index("documents_org_facility_category_idx").on(table.organizationId, table.facilityId, table.category)],
+  (table) => [
+    uniqueIndex("documents_borrower_facility_checksum_uq").on(
+      table.borrowerId,
+      table.facilityId,
+      table.sha256Ciphertext,
+    ),
+    index("documents_org_facility_status_idx").on(table.organizationId, table.facilityId, table.status),
+  ],
 );
 
-export const documentVersions = pgTable(
-  "document_versions",
+export const analysisRuns = pgTable(
+  "analysis_runs",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "restrict" }),
-    documentId: uuid("document_id").notNull().references(() => documents.id, { onDelete: "restrict" }),
-    versionNo: integer("version_no").default(1).notNull(),
-    objectKey: text("object_key").notNull(),
-    sha256: char("sha256", { length: 64 }).notNull(),
-    sizeBytes: bigint("size_bytes", { mode: "number" }).notNull(),
-    mimeType: text("mime_type").notNull(),
-    pageCount: integer("page_count"),
-    periodStart: date("period_start"),
-    periodEnd: date("period_end"),
-    asOfDate: date("as_of_date"),
-    processingStatus: documentStatus("processing_status").default("RECEIVED").notNull(),
-    parserVersion: text("parser_version"),
+    organizationId: uuid("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "restrict" }),
+    borrowerId: uuid("borrower_id")
+      .notNull()
+      .references(() => borrowers.id, { onDelete: "restrict" }),
+    facilityId: uuid("facility_id")
+      .notNull()
+      .references(() => facilities.id, { onDelete: "restrict" }),
+    documentId: uuid("document_id")
+      .notNull()
+      .references(() => documents.id, { onDelete: "restrict" }),
+    runNumber: integer("run_number").notNull(),
+    status: analysisStatus("status").default("DRAFT").notNull(),
     createdBy: text("created_by").notNull(),
+    servTraceId: text("serv_trace_id"),
+    providerTrace: jsonb("provider_trace").$type<Record<string, unknown>>().default({}).notNull(),
+    termsVersion: integer("terms_version"),
+    financialInputsHash: char("financial_inputs_hash", { length: 64 }),
+    resultCode: resultCode("result_code"),
+    failureCode: text("failure_code"),
+    startedAt: timestamp("started_at", { withTimezone: true }),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    version: integer("version").default(1).notNull(),
     createdAt: createdAt(),
-    supersedesVersionId: uuid("supersedes_version_id"),
-    metadata: jsonb("metadata").$type<Record<string, unknown>>().default({}).notNull(),
+    updatedAt: updatedAt(),
   },
   (table) => [
-    uniqueIndex("document_versions_doc_version_uq").on(table.documentId, table.versionNo),
-    index("document_versions_org_status_idx").on(table.organizationId, table.processingStatus),
+    uniqueIndex("analysis_runs_facility_run_number_uq").on(table.facilityId, table.runNumber),
+    uniqueIndex("analysis_runs_document_uq").on(table.documentId),
+    index("analysis_runs_org_status_idx").on(table.organizationId, table.status, table.createdAt),
+    index("analysis_runs_org_borrower_created_idx").on(table.organizationId, table.borrowerId, table.createdAt),
   ],
+);
+
+export const covenantTerms = pgTable(
+  "covenant_terms",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    organizationId: uuid("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "restrict" }),
+    analysisRunId: uuid("analysis_run_id")
+      .notNull()
+      .references(() => analysisRuns.id, { onDelete: "restrict" }),
+    covenantType: text("covenant_type").default("DEBT_TO_ADJUSTED_EBITDA").notNull(),
+    comparator: text("comparator").default("LTE").notNull(),
+    thresholdBps: integer("threshold_bps").notNull(),
+    currency: char("currency", { length: 3 }),
+    totalDebtDefinition: text("total_debt_definition").notNull(),
+    ebitdaDefinition: text("ebitda_definition").notNull(),
+    permittedAddbacks: jsonb("permitted_addbacks").$type<Record<string, unknown>[]>().notNull(),
+    testingDate: date("testing_date"),
+    cureRightsSummary: text("cure_rights_summary"),
+    evidence: jsonb("evidence").$type<Record<string, unknown>[]>().notNull(),
+    confidence: numeric("confidence", { precision: 4, scale: 3 }),
+    uncertaintyNotes: jsonb("uncertainty_notes").$type<string[]>().notNull(),
+    reviewStatus: covenantReviewStatus("review_status").default("PENDING").notNull(),
+    reviewedBy: text("reviewed_by"),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    createdBy: text("created_by").notNull(),
+    createdAt: createdAt(),
+  },
+  (table) => [
+    uniqueIndex("covenant_terms_run_uq").on(table.analysisRunId),
+    index("covenant_terms_org_review_idx").on(table.organizationId, table.reviewStatus),
+  ],
+);
+
+export const financialInputs = pgTable(
+  "financial_inputs",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    organizationId: uuid("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "restrict" }),
+    analysisRunId: uuid("analysis_run_id")
+      .notNull()
+      .references(() => analysisRuns.id, { onDelete: "restrict" }),
+    currency: char("currency", { length: 3 }).notNull(),
+    ...sealed("payload"),
+    financialInputsHash: char("financial_inputs_hash", { length: 64 }).notNull(),
+    attestedBy: text("attested_by").notNull(),
+    attestedAt: timestamp("attested_at", { withTimezone: true }).notNull(),
+    createdAt: createdAt(),
+  },
+  (table) => [uniqueIndex("financial_inputs_run_uq").on(table.analysisRunId)],
+);
+
+export const scenarioResults = pgTable(
+  "scenario_results",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    organizationId: uuid("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "restrict" }),
+    analysisRunId: uuid("analysis_run_id")
+      .notNull()
+      .references(() => analysisRuns.id, { onDelete: "restrict" }),
+    scenario: scenarioKind("scenario").notNull(),
+    ...sealed("payload"),
+    result: scenarioOutcome("result").notNull(),
+    riskBand: riskBand("risk_band"),
+    createdAt: createdAt(),
+  },
+  (table) => [uniqueIndex("scenario_results_run_scenario_uq").on(table.analysisRunId, table.scenario)],
+);
+
+export const proofArtifacts = pgTable(
+  "proof_artifacts",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    organizationId: uuid("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "restrict" }),
+    analysisRunId: uuid("analysis_run_id")
+      .notNull()
+      .references(() => analysisRuns.id, { onDelete: "restrict" }),
+    circuitVersion: text("circuit_version").notNull(),
+    verificationKeyHash: char("verification_key_hash", { length: 64 }).notNull(),
+    proofStorageKey: text("proof_storage_key").notNull(),
+    publicSignals: jsonb("public_signals").$type<string[]>().notNull(),
+    witnessCommitment: char("witness_commitment", { length: 64 }).notNull(),
+    status: proofState("status").default("VERIFYING").notNull(),
+    verified: boolean("verified").default(false).notNull(),
+    errorCode: text("error_code"),
+    verifiedAt: timestamp("verified_at", { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (table) => [uniqueIndex("proof_artifacts_run_uq").on(table.analysisRunId)],
+);
+
+export const approvals = pgTable(
+  "approvals",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    organizationId: uuid("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "restrict" }),
+    analysisRunId: uuid("analysis_run_id")
+      .notNull()
+      .references(() => analysisRuns.id, { onDelete: "restrict" }),
+    managerId: text("manager_id").notNull(),
+    decision: approvalDecision("decision").notNull(),
+    riskAcknowledged: boolean("risk_acknowledged").default(false).notNull(),
+    rationale: text("rationale"),
+    proofArtifactId: uuid("proof_artifact_id").references(() => proofArtifacts.id, { onDelete: "restrict" }),
+    analysisVersion: integer("analysis_version").notNull(),
+    createdAt: createdAt(),
+  },
+  (table) => [
+    uniqueIndex("approvals_run_uq").on(table.analysisRunId),
+    index("approvals_manager_created_idx").on(table.managerId, table.createdAt),
+  ],
+);
+
+export const redactionRevisions = pgTable(
+  "redaction_revisions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    organizationId: uuid("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "restrict" }),
+    analysisRunId: uuid("analysis_run_id")
+      .notNull()
+      .references(() => analysisRuns.id, { onDelete: "restrict" }),
+    revision: integer("revision").notNull(),
+    redactedTextStorageKey: text("redacted_text_storage_key").notNull(),
+    encryptedTokenMap: text("encrypted_token_map").notNull(),
+    tokenMapNonce: text("token_map_nonce").notNull(),
+    tokenMapTag: text("token_map_tag").notNull(),
+    entities: jsonb("entities").$type<Record<string, unknown>[]>().notNull(),
+    reviewedBy: text("reviewed_by"),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (table) => [uniqueIndex("redaction_revisions_run_revision_uq").on(table.analysisRunId, table.revision)],
 );
 
 export const extractionRuns = pgTable(
   "extraction_runs",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "restrict" }),
-    documentVersionId: uuid("document_version_id").notNull().references(() => documentVersions.id, { onDelete: "restrict" }),
-    extractionType: extractionType("extraction_type").notNull(),
+    organizationId: uuid("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "restrict" }),
+    analysisRunId: uuid("analysis_run_id")
+      .notNull()
+      .references(() => analysisRuns.id, { onDelete: "restrict" }),
     provider: text("provider").notNull(),
     modelId: text("model_id").notNull(),
     promptVersion: text("prompt_version").notNull(),
     providerRequestId: text("provider_request_id"),
     status: extractionStatus("status").default("STARTED").notNull(),
-    outputJson: jsonb("output_json").$type<Record<string, unknown>>(),
     outputSha256: char("output_sha256", { length: 64 }),
+    attestation: jsonb("attestation").$type<Record<string, unknown>>().default({}).notNull(),
     inputTokens: integer("input_tokens"),
     outputTokens: integer("output_tokens"),
     errorCode: text("error_code"),
     createdAt: createdAt(),
     completedAt: timestamp("completed_at", { withTimezone: true }),
   },
-  (table) => [index("extraction_runs_org_document_idx").on(table.organizationId, table.documentVersionId, table.createdAt)],
+  (table) => [index("extraction_runs_run_created_idx").on(table.analysisRunId, table.createdAt)],
 );
 
-export const covenantDefinitions = pgTable(
-  "covenant_definitions",
+export const feedbackRecords = pgTable(
+  "feedback_records",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "restrict" }),
-    facilityId: uuid("facility_id").notNull().references(() => facilities.id, { onDelete: "restrict" }),
-    name: text("name").notNull(),
-    covenantType: covenantType("covenant_type").default("MAX_LEVERAGE").notNull(),
-    activeVersionId: uuid("active_version_id"),
-    status: covenantStatus("status").default("DRAFT").notNull(),
+    organizationId: uuid("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "restrict" }),
+    analysisRunId: uuid("analysis_run_id")
+      .notNull()
+      .references(() => analysisRuns.id, { onDelete: "restrict" }),
     createdBy: text("created_by").notNull(),
-    version: integer("version").default(1).notNull(),
+    correctionType: text("correction_type").notNull(),
+    beforeValue: jsonb("before_value").$type<Record<string, unknown>>().notNull(),
+    afterValue: jsonb("after_value").$type<Record<string, unknown>>().notNull(),
+    syntheticOnly: boolean("synthetic_only").default(true).notNull(),
     createdAt: createdAt(),
-    updatedAt: updatedAt(),
   },
-  (table) => [index("covenant_definitions_org_facility_status_idx").on(table.organizationId, table.facilityId, table.status)],
+  (table) => [index("feedback_records_run_idx").on(table.analysisRunId, table.createdAt)],
 );
 
-export const covenantDefinitionVersions = pgTable(
-  "covenant_definition_versions",
+export const reppoEvaluations = pgTable(
+  "reppo_evaluations",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "restrict" }),
-    covenantDefinitionId: uuid("covenant_definition_id").notNull().references(() => covenantDefinitions.id, { onDelete: "restrict" }),
-    versionNo: integer("version_no").notNull(),
-    formulaAst: jsonb("formula_ast").$type<Record<string, unknown>>().notNull(),
-    formulaSha256: char("formula_sha256", { length: 64 }).notNull(),
-    threshold: money("threshold").notNull(),
-    operator: text("operator").notNull(),
-    ratioUnit: text("ratio_unit").default("x").notNull(),
-    periodPolicy: jsonb("period_policy").$type<Record<string, unknown>>().notNull(),
-    inputMetricKeys: text("input_metric_keys").array().notNull(),
-    sourceRefs: jsonb("source_refs").$type<Record<string, unknown>[]>().notNull(),
-    contractClauseText: text("contract_clause_text").notNull(),
-    effectiveFrom: date("effective_from").notNull(),
-    effectiveTo: date("effective_to"),
-    status: covenantStatus("status").default("DRAFT").notNull(),
-    createdBy: text("created_by").notNull(),
-    approvedBy: text("approved_by"),
-    approvedAt: timestamp("approved_at", { withTimezone: true }),
-    supersedesVersionId: uuid("supersedes_version_id"),
-    createdAt: createdAt(),
-    updatedAt: updatedAt(),
+    organizationId: uuid("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "restrict" }),
+    feedbackRecordId: uuid("feedback_record_id")
+      .notNull()
+      .references(() => feedbackRecords.id, { onDelete: "restrict" }),
+    providerEvalId: text("provider_eval_id"),
+    status: text("status").default("PENDING").notNull(),
+    score: integer("score"),
+    decision: text("decision"),
+    confidence: text("confidence"),
+    critique: jsonb("critique").$type<Record<string, unknown>>(),
+    route: text("route"),
+    submittedAt: timestamp("submitted_at", { withTimezone: true }),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    providerCost: numeric("provider_cost", { precision: 12, scale: 6 }),
   },
   (table) => [
-    uniqueIndex("covenant_versions_definition_version_uq").on(table.covenantDefinitionId, table.versionNo),
-    index("covenant_versions_org_status_idx").on(table.organizationId, table.status),
+    uniqueIndex("reppo_evaluations_provider_id_uq").on(table.providerEvalId),
+    index("reppo_evaluations_status_idx").on(table.status, table.submittedAt),
   ],
-);
-
-export const financialEvidence = pgTable(
-  "financial_evidence",
-  {
-    id: uuid("id").defaultRandom().primaryKey(),
-    organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "restrict" }),
-    facilityId: uuid("facility_id").notNull().references(() => facilities.id, { onDelete: "restrict" }),
-    documentVersionId: uuid("document_version_id").references(() => documentVersions.id, { onDelete: "restrict" }),
-    canonicalMetricKey: text("canonical_metric_key").notNull(),
-    value: money("value").notNull(),
-    currency: char("currency", { length: 3 }).notNull(),
-    unit: text("unit").notNull(),
-    periodStart: date("period_start"),
-    periodEnd: date("period_end"),
-    asOfDate: date("as_of_date"),
-    sourcePage: integer("source_page"),
-    sourceExcerpt: text("source_excerpt"),
-    extractionRunId: uuid("extraction_run_id"),
-    status: evidenceStatus("status").default("SUGGESTED").notNull(),
-    reviewedBy: text("reviewed_by"),
-    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
-    reason: text("reason"),
-    supersedesEvidenceId: uuid("supersedes_evidence_id"),
-    createdBy: text("created_by").notNull(),
-    createdAt: createdAt(),
-  },
-  (table) => [
-    index("financial_evidence_org_facility_metric_idx").on(table.organizationId, table.facilityId, table.canonicalMetricKey),
-    index("financial_evidence_org_status_idx").on(table.organizationId, table.status),
-  ],
-);
-
-export const assessments = pgTable(
-  "assessments",
-  {
-    id: uuid("id").defaultRandom().primaryKey(),
-    organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "restrict" }),
-    facilityId: uuid("facility_id").notNull().references(() => facilities.id, { onDelete: "restrict" }),
-    covenantDefinitionId: uuid("covenant_definition_id").notNull().references(() => covenantDefinitions.id, { onDelete: "restrict" }),
-    covenantVersionId: uuid("covenant_version_id").notNull().references(() => covenantDefinitionVersions.id, { onDelete: "restrict" }),
-    assessmentKind: assessmentKind("assessment_kind").notNull(),
-    testDate: date("test_date").notNull(),
-    periodStart: date("period_start"),
-    periodEnd: date("period_end"),
-    formulaSha256: char("formula_sha256", { length: 64 }).notNull(),
-    inputSnapshot: jsonb("input_snapshot").$type<Record<string, unknown>>().notNull(),
-    inputSnapshotSha256: char("input_snapshot_sha256", { length: 64 }).notNull(),
-    calculatedValue: money("calculated_value"),
-    thresholdSnapshot: money("threshold_snapshot").notNull(),
-    operatorSnapshot: text("operator_snapshot").notNull(),
-    verificationStatus: verificationStatus("verification_status").default("VERIFYING").notNull(),
-    complianceStatus: complianceStatus("compliance_status").default("NOT_ASSESSED").notNull(),
-    calculationTrace: jsonb("calculation_trace").$type<string[]>(),
-    supersedesAssessmentId: uuid("supersedes_assessment_id"),
-    createdBy: text("created_by").notNull(),
-    verifiedAt: timestamp("verified_at", { withTimezone: true }),
-    version: integer("version").default(1).notNull(),
-    createdAt: createdAt(),
-    updatedAt: updatedAt(),
-  },
-  (table) => [
-    index("assessments_org_facility_testdate_idx").on(table.organizationId, table.facilityId, table.testDate),
-    index("assessments_covenant_date_idx").on(table.covenantDefinitionId, table.testDate),
-  ],
-);
-
-export const verificationRuns = pgTable(
-  "verification_runs",
-  {
-    id: uuid("id").defaultRandom().primaryKey(),
-    organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "restrict" }),
-    assessmentId: uuid("assessment_id").notNull().references(() => assessments.id, { onDelete: "restrict" }),
-    policyVersion: text("policy_version").notNull(),
-    checks: jsonb("checks").$type<Record<string, unknown>>().notNull(),
-    recomputedValue: money("recomputed_value"),
-    recomputedSnapshotSha256: char("recomputed_snapshot_sha256", { length: 64 }),
-    result: verificationStatus("result").notNull(),
-    failureCodes: text("failure_codes").array().notNull(),
-    verifiedByService: text("verified_by_service").notNull(),
-    createdAt: createdAt(),
-  },
-  (table) => [index("verification_runs_org_assessment_idx").on(table.organizationId, table.assessmentId, table.createdAt)],
-);
-
-export const scenarios = pgTable(
-  "scenarios",
-  {
-    id: uuid("id").defaultRandom().primaryKey(),
-    organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "restrict" }),
-    facilityId: uuid("facility_id").notNull().references(() => facilities.id, { onDelete: "restrict" }),
-    covenantDefinitionId: uuid("covenant_definition_id").notNull().references(() => covenantDefinitions.id, { onDelete: "restrict" }),
-    name: text("name").notNull(),
-    horizonStart: date("horizon_start").notNull(),
-    horizonEnd: date("horizon_end").notNull(),
-    assumptionSet: jsonb("assumption_set").$type<Record<string, unknown>>().notNull(),
-    status: scenarioStatus("status").default("DRAFT").notNull(),
-    createdBy: text("created_by").notNull(),
-    version: integer("version").default(1).notNull(),
-    createdAt: createdAt(),
-    updatedAt: updatedAt(),
-  },
-);
-
-export const exceptionCases = pgTable(
-  "exception_cases",
-  {
-    id: uuid("id").defaultRandom().primaryKey(),
-    organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "restrict" }),
-    facilityId: uuid("facility_id").notNull().references(() => facilities.id, { onDelete: "restrict" }),
-    covenantDefinitionId: uuid("covenant_definition_id").references(() => covenantDefinitions.id, { onDelete: "restrict" }),
-    assessmentId: uuid("assessment_id").references(() => assessments.id, { onDelete: "restrict" }),
-    caseType: caseType("case_type").notNull(),
-    severity: caseSeverity("severity").default("MEDIUM").notNull(),
-    status: caseStatus("status").default("OPEN").notNull(),
-    title: text("title").notNull(),
-    description: text("description"),
-    ownerUserId: text("owner_user_id"),
-    dueDate: date("due_date"),
-    resolutionCode: text("resolution_code"),
-    resolutionReason: text("resolution_reason"),
-    createdBy: text("created_by").notNull(),
-    version: integer("version").default(1).notNull(),
-    createdAt: createdAt(),
-    updatedAt: updatedAt(),
-  },
-  (table) => [
-    uniqueIndex("exception_cases_active_assessment_type_uq")
-      .on(table.assessmentId, table.caseType)
-      .where(sql`${table.status} NOT IN ('RESOLVED','CLOSED')`),
-    index("exception_cases_org_status_owner_idx").on(table.organizationId, table.status, table.ownerUserId),
-  ],
-);
-
-export const caseNotes = pgTable(
-  "case_notes",
-  {
-    id: uuid("id").defaultRandom().primaryKey(),
-    organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "restrict" }),
-    caseId: uuid("case_id").notNull().references(() => exceptionCases.id, { onDelete: "restrict" }),
-    authorId: text("author_id").notNull(),
-    body: text("body").notNull(),
-    visibility: text("visibility").default("INTERNAL").notNull(),
-    createdAt: createdAt(),
-  },
-  (table) => [index("case_notes_org_case_idx").on(table.organizationId, table.caseId, table.createdAt)],
-);
-
-export const memoDrafts = pgTable(
-  "memo_drafts",
-  {
-    id: uuid("id").defaultRandom().primaryKey(),
-    organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "restrict" }),
-    caseId: uuid("case_id").notNull().references(() => exceptionCases.id, { onDelete: "restrict" }),
-    assessmentId: uuid("assessment_id").notNull().references(() => assessments.id, { onDelete: "restrict" }),
-    versionNo: integer("version_no").notNull(),
-    factsSnapshot: jsonb("facts_snapshot").$type<Record<string, unknown>>().notNull(),
-    factsSha256: char("facts_sha256", { length: 64 }).notNull(),
-    bodyMarkdown: text("body_markdown").notNull(),
-    bodySha256: char("body_sha256", { length: 64 }).notNull(),
-    status: memoStatus("status").default("DRAFT").notNull(),
-    createdBy: text("created_by").notNull(),
-    supersedesMemoId: uuid("supersedes_memo_id"),
-    createdAt: createdAt(),
-    updatedAt: updatedAt(),
-  },
-  (table) => [uniqueIndex("memo_drafts_case_version_uq").on(table.caseId, table.versionNo)],
-);
-
-export const approvalRequests = pgTable(
-  "approval_requests",
-  {
-    id: uuid("id").defaultRandom().primaryKey(),
-    organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "restrict" }),
-    actionType: approvalAction("action_type").notNull(),
-    entityType: text("entity_type").notNull(),
-    entityId: uuid("entity_id").notNull(),
-    requesterId: text("requester_id").notNull(),
-    actionPayload: jsonb("action_payload").$type<Record<string, unknown>>().notNull(),
-    payloadSha256: char("payload_sha256", { length: 64 }).notNull(),
-    dependencyVersions: jsonb("dependency_versions").$type<Record<string, unknown>>().notNull(),
-    status: approvalStatus("status").default("PENDING").notNull(),
-    supersedesRequestId: uuid("supersedes_request_id"),
-    createdAt: createdAt(),
-    updatedAt: updatedAt(),
-    version: integer("version").default(1).notNull(),
-  },
-  (table) => [index("approval_requests_org_status_idx").on(table.organizationId, table.status, table.createdAt)],
-);
-
-export const approvalDecisions = pgTable(
-  "approval_decisions",
-  {
-    id: uuid("id").defaultRandom().primaryKey(),
-    organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "restrict" }),
-    approvalRequestId: uuid("approval_request_id").notNull().references(() => approvalRequests.id, { onDelete: "restrict" }),
-    decision: decisionStatus("decision").notNull(),
-    decidedBy: text("decided_by").notNull(),
-    reason: text("reason"),
-    payloadSha256: char("payload_sha256", { length: 64 }).notNull(),
-    dependencyVersions: jsonb("dependency_versions").$type<Record<string, unknown>>().notNull(),
-    auditEventId: uuid("audit_event_id"),
-    decidedAt: createdAt(),
-  },
-  (table) => [uniqueIndex("approval_decisions_request_uq").on(table.approvalRequestId)],
 );
 
 export const auditEvents = pgTable(
   "audit_events",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "restrict" }),
+    organizationId: uuid("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "restrict" }),
+    borrowerId: uuid("borrower_id")
+      .notNull()
+      .references(() => borrowers.id, { onDelete: "restrict" }),
     sequenceNo: bigint("sequence_no", { mode: "number" }).notNull(),
-    actorType: actorType("actor_type").notNull(),
-    actorUserId: text("actor_user_id"),
     eventType: text("event_type").notNull(),
+    actorType: actorType("actor_type").notNull(),
+    actorId: text("actor_id"),
     entityType: text("entity_type").notNull(),
     entityId: uuid("entity_id").notNull(),
-    payload: jsonb("payload").$type<Record<string, unknown>>().notNull(),
-    payloadSha256: char("payload_sha256", { length: 64 }).notNull(),
     previousHash: char("previous_hash", { length: 64 }).notNull(),
+    ...sealed("payload"),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>().default({}).notNull(),
     eventHash: char("event_hash", { length: 64 }).notNull(),
-    signature: text("signature"),
+    signature: text("signature").notNull(),
     createdAt: createdAt(),
   },
   (table) => [
-    uniqueIndex("audit_events_org_sequence_uq").on(table.organizationId, table.sequenceNo),
-    uniqueIndex("audit_events_org_hash_uq").on(table.organizationId, table.eventHash),
-    index("audit_events_org_created_idx").on(table.organizationId, table.createdAt),
-    index("audit_events_entity_idx").on(table.organizationId, table.entityType, table.entityId),
+    uniqueIndex("audit_events_borrower_sequence_uq").on(table.borrowerId, table.sequenceNo),
+    uniqueIndex("audit_events_borrower_hash_uq").on(table.borrowerId, table.eventHash),
+    index("audit_events_borrower_created_idx").on(table.borrowerId, table.createdAt),
+    index("audit_events_org_entity_idx").on(table.organizationId, table.entityType, table.entityId),
   ],
 );
 
 export const auditHeads = pgTable("audit_heads", {
-  organizationId: uuid("organization_id").primaryKey().references(() => organizations.id, { onDelete: "restrict" }),
+  borrowerId: uuid("borrower_id")
+    .primaryKey()
+    .references(() => borrowers.id, { onDelete: "restrict" }),
+  organizationId: uuid("organization_id")
+    .notNull()
+    .references(() => organizations.id, { onDelete: "restrict" }),
   lastSequenceNo: bigint("last_sequence_no", { mode: "number" }).default(0).notNull(),
   lastHash: char("last_hash", { length: 64 }).default("GENESIS").notNull(),
   updatedAt: updatedAt(),
 });
 
-export const idempotencyKeys = pgTable(
-  "idempotency_keys",
+export const idempotencyRecords = pgTable(
+  "idempotency_records",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "restrict" }),
-    userId: text("user_id").notNull(),
-    routeKey: text("route_key").notNull(),
-    idempotencyKey: text("idempotency_key").notNull(),
+    organizationId: uuid("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "restrict" }),
+    actorId: text("actor_id").notNull(),
+    key: text("key").notNull(),
+    method: text("method").notNull(),
+    route: text("route").notNull(),
     requestHash: char("request_hash", { length: 64 }).notNull(),
     responseStatus: integer("response_status").notNull(),
-    responseBody: jsonb("response_body").$type<Record<string, unknown>>().notNull(),
+    responseResourceType: text("response_resource_type").notNull(),
+    responseResourceId: text("response_resource_id").notNull(),
     createdAt: createdAt(),
-    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
   },
   (table) => [
-    uniqueIndex("idempotency_org_user_route_key_uq").on(table.organizationId, table.userId, table.routeKey, table.idempotencyKey),
+    uniqueIndex("idempotency_org_actor_key_uq").on(table.organizationId, table.actorId, table.key),
+    index("idempotency_created_idx").on(table.createdAt),
   ],
 );
 
@@ -606,12 +583,16 @@ export const jobs = pgTable(
   "jobs",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "restrict" }),
+    organizationId: uuid("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "restrict" }),
     jobType: text("job_type").notNull(),
     payload: jsonb("payload").$type<Record<string, unknown>>().notNull(),
     status: jobStatus("status").default("QUEUED").notNull(),
     attempts: integer("attempts").default(0).notNull(),
     maxAttempts: integer("max_attempts").default(3).notNull(),
+    lockedAt: timestamp("locked_at", { withTimezone: true }),
+    lockedBy: text("locked_by"),
     leaseUntil: timestamp("lease_until", { withTimezone: true }),
     nextRunAt: timestamp("next_run_at", { withTimezone: true }).defaultNow().notNull(),
     lastErrorCode: text("last_error_code"),
@@ -631,23 +612,21 @@ export const schema = {
   memberships,
   organizationInvitations,
   borrowers,
+  borrowerKeys,
   facilities,
   documents,
-  documentVersions,
+  analysisRuns,
+  covenantTerms,
+  financialInputs,
+  scenarioResults,
+  proofArtifacts,
+  approvals,
+  redactionRevisions,
   extractionRuns,
-  covenantDefinitions,
-  covenantDefinitionVersions,
-  financialEvidence,
-  assessments,
-  verificationRuns,
-  scenarios,
-  exceptionCases,
-  caseNotes,
-  memoDrafts,
-  approvalRequests,
-  approvalDecisions,
+  feedbackRecords,
+  reppoEvaluations,
   auditEvents,
   auditHeads,
-  idempotencyKeys,
+  idempotencyRecords,
   jobs,
 };

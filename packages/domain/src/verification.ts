@@ -55,7 +55,9 @@ export function verifyCalculation(
     const adjusted = ebitda + addbacks;
     const threshold = BigInt(input.thresholdBps);
     const compliant = debt * 10000n <= adjusted * threshold;
-    const scaled = adjusted === 0n ? 0n : (debt * 100_000_000n) / adjusted;
+    // Match the primary Decimal engine's ROUND_HALF_UP at 8 decimal places
+    // without using floating point or the primary result itself.
+    const scaled = adjusted === 0n ? 0n : (debt * 100_000_000n + adjusted / 2n) / adjusted;
     const recomputedValue =
       adjusted === 0n
         ? null

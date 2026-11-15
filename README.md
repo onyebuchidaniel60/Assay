@@ -12,7 +12,7 @@ Assay helps a credit analyst review one maximum Debt / Adjusted EBITDA covenant 
 2. The analyst uploads a text-based PDF or TXT agreement.
 3. Assay encrypts the document before private storage, parses its text and uses Presidio to detect/tokenize identifying fields.
 4. The analyst reviews redaction before any model call.
-5. AI extracts a single Debt / Adjusted EBITDA covenant, its threshold and permitted add-back definitions, with supporting quote/page evidence. Sensitive extraction is routed to NEAR AI Cloud's TEE-attested gateway only after redaction; SERV Reasoning orchestrates the graph and routes structured judgement/generation to OpenRouter. The analyst confirms the result.
+5. AI extracts a single Debt / Adjusted EBITDA covenant, its threshold and permitted add-back definitions, with supporting quote/page evidence. Sensitive extraction is routed to NEAR AI Cloud's TEE-attested gateway only after redaction; every extraction verifies fresh Intel TDX and NVIDIA NRAS evidence, nonce binding and the response signature. SERV Reasoning gates the structured branch. The analyst confirms the result.
 6. The analyst enters total debt, reported EBITDA and permitted add-backs.
 7. Assay calculates leverage and headroom deterministically, then runs an EBITDA-downside and debt-upside scenario.
 8. A fixed ZK circuit proves the baseline inequality when compliant. A manager approves or rejects from a restricted view; proof verification is required before approval.
@@ -23,16 +23,16 @@ Assay helps a credit analyst review one maximum Debt / Adjusted EBITDA covenant 
 - It does not decide whether to lend, underwrite the borrower or recommend a credit limit.
 - It does not support arbitrary covenant families.
 - It does not autonomously extract financial statement amounts from any arbitrary document; the analyst enters and attests those values.
-- It does not support production borrower data, multi-tenant access, a borrower portal or mobile apps.
+- It does not support production borrower data, a borrower portal, public signup or mobile apps. Workspace tenant scoping exists for synthetic demonstration data only.
 - It does not custody funds or make customer payments.
 - It does not claim TEE-grade security, legal compliance, absolute zero retention or differential privacy unless separately implemented and verified.
 
 ## User roles
 
-- **Credit Analyst:** creates records, uploads agreements, reviews redaction/terms, enters figures and runs analysis.
-- **Credit Manager:** sees a limited compliance summary and approves/rejects eligible runs.
+- **Analyst:** creates records, uploads agreements, reviews redaction/terms, attests figures, runs analysis and requests proofs.
+- **Manager:** sees a limited compliance summary and approves/rejects eligible runs; stressed breaches require risk acknowledgement.
 - **Auditor:** reads audit metadata, signatures, proof and approval evidence.
-- **Workspace Admin:** manages staff access and integration health; no default access to financial content.
+- **Admin:** manages staff access and integration health, and can run the demo-only synthetic crypto-shred; no inherent credit approval.
 
 ## Getting started
 
@@ -63,13 +63,19 @@ pnpm build
 pnpm dev
 ```
 
-`pnpm dev` starts the Next.js app on `http://localhost:3000` and the Fastify API on `http://localhost:3001`. Neon Postgres/Auth, private S3-compatible storage, encryption, signed audit events, the Postgres job worker and the `REDUCED_PII_MODE` Presidio service are wired. Covenant domain/API routes are the next Phase 3 deliverable. Use `.env.example` as a variable catalogue; copy it to `.env.local` only for local work and never commit the real file. The API validates variables at startup.
+```bash
+pnpm --filter @assay/db migrate
+pnpm --filter @assay/api dev
+pnpm --filter @assay/web dev
+```
 
-Phase 1 preview: **https://assay-guyo5yh6z-uhhh2.vercel.app** (protected by Vercel Authentication). It is a labelled shell, not a live covenant engine.
+The web app runs on `http://localhost:3000`; Fastify on `http://localhost:3001`. Neon Postgres/Auth, private S3-compatible storage, envelope encryption, per-borrower signed audit chains, the Postgres job worker, the fixed-circuit proof worker and the `REDUCED_PII_MODE` Presidio service are wired. The analyst/manager/auditor workflow is implemented end-to-end against synthetic data. Start Presidio separately (see `docs/SETUP.md`). Use `.env.example` as a variable catalogue; copy it to `.env.local` only for local work and never commit the real file.
+
+Phase 1 preview: **https://assay-guyo5yh6z-uhhh2.vercel.app** (protected by Vercel Authentication). The authenticated Phase 3/4 preview is deployed in Phase 5 once the Render API is available; the current Vercel deployment is not a live covenant engine.
 
 ## Development operating modes
 
-- **Local development:** Next.js shell + Fastify API; synthetic fixtures; provider calls disabled until credentials and adapters are verified.
+- **Local development:** Next.js app + Fastify API + Presidio; synthetic fixtures; live NEAR AI/OpenRouter/SERV calls only through the verified adapters.
 - **Preview:** Vercel frontend + Render API/Presidio + authorized database; synthetic data only; sandbox providers only; `ENABLE_DEMO_SHRED=false` unless an explicitly authorized demo session requires it.
 - **Production:** authorized by the operator, but release remains gated on the full Phase 5/9 test and security matrix. No production deployment is currently claimed.
 
@@ -79,7 +85,7 @@ README and `docs/` are maintained alongside functionality. The final submission 
 
 ## Project status
 
-Phases 1–2 are implemented: a pnpm monorepo with a route-complete Next.js shell, Fastify API foundation, Neon Postgres/Auth, private S3-compatible storage, envelope encryption, signed audit chain, Postgres job worker, `REDUCED_PII_MODE` Presidio service, CI and tests. NEAR AI, OpenRouter and SERV live checks passed; Kite testnet is enabled with the payment path provider-blocked. The protected Vercel Phase 1 preview remains online. Phase 3 domain/API routes are next. Check `docs/BUILD_LOG.md` and `AI_HANDOFF.md` for exact evidence.
+Phases 1–4 are implemented: a pnpm monorepo, Fastify API with the full borrower → facility → encrypted upload → redaction review → attested extraction → confirmed terms → attested financial inputs → deterministic calculation + SERV gate → ZK proof → manager approval workflow, role-shaped UI for analyst/manager/auditor, Neon Postgres/Auth, private object storage, envelope encryption, per-borrower signed audit chains, a Postgres job worker and `REDUCED_PII_MODE` Presidio. Live NEAR AI TDX/NRAS attestation, OpenRouter and SERV checks passed. Kite testnet is enabled but the x402 payment path remains provider-blocked. Render deployment is deferred to Phase 5. Check `docs/BUILD_LOG.md` and `AI_HANDOFF.md` for exact evidence.
 
 ## License
 

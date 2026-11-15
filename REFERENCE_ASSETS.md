@@ -15,7 +15,7 @@ These are visual-direction references only. Do not copy the source template's br
 | UI-REF-03 | `design/reference/assayref3.avif` | Operator-supplied; licensed per Option A (operator assertion) | Analysis index, writer/analyst profile, cards and footer | Inspected |
 | UI-REF-04 | `design/reference/assayref4.avif` | Operator-supplied; licensed per Option A (operator assertion) | Home hierarchy, pricing/rate sheet, email capture, mobile | Inspected |
 
-All images are 1600 × 1200 AVIF. The working tree currently has them under `design/reference/`; they are not committed by this Phase 0 record.
+All images are 1600 × 1200 AVIF. The working tree currently has them under `design/reference/`; `design/` is Git-ignored and not redistributed until the exact license text is attached.
 
 ## Observed design principles
 
