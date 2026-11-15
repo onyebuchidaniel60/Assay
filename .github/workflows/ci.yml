@@ -38,7 +38,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build workspace packages
-        run: pnpm --filter @assay/domain --filter @assay/crypto --filter @assay/contracts --filter @assay/storage --filter @assay/proof --filter @assay/db build
+        run: pnpm --filter @assay/domain --filter @assay/crypto --filter @assay/contracts --filter @assay/storage --filter @assay/proof --filter @assay/db --filter @assay/ai build
 
       - name: Typecheck
         run: pnpm typecheck
