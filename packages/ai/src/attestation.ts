@@ -266,7 +266,7 @@ export async function attestedChat(
 
   const chat = await postChat(`${baseUrl}/chat/completions`, config.apiKey, config.model, messages, {
     maxTokens,
-    timeoutMs: config.timeoutMs ?? 120_000,
+    timeoutMs: config.timeoutMs ?? 300_000,
     tokenParameter: "max_completion_tokens",
   });
   if (!chat.id) throw new AttestationError("Provider response did not include a chat id.", "MISSING_CHAT_ID");

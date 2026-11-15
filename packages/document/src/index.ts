@@ -237,7 +237,7 @@ export class PresidioClient {
    */
   private async ensureAwake(): Promise<void> {
     if (this.awake) return;
-    for (let attempt = 0; attempt < 30; attempt += 1) {
+    for (let attempt = 0; attempt < 60; attempt += 1) {
       try {
         const response = await fetch(`${this.baseUrl}/health`, { signal: AbortSignal.timeout(15_000) });
         if (response.ok) {
@@ -247,7 +247,7 @@ export class PresidioClient {
       } catch {
         // Keep waiting through a cold start or a transient network failure.
       }
-      await new Promise((resolve) => setTimeout(resolve, 3_000));
+      await new Promise((resolve) => setTimeout(resolve, 5_000));
     }
     throw new PresidioUnavailableError("The redaction service did not wake up.");
   }

@@ -308,6 +308,9 @@ Return strict JSON only: {"branch":"SUPPORTED_CLEAR|ANALYST_REVIEW_REQUIRED|UNSU
         : error instanceof ProviderError
           ? "PROVIDER_UNAVAILABLE"
           : "EXTRACTION_FAILED";
+    process.stderr.write(
+      `analysis.extract failed code=${code} error=${error instanceof Error ? error.message.slice(0, 300) : "unknown"}\n`,
+    );
     if (extractionRunId) {
       await db
         .update(extractionRuns)
