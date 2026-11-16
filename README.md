@@ -1,5 +1,33 @@
 # <img src="apps/web/public/brand/assay-logo.png" alt="Assay logo" width="72" align="left" /> Assay
 
+# Assay
+
+**AI-assisted covenant monitoring for credit teams.** The model interprets, deterministic code calculates, ZK proofs verify compliance without exposing figures, and a human approves.
+
+[Live app](https://assay-uhhh2.vercel.app) · [Demo video](https://github.com/onyebuchidaniel60/Assay/releases) · [Docs](docs/)
+
+---
+
+## 🔑 Try it — demo accounts
+
+The app is invite-only and contains **synthetic data only**. Sign in with any of these:
+
+| Role | Email | Password | What you can do |
+|---|---|---|---|
+| **Analyst** | `analyst@assay.test` | `AnalystDemo2026!` | Upload agreements, review redactions, confirm terms, enter financials, calculate, generate proofs |
+| **Manager** | `manager@assay.test` | `ManagerDemo2026!` | Review the restricted compliance summary and approve/reject eligible runs |
+| **Auditor** | `auditor@assay.test` | `AuditorDemo2026!` | Inspect the signed audit chain and verify events |
+
+**Fastest path to see it work:** sign in as **Analyst** → open a pre-seeded borrower (e.g. **BOR-018**) → you'll see a completed run with a verified ZK proof and a manager approval in the audit trail.
+
+**To walk the full workflow:** sign in as Analyst in one browser, sign in as Manager in a second incognito window, then submit an analysis and approve it.
+
+> These accounts are seeded fixtures for evaluation. No real borrower data exists in this deployment.
+
+
+
+
+
 **Covenant operations with evidence, deterministic arithmetic, proof-backed controls and human approval.**
 
 <br clear="left" />
