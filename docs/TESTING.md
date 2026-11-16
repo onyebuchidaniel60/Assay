@@ -70,6 +70,6 @@ Recorded in `docs/BUILD_LOG.md`:
 
 ## Gate
 
-All unit/integration tests pass (61), Playwright passes 20/20 desktop+mobile, the deployed production smoke test passes, no unresolved critical/high security issue remains, and no secret or real data is exposed. Production was deployed at `60fac34` after this gate.
+All unit/integration tests pass (61), Playwright passes 20/20 desktop+mobile, the deployed production smoke test passes, no unresolved critical/high security issue remains, and no secret or real data is exposed. Production was deployed after this gate; the current post-submission build is `c27a02a`, verified with 24 public/role routes and fresh sign-ins.
 
 Do not document an unrun test as passing. Record exact commands and outcomes in this file and `docs/BUILD_LOG.md`.

@@ -1,9 +1,9 @@
 # Assay — AI Handoff / Build State
 
-**Status:** Phases 1–9 complete. Production deployed and smoke-tested after the full regression and security matrix passed.  
+**Status:** Phases 1–9 complete. Public production deployed and smoke-tested after the full regression and security matrix passed; post-submission access and branding fixes applied.  
 **Repository:** `https://github.com/onyebuchidaniel60/Assay` — public, default branch `main`.  
-**Production URL:** `https://assay-omega-gray.vercel.app` — Vercel Authentication enabled (Option B). `https://assay-uhhh2.vercel.app` aliases the same production deployment `assay-c1l1ridga-uhhh2.vercel.app`.  
-**Production commit:** `60fac34`. **Render API:** `https://assay-api-7hy0.onrender.com` (live at `60fac34`). **Render Presidio:** `https://assay-presidio.onrender.com`.  
+**Production URL:** `https://assay-uhhh2.vercel.app` — public (Vercel Authentication disabled). `https://assay-omega-gray.vercel.app` is the production domain and points to the same deployment `assay-o65mwq19k-uhhh2.vercel.app`.  
+**Production commit:** `c27a02a`. **Render API:** `https://assay-api-7hy0.onrender.com` (live at `60fac34`; post-submission UI change is Vercel-only). **Render Presidio:** `https://assay-presidio.onrender.com`.  
 **Public demo:** `https://github.com/onyebuchidaniel60/Assay/releases/download/demo-v1/assay-demo-final.mp4` — 131.97 s, 1080p/30 fps.  
 **Production release authority:** Exercised after the gate passed; no unresolved critical/high finding.  
 **Data boundary:** Synthetic data only; no real borrower, lender or production records.  
@@ -136,18 +136,27 @@
 
 ## Production deployment
 
-- **Frontend:** `https://assay-omega-gray.vercel.app`; deployment `assay-c1l1ridga-uhhh2.vercel.app`; commit `60fac34`; Vercel Authentication enabled (Option B). `https://assay-uhhh2.vercel.app` aliases the same deployment. Final-build screenshots are in `docs/evidence/`.
+- **Frontend:** `https://assay-uhhh2.vercel.app` (public); production domain `https://assay-omega-gray.vercel.app`; deployment `assay-o65mwq19k-uhhh2.vercel.app`; commit `c27a02a`. Final-build screenshots are in `docs/evidence/`.
 - **API:** `https://assay-api-7hy0.onrender.com`, live at `60fac34`, worker enabled, Reppo live.
 - **Presidio:** `https://assay-presidio.onrender.com`, `REDUCED_PII_MODE`.
 - **Database/auth/storage:** Neon Postgres/Neon Auth/private S3-compatible storage; trusted origins include the production and stable alias domains; public signup disabled.
-- **Production env names:** `NEON_AUTH_COOKIE_SECRET`, `NEON_AUTH_BASE_URL`, `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_API_URL`, `API_PUBLIC_URL`, `APP_ENV`.
+- **Production env names:** `NEON_AUTH_COOKIE_SECRET`, `NEON_AUTH_BASE_URL`, `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_API_URL`, `API_PUBLIC_URL`, `APP_ENV`, `VERCEL_PREVIEW_FEEDBACK_ENABLED=0`.
+
+## Post-submission access and branding — complete
+
+- Vercel Authentication is **disabled** for the project; `https://assay-uhhh2.vercel.app` is public (`200`), and `/dashboard` redirects to the app’s own `/login`. No Vercel login is required.
+- User-facing preview/demo/staging copy was removed from the landing, login, authenticated shell, footer, settings, borrower, audit, document and facility views. Synthetic aliases and the organization name were renamed to remove “Demo”.
+- A 24-route headed-browser check verified the logo on every actual route, no banned branding and no Vercel toolbar. Screenshots and the route map are in `docs/evidence/`.
+- `/favicon.ico` and `/opengraph-image` return `200`; `/opengraph-image` serves `image/png`.
+- The three Neon Auth accounts were updated to the operator-requested passwords and re-linked by `pnpm seed:workspace`. Passwords are delivered only in chat and stored in `/root/assay-secrets/demo-users.env` (mode 600), never in Git.
+- Production deployment: `c27a02a` / `assay-o65mwq19k-uhhh2.vercel.app`. Render API remains at `60fac34` (web-only change).
 
 ## Residual operator actions
 
 1. Upload the demo to YouTube (unlisted) or Google Drive if the hackathon form requires that host; the GitHub release asset is public and currently linked.
 2. Confirm OpenServ data-collection is enabled and the SERV API credit balance is adequate in the operator console.
 3. Kite payment remains provider-blocked on both documented testnet endpoints; do not retry or claim a receipt without new provider evidence.
-4. Production is protected by Vercel Authentication; if judges require interactive access, use the submission note or provide invited synthetic credentials through the official channel.
+4. Production is public; the workspace remains invite-only at the app level. Use the three synthetic accounts supplied to the operator for judge access.
 
 ## Authorization boundaries
 

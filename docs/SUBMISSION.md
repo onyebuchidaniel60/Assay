@@ -79,7 +79,7 @@ Design reference images are used as licensed inspiration only and are not redist
 - **Repository:** https://github.com/onyebuchidaniel60/Assay
 - **Demo video:** https://github.com/onyebuchidaniel60/Assay/releases/download/demo-v1/assay-demo-final.mp4 (public GitHub release asset; YouTube/Drive upload requires operator OAuth)
 - **Public API health:** https://assay-api-7hy0.onrender.com/health/live
-- **Production:** https://assay-omega-gray.vercel.app — protected by Vercel Authentication (Option B); interactive access requires an invited synthetic account. Stable alias: https://assay-uhhh2.vercel.app. The demo video is the public walkthrough.
+- **Production:** https://assay-uhhh2.vercel.app — public landing and login; the workspace requires an invited synthetic account. Production domain: https://assay-omega-gray.vercel.app. Demo credentials are supplied separately through the operator channel.
 - **Documentation:** https://github.com/onyebuchidaniel60/Assay/tree/main/docs
 
 ## X post
@@ -98,7 +98,7 @@ Design reference images are used as licensed inspiration only and are not redist
 
 - [x] Public GitHub repository: https://github.com/onyebuchidaniel60/Assay
 - [x] Demo video public URL — GitHub release asset (YouTube/Drive upload requires operator OAuth)
-- [x] Live production deployment — protected by Vercel Authentication (Option B); documented as protected
+- [x] Live production deployment — public URL; app-level invite-only sign-in; demo credentials supplied by the operator
 - [x] Write-up ready (this file)
 - [x] X post drafted
 - [ ] X post will link to the submission — operator action

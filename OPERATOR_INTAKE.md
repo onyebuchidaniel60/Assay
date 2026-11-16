@@ -196,8 +196,8 @@ Additional observations:
 |---|---:|---|---|
 | Account access | Yes | `VALIDATED (CLI)` | Vercel CLI 65.8.0 authenticated as `onyebuchidaniel60-1034`; team `uhhh2`, Hobby plan |
 | Assay project | Yes | `PRESENT` | `uhhh2/assay`; linked and deployed |
-| Preview deployment permission | Yes | `AUTHORIZED AND DEPLOYED` | Protected preview and stable alias verified |
-| Production deployment permission | Yes | `AUTHORIZED AND DEPLOYED` | `https://assay-omega-gray.vercel.app` at commit `60fac34`; Vercel Authentication enabled (Option B) |
+| Preview deployment permission | Yes | `AUTHORIZED AND DEPLOYED` | Public stable alias verified; Vercel Authentication disabled |
+| Production deployment permission | Yes | `AUTHORIZED AND DEPLOYED` | `https://assay-uhhh2.vercel.app` at commit `c27a02a`; public, with app-level invite-only sign-in |
 | Paid upgrade | No | `PROHIBITED` | Hobby/free only unless budget authority is added |
 
 ### 2.7 Render

@@ -93,13 +93,13 @@ See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for every variable and [docs/
 
 ## Verified deployment
 
-- **Production:** `https://assay-omega-gray.vercel.app` (Vercel Authentication enabled; stable alias `https://assay-uhhh2.vercel.app`)
+- **Production:** `https://assay-uhhh2.vercel.app` (public; stable alias of `https://assay-omega-gray.vercel.app`)
 - **API health:** `https://assay-api-7hy0.onrender.com/health/live`
 - **Presidio:** `https://assay-presidio.onrender.com/health`
 - **Demo video:** [public release asset](https://github.com/onyebuchidaniel60/Assay/releases/download/demo-v1/assay-demo-final.mp4) · [local copy](artifacts/demo/assay-demo-final.mp4)
 - **Repository:** `https://github.com/onyebuchidaniel60/Assay`
 
-The production workspace requires an invited synthetic account. The public API health endpoint is available for availability checks; the demo video is the primary public walkthrough.
+The production deployment is public; the workspace itself requires an invited synthetic account. The public API health endpoint is available for availability checks; the demo video is the primary public walkthrough.
 
 ## Documentation
 

@@ -86,7 +86,7 @@ Neon provides Postgres and managed Better Auth. Private S3-compatible storage ho
 
 ## Vercel — frontend hosting
 
-Hobby/free plan only. Production and preview deployments are protected by Vercel Authentication (Option B). The production deployment is `https://assay-omega-gray.vercel.app` at commit `60fac34`; `https://assay-uhhh2.vercel.app` aliases the same deployment. No paid plan, domain or add-on without explicit budget authority.
+Hobby/free plan only. The production deployment is public at `https://assay-uhhh2.vercel.app` (production domain `https://assay-omega-gray.vercel.app`) at commit `c27a02a`; Vercel Authentication is disabled and the app keeps its own invite-only sign-in. Vercel Toolbar feedback is disabled for production and preview. No paid plan, domain or add-on without explicit budget authority.
 
 ## Render — API and Presidio host
 
