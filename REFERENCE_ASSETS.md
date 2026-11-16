@@ -15,7 +15,16 @@ These are visual-direction references only. Do not copy the source template's br
 | UI-REF-03 | `design/reference/assayref3.avif` | Operator-supplied; licensed per Option A (operator assertion) | Analysis index, writer/analyst profile, cards and footer | Inspected |
 | UI-REF-04 | `design/reference/assayref4.avif` | Operator-supplied; licensed per Option A (operator assertion) | Home hierarchy, pricing/rate sheet, email capture, mobile | Inspected |
 
-All images are 1600 × 1200 AVIF. The working tree currently has them under `design/reference/`; `design/` is Git-ignored and not redistributed until the exact license text is attached.
+All inspiration images are 1600 × 1200 AVIF. The working tree currently has them under `design/reference/`; `design/` is Git-ignored and not redistributed until the exact license text is attached.
+
+## Assay product logo
+
+- **Source:** operator-supplied `/root/Assay/design/reference/assay-logo.png`.
+- **Dimensions/format:** 1254 × 1254 PNG, RGBA, non-interlaced; alpha present with rounded-square dark field; single variant; icon-only (no text).
+- **Palette:** dark navy field, blue/cyan bar chart and green/cyan sweep. No recoloring.
+- **Committed canonical/derived assets:** `apps/web/public/brand/assay-logo.png` (optimized 512×512), `apps/web/public/brand/assay-logo-original.png` (1254×1254), `apps/web/public/brand/icon-192.png`, `apps/web/public/brand/icon-512.png`, `apps/web/src/app/icon.png`, `apps/web/src/app/apple-icon.png`, `apps/web/src/app/favicon.ico` (16/32/48), `apps/web/src/app/opengraph-image.png` (1200×630 on warm paper).
+- **Usage:** header/navigation, login, footer, settings identity block, favicon, Apple touch icon, manifest and OpenGraph.
+- **License:** operator-supplied product logo; committed as the official product asset. The four inspiration AVIFs remain a separate, Git-ignored category and are not redistributed.
 
 ## Observed design principles
 

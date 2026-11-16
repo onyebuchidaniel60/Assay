@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
@@ -91,7 +92,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       >
         <div className="flex items-center justify-between border-b border-white/10 px-6 py-5">
           <Link href="/dashboard" className="group flex items-center gap-3" aria-label="Assay overview">
-            <span className="grid size-9 place-items-center rounded-full bg-acid text-lg font-black text-ink">A</span>
+            <Image src="/brand/assay-logo.png" alt="Assay" width={40} height={40} priority className="size-10 rounded-xl" />
             <span>
               <span className="block text-sm font-bold uppercase tracking-[0.24em]">Assay</span>
               <span className="block text-[10px] uppercase tracking-[0.16em] text-white/50">Covenant operations</span>
@@ -162,6 +163,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </button>
 
             <div className="flex min-w-0 items-center gap-2 text-xs text-muted">
+              <Image src="/brand/assay-logo.png" alt="Assay" width={24} height={24} className="size-6 rounded-md" />
               <span className="hidden font-semibold uppercase tracking-[0.16em] sm:inline">Assay</span>
               <span className="hidden text-line sm:inline">/</span>
               <span className="truncate font-medium text-ink">{currentLabel}</span>
@@ -192,7 +194,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         <footer className="border-t border-line px-4 py-6 sm:px-6 lg:px-10">
           <div className="mx-auto flex max-w-[1240px] flex-col gap-3 text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
-            <p>Assay — synthetic-data covenant operations preview. Not a production credit decision system.</p>
+            <p className="flex items-center gap-2"><Image src="/brand/assay-logo.png" alt="Assay" width={20} height={20} className="size-5 rounded" /> Assay — synthetic-data covenant operations preview. Not a production credit decision system.</p>
             <div className="flex flex-wrap items-center gap-4">
               <Link className="underline decoration-line underline-offset-4 hover:text-ink" href="/audit">
                 Audit evidence

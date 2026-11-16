@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, ArrowUpRight, KeyRound, LockKeyhole } from "lucide-react";
 import { StatusBadge } from "@/components/status-badge";
 import { signIn } from "./actions";
@@ -12,7 +13,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
       <section className="flex flex-col justify-between px-5 py-6 sm:px-8 lg:px-14 lg:py-10">
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3">
-            <span className="grid size-9 place-items-center rounded-full bg-ink text-lg font-black text-acid">A</span>
+            <Image src="/brand/assay-logo.png" alt="Assay" width={40} height={40} priority className="size-10 rounded-xl" />
             <span className="text-sm font-bold uppercase tracking-[0.24em]">Assay</span>
           </Link>
           <Link href="/dashboard" className="inline-flex items-center gap-2 text-xs font-semibold text-muted hover:text-ink">
@@ -21,6 +22,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         </div>
 
         <div className="mx-auto w-full max-w-md py-16">
+          <Image src="/brand/assay-logo.png" alt="Assay" width={88} height={88} priority className="mb-6 size-20 rounded-3xl" />
           <StatusBadge tone="proof">Invite-only staff access</StatusBadge>
           <h1 className="display mt-5 text-5xl font-semibold sm:text-6xl">Sign in to review.</h1>
           <p className="mt-4 text-sm leading-6 text-muted">
@@ -103,7 +105,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
           </div>
         </div>
         <div className="flex items-center justify-between border-t border-white/10 pt-6 text-xs text-white/50">
-          <span>Assay preview · synthetic data</span>
+          <span className="flex items-center gap-2"><Image src="/brand/assay-logo.png" alt="Assay" width={18} height={18} className="size-4 rounded" /> Assay preview · synthetic data</span>
           <Link href="/" className="inline-flex items-center gap-1 text-white/70 hover:text-white">
             <ArrowLeft className="size-3.5" /> Back
           </Link>

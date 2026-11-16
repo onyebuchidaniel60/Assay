@@ -14,7 +14,8 @@
 | SERV status pending | SERV key/credits/model unavailable or call failed | Check account and trace; do not mark graph complete if no SERV node ran. |
 | Proof generation fails | Circuit version/key artefact mismatch, invalid witness bounds | Compare circuit version/hash and input commitment; regenerate only for same immutable snapshot. |
 | Audit chain fails verification | DB tampering, missing signature/key, serialization drift | Stop approvals for affected borrower; preserve evidence; do not rewrite history. |
-| Reppo evaluation pending | Evaluation settlement interval or quota | Poll per current API docs; keep `PENDING`; do not fabricate a score. |
+| Reppo evaluation pending | Provider queue or polling window | Keep `PENDING`; poll every 60 s within the chosen 10/15/30-minute cap. A timeout is not a verdict. |
+| Reppo submission failed | Client payload/key/credits or provider failure | Read `errorCode`/`errorMessage` and the side recorded; do not retry blindly. |
 | Kite payment timed out | Unknown settlement state | Set `RECONCILIATION_REQUIRED`; query provider receipt; never blindly retry. |
 | Demo capture slow | Render free-service sleep or cold Presidio service | Warm preview before capture, then reload from clean browser profile. |
 | TTS quota unavailable | Free-tier rate/availability changed | Use a permitted local TTS fallback; do not enable billing without approval. |

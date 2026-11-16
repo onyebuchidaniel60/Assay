@@ -57,3 +57,6 @@ design/
 
 # Installed agent skills (reinstall with npx skills add; lock file records provenance)
 .agents/
+
+# Demo working audio (final MP4, script, captions and notes are committed)
+artifacts/demo/audio/

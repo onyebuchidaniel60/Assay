@@ -54,6 +54,7 @@ Stack traces, SQL messages, provider raw errors, prompts, raw documents and priv
 | `PUT /v1/analysis-runs/:id/financial-inputs` | Analyst/Admin | Integer minor units, permitted add-back codes, deterministic caps, explicit attestation; seals snapshot |
 | `POST /v1/analysis-runs/:id/calculate` | Analyst/Admin | Deterministic Decimal calculation + independent BigInt verification + SERV coherence gate; stores three sealed scenario rows |
 | `POST /v1/analysis-runs/:id/proof` | Analyst/Admin | `Idempotency-Key` required; generates/verifies fixed-circuit proof in a one-shot child process; witness never persisted |
+| `POST /v1/analysis-runs/:id/proof/verify` | Analyst/Manager/Auditor/Admin | Re-verifies the stored proof bytes against the fixed verification key; mutation sets `PROOF_FAILED` and blocks approval |
 | `GET /v1/analysis-runs/:id/proof` | Analyst/Manager/Auditor | Proof status/public signals; no witness or proof bytes |
 | `GET /v1/analysis-runs/:id/report` | All staff | Analyst full; manager restricted; auditor evidence-only; admin metadata |
 | `POST /v1/analysis-runs/:id/cancel` | Analyst/Admin | Allowed before a manager decision; terminal `CANCELLED` |
@@ -72,10 +73,12 @@ Stack traces, SQL messages, provider raw errors, prompts, raw documents and priv
 | `GET /v1/borrowers/:id/audit-events` | All staff | Metadata only; payload availability is role-shaped |
 | `POST /v1/borrowers/:id/audit/verify` | All staff | Recomputes the per-borrower hash chain and verifies every Ed25519 signature |
 | `GET /v1/borrowers/:id/audit-events/:eventId/payload` | Analyst/Admin | Decrypts the sealed payload; returns unavailable after key shred |
-| `POST /v1/feedback` | Analyst/Admin | Stores synthetic correction before/after values and audit event; Reppo submission stays disabled |
+| `POST /v1/feedback` | Analyst/Admin | Stores a synthetic correction and audit event; optional `submitToReppo` creates a de-identified Reppo trace (50 KB preflight) |
 | `GET /v1/integrations/status` | Analyst/Admin | Configured/disabled/blocked status; no secrets |
-| `POST /v1/integrations/reppo/evaluations` | Analyst/Admin | Returns `503 PROVIDER_DISABLED` until contract/quota verified |
-| `POST /v1/integrations/kite/benchmark-requests` | Analyst/Admin | Deterministic local session/cap/asset/expiry check; provider remains blocked and no payment is attempted |
+| `POST /v1/integrations/reppo/evaluations` | Analyst/Admin | Submits a feedback record to the live Reppo Eval Router; returns `202` or a visible provider/client error |
+| `GET /v1/integrations/reppo/evaluations` | All staff | Tenant-scoped evaluation register |
+| `GET /v1/integrations/reppo/evaluations/:id` | All staff | Real provider status/score/decision/confidence/route/result; `?refresh=1` polls the provider |
+| `POST /v1/integrations/kite/benchmark-requests` | Analyst/Admin | Deterministic local session/cap/asset/expiry check; both documented testnet endpoints are provider-blocked/DNS-unresolved and no payment is attempted |
 | `POST /v1/demo/borrowers/:id/shred` | Admin, demo-only | Requires `APP_ENV=demo`, `ENABLE_DEMO_SHRED=true`, synthetic `BOR-*` reference and typed confirmation |
 
 ## Idempotency and state

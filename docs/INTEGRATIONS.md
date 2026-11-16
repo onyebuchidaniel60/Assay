@@ -33,9 +33,33 @@ Live endpoint: `https://inference-api.openserv.ai/v1`. The account catalog was v
 
 Dolphin was evaluated and rejected because its confidentiality mechanism is unverified: no TEE, no MPC and unverified zero-retention claims. Do not build a Dolphin adapter or add Dolphin endpoints, models, keys or privacy-verification flags. Historical references are superseded.
 
-## Reppo — optional
+## Reppo — LIVE synthetic feedback evaluation
 
-Reppo remains disabled. The API surface returns `503 PROVIDER_DISABLED` for submission and stores only synthetic correction records locally. No score, decision or cost is fabricated. Enable only after the current synthetic-only contract, quota and terms are verified.
+- **Endpoint migration:** the legacy `/agents/eval-requests/submit` and `/agents/eval-requests/{evalId}` endpoints documented in the first blueprint were removed by the provider and now return HTML 404. Assay targets the live endpoints: `POST https://eval.reppo.xyz/api/v1/agents/evals` with `taskType`/`input`, and `GET https://eval.reppo.xyz/api/v1/agents/evals/{id}`. This deviation is recorded because the old contract is no longer callable.
+- **Auth:** bearer `REPPO_API_KEY`, server-side only.
+- **Payload:** only synthetic/de-identified correction traces built from an allowlist: correction type, changed field names, safe categorical values and the synthetic covenant threshold. Amounts, free text, borrower identity, token map, agreement text, document excerpts and witness data are excluded. A preflight check rejects payloads over 50 KB before any network call and rejects emails, account-like numbers, token-map placeholders and secret-like material.
+- **Polling:** background `reppo.poll` job every 60 seconds; local cap selected per request at 10, 15 or 30 minutes. `PENDING` is displayed honestly. `FAILED` is stored with the exact provider error and is not retried blindly. `TIMEOUT`/poll-window expiry is distinct from provider failure.
+- **Verdict storage:** provider status, score, decision, confidence, route, full result, credits charged and exact error fields are persisted in `reppo_evaluations`.
+- **No authority:** Reppo does not approve a covenant, change a prompt, alter a calculation or trigger a payment.
+
+### Live evaluation evidence — 16 November 2026
+
+| Field | Value |
+|---|---|
+| Provider eval ID | `cmwikqtsn000f08l4y73d9a8m` |
+| Local evaluation | `56cfd84f-acdc-457d-a673-c84cf0d0178c` |
+| Submitted | `2026-11-16T01:18:00.352Z` |
+| Status at submission | `PENDING` (provider `QUEUED`) |
+| Final status | `COMPLETED` at `2026-11-16T01:19:06.641Z` |
+| Score | `98 / 100` |
+| Decision | `accept` |
+| Confidence | `low` |
+| Route | `review` |
+| Credits charged | `440` |
+| Payload size | `409 bytes` |
+| Polling | 60 s interval; 10-minute cap; completed in ~66 s |
+
+Returned verdict summary: the submission scored 98 and was accepted, but low confidence routed it to `review` for additional validation. Rubric: scope 100, safety 100, correctness 100, reversibility 88. Three evaluators were weighted (economic 98 vs equal-weight 86; score spread 16.9); the route decision was `review`. No sensitive data was sent or returned.
 
 ## Kite Passport / x402 — optional
 
@@ -68,11 +92,11 @@ Hobby/free plan only unless the operator raises the budget. Preview deployment r
 
 Free web services only; 512 MB RAM, no persistent local disk and possible sleep. Persistent data belongs in Neon. Free Render Postgres is not used because it expires after 30 days. No paid plan, disk or add-on without explicit budget authority.
 
-## Google Gemini TTS — demo only
+## Demo TTS
 
-Check current official Gemini TTS model availability and free-tier limits on the day of production. Use only public narration text because Google’s free tier may use input for product improvement. No billing/paid plan without permission. If unavailable or unsuitable, use a local free TTS model/tool with checked license.
+Google Gemini TTS was not used: no Google AI/TTS credential or free-tier activation is present. The demo uses Microsoft Edge TTS (`edge-tts`, free, no account) with `en-US-AndrewNeural`; only the public narration script is sent. No billing was enabled.
 
-## Disabled by default
+## Integration state
 
-- Reppo: optional; enable only after synthetic-data authorization.
-- Kite: testnet session enabled; payment path is provider-blocked and the over-cap policy rejection is verified.
+- Reppo: **LIVE** — one real synthetic evaluation completed; score 98, decision `accept`, confidence `low`, route `review`, 440 credits.
+- Kite: testnet session enabled; both documented testnet endpoints are provider-blocked. `passport.dev.gokite.ai/x402/test` previously returned an upstream internal error; the second endpoint `x402.dev.gokite.ai/api/weather` did not resolve (DNS `ENOTFOUND`) on 16 November 2026. No payment was attempted through it, and the earlier endpoint was not retried a third time.

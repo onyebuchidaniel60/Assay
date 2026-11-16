@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowUpRight, KeyRound, LockKeyhole, ShieldCheck, Users } from "lucide-react";
 import { PageHeader, SectionLabel } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
@@ -49,6 +50,10 @@ export default async function SettingsPage({
         <section className="rounded-3xl border border-line bg-paper p-5 sm:p-7">
           <div className="flex items-center gap-2"><Users className="size-4 text-muted" /><SectionLabel>Current membership</SectionLabel></div>
           <div className="mt-5 rounded-2xl border border-line bg-white/40 p-4">
+            <div className="mb-4 flex items-center gap-3 border-b border-line pb-4">
+              <Image src="/brand/assay-logo.png" alt="Assay" width={48} height={48} className="size-12 rounded-xl" />
+              <div><p className="text-sm font-bold uppercase tracking-[0.2em]">Assay</p><p className="text-xs text-muted">Covenant operations workspace</p></div>
+            </div>
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <p className="text-lg font-semibold">{me.user.name ?? "Staff member"}</p>

@@ -11,7 +11,7 @@ Use `.env.example` as the canonical environment variable list. The complete vari
 
 ## Server-only secrets
 
-`DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `NEON_AUTH_BASE_URL`, `NEON_AUTH_API_KEY`, `NEON_AUTH_COOKIE_SECRET`, `NEON_STORAGE_BUCKET`, `AWS_ENDPOINT_URL_S3`, `AWS_REGION`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `SERV_REASONING_API_KEY`, `NEARAI_API_KEY`, `OPENROUTER_API_KEY`, `REPPO_API_KEY`, `PRESIDIO_SERVICE_TOKEN`, `DATA_KEK_BASE64`, `AUDIT_SIGNING_PRIVATE_KEY_BASE64`, `AUDIT_SIGNING_PUBLIC_KEY_BASE64` and optional Kite session material. Never prefix them with `NEXT_PUBLIC_`.
+`DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `NEON_AUTH_BASE_URL`, `NEON_AUTH_API_KEY`, `NEON_AUTH_COOKIE_SECRET`, `NEON_STORAGE_BUCKET`, `AWS_ENDPOINT_URL_S3`, `AWS_REGION`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `SERV_REASONING_API_KEY`, `NEARAI_API_KEY`, `OPENROUTER_API_KEY`, `REPPO_API_KEY`, `REPPO_BASE_URL`, `PRESIDIO_SERVICE_TOKEN`, `DATA_KEK_BASE64`, `AUDIT_SIGNING_PRIVATE_KEY_BASE64`, `AUDIT_SIGNING_PUBLIC_KEY_BASE64` and optional Kite session material. Never prefix them with `NEXT_PUBLIC_`.
 
 ## Model and provider configuration
 
@@ -32,7 +32,7 @@ Do not add `DOLPHIN_BASE_URL`, `DOLPHIN_API_KEY`, `DOLPHIN_MODEL` or `DOLPHIN_PR
 ## Provider flags
 
 - `NEARAI_ATTESTATION_REQUIRED=true` by default. Do not accept un-attested Layer 2 output.
-- `REPPO_ENABLED=false` until key, quota and synthetic-only payload contract are verified.
+- `REPPO_ENABLED=true` with a server-side `REPPO_API_KEY`. The adapter uses the live `https://eval.reppo.xyz/api/v1/agents/evals` endpoints, a 50 KB preflight, de-identified correction traces and 60-second polling capped at 10/15/30 minutes.
 - `KITE_ENABLED=true` for the authorized Kite testnet integration. Kite does not use an API key; authentication is via the passkey-approved wallet session.
 - `ENABLE_DEMO_SHRED=false` outside a controlled synthetic demo.
 - `PRESIDIO_MODE=REDUCED_PII_MODE` — Presidio Analyzer with the small spaCy model plus deterministic custom financial recognizers. This is not full-strength Presidio.
@@ -63,7 +63,7 @@ The adapter must enforce `KITE_MAX_PER_PAYMENT_MINOR` and `KITE_MAX_TOTAL_MINOR`
 ## Jobs and auth
 
 - `WORKER_ENABLED=true` runs the in-process Postgres job poller. The worker claims `analysis.parse` and `analysis.extract` jobs with `FOR UPDATE SKIP LOCKED`.
-- Public sign-up is disabled in Neon Auth (`email_and_password.disableSignUp=true`). Provision staff accounts in Neon, then run `ALLOW_DEMO_SEED=true pnpm seed:workspace` to create profiles/memberships. Seed scripts refuse `APP_ENV=production`.
+- Public sign-up is disabled in Neon Auth (`email_and_password.disableSignUp=true`). Provision staff accounts in Neon, then run `ALLOW_DEMO_SEED=true pnpm seed:workspace` to create profiles/memberships. Seed scripts refuse `APP_ENV=production`. The web session-data cache TTL is 1 second so expired/revoked sessions are rechecked promptly; the API still loads the current profile status on every protected request.
 
 ## Environment separation
 

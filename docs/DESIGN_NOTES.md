@@ -25,8 +25,9 @@ Reference-led UI implemented in Phases 1–5. The operator supplied four AVIF re
 - `/audit` — borrower selector, chain verification, sequence/hash/signature table.
 - `/covenants` — confirmed covenant snapshots with threshold and result.
 - `/cases` — exception list derived from breach/failed run state; detail redirects to the immutable run.
-- `/integrations` — honest provider status, including Kite provider-blocked and Reppo disabled.
-- `/settings` — current membership, role matrix, sign-out and server-only secret boundary.
+- `/integrations` — honest provider status, including Reppo LIVE and Kite provider-blocked on both documented testnet endpoints.
+- `/settings` — current membership, product identity block/logo, role matrix, sign-out and server-only secret boundary.
+- `/evaluations`, `/evaluations/[id]` — real Reppo status, score, decision, confidence, route, rubric/result and errors.
 
 ## Responsive and accessibility
 
@@ -45,6 +46,10 @@ Reference-led UI implemented in Phases 1–5. The operator supplied four AVIF re
 - Responsive intent: desktop operations density, mobile stacked cards and scrollable tables.
 
 Recorded in `REFERENCE_ASSETS.md`; exact license text remains an operator follow-up before external redistribution of the reference images.
+
+## Logo
+
+The operator supplied a 1254×1254 RGBA logo with a dark navy rounded-square field, cyan/blue growth bars and a green/cyan sweep. It has no separate light/dark variant and no text. It is used unmodified in the navigation, login, footer, settings identity block, favicon, Apple touch icon, manifest and OpenGraph card. The dark field remains legible on both the light paper header and dark sidebar, so no recoloring or background rectangle is needed. Canonical copy: `apps/web/public/brand/assay-logo.png` (optimized 512×512); original 1254×1254 and derived icons are committed alongside it. It did not change the existing acid-yellow/ink palette; it acts as the product mark rather than a color source.
 
 ## Phase 6 `stageshow` attempt
 

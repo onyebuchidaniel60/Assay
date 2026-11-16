@@ -34,7 +34,7 @@ Open the audit timeline, inspect event metadata and run chain verification. Audi
 - ZK proof verifies the defined inequality for a private witness; it does not prove agreement authenticity or input-source truth.
 - Hash chain is tamper-evident; it is not an immutable public ledger.
 - Demo crypto-shred removes the application-wrapped key for synthetic data; it is not a legal erasure certification.
-- Reppo/Kite integrations are optional and appear disabled when not configured.
+- Reppo is live for synthetic feedback evaluation; Kite policy is live but both documented payment endpoints remain provider-blocked/DNS-unresolved. Never present a blocked payment as successful.
 
 ## Support
 

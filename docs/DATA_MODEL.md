@@ -17,7 +17,7 @@ PostgreSQL (Neon) is canonical. The applied Drizzle migration is `packages/db/mi
 - `approvals` — one manager decision per run; binds manager, decision, risk acknowledgement, rationale, proof artifact and exact analysis version.
 - `redaction_revisions` — immutable redaction revision: sealed redacted pages, encrypted token map, non-sensitive entity spans and analyst review metadata.
 - `extraction_runs` — provider/model/prompt version, provider request ID, output hash, attestation evidence and token counts. Raw provider output and document text are not persisted here.
-- `feedback_records`, `reppo_evaluations` — synthetic correction records and actual provider evaluation status; no fabricated verdicts.
+- `feedback_records`, `reppo_evaluations` — synthetic correction records and actual Reppo provider status/score/decision/confidence/route/result, credits charged, error code/message, 10/15/30-minute polling cap and last-poll timestamp. No fabricated verdicts.
 - `audit_events`, `audit_heads` — per-borrower signed hash chain. Sequence and previous hash are row-locked; the event envelope is sealed with the borrower DEK; the Ed25519 signature and chain hash remain verifiable after demo key shred.
 - `jobs` — Postgres queue (`QUEUED`, `RUNNING`, `RETRY`, `SUCCEEDED`, `FAILED`, `CANCELLED`), lease fields, retry/dead-letter, IDs-only payloads. Claimed with `FOR UPDATE SKIP LOCKED`.
 - `idempotency_records` — org/actor/key scoped request hash and resource pointer; unique constraint prevents duplicate creation. Sensitive response bodies are not stored.

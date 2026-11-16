@@ -1,92 +1,128 @@
-# Assay
+# <img src="apps/web/public/brand/assay-logo.png" alt="Assay logo" width="72" align="left" /> Assay
 
-**Privacy-conscious, AI-assisted covenant monitoring for credit teams.**
+**Covenant operations with evidence, deterministic arithmetic, proof-backed controls and human approval.**
 
-Assay helps a credit analyst review one maximum Debt / Adjusted EBITDA covenant from a credit agreement, calculate compliance using deterministic arithmetic, inspect two downside scenarios, and route an eligible result to a manager for approval with a verifiable proof and tamper-evident audit record.
+<br clear="left" />
 
-> **MVP limitation:** Assay is a demonstration/workflow prototype using synthetic data only. It is not a lending decision system, legal interpretation service, full credit-underwriting platform or production compliance certification. Do not upload real borrower information.
+Credit teams still reconcile maximum-leverage covenants across PDFs, spreadsheets and email. Generic AI can summarize a clause, but it cannot be trusted to do the arithmetic, preserve the evidence trail, or decide whether a manager may approve. Assay makes that workflow explicit and auditable using synthetic data only.
 
-## What Assay does
+## The problem
 
-1. A credit analyst creates a synthetic borrower and facility.
-2. The analyst uploads a text-based PDF or TXT agreement.
-3. Assay encrypts the document before private storage, parses its text and uses Presidio to detect/tokenize identifying fields.
-4. The analyst reviews redaction before any model call.
-5. AI extracts a single Debt / Adjusted EBITDA covenant, its threshold and permitted add-back definitions, with supporting quote/page evidence. Sensitive extraction is routed to NEAR AI Cloud's TEE-attested gateway only after redaction; every extraction verifies fresh Intel TDX and NVIDIA NRAS evidence, nonce binding and the response signature. SERV Reasoning gates the structured branch. The analyst confirms the result.
-6. The analyst enters total debt, reported EBITDA and permitted add-backs.
-7. Assay calculates leverage and headroom deterministically, then runs an EBITDA-downside and debt-upside scenario.
-8. A fixed ZK circuit proves the baseline inequality when compliant. A manager approves or rejects from a restricted view; proof verification is required before approval.
-9. Assay records material events in an encrypted, signed hash chain that can be verified.
+A single maximum Debt / Adjusted EBITDA covenant requires an analyst to find the right clause, confirm definitions and permitted add-backs, attest the financial figures, calculate leverage and stress cases, and hand a manager a decision they can defend. Most tools compress that into a chat answer with no source binding, no arithmetic control and no approval evidence.
 
-## What Assay does not do
+## Who it is for
 
-- It does not decide whether to lend, underwrite the borrower or recommend a credit limit.
-- It does not support arbitrary covenant families.
-- It does not autonomously extract financial statement amounts from any arbitrary document; the analyst enters and attests those values.
-- It does not support production borrower data, a borrower portal, public signup or mobile apps. Workspace tenant scoping exists for synthetic demonstration data only.
-- It does not custody funds or make customer payments.
-- It does not claim TEE-grade security, legal compliance, absolute zero retention or differential privacy unless separately implemented and verified.
+Credit analysts, credit managers and auditors at a lender or credit fund who need a reviewable covenant workflow. The demonstration uses a synthetic workspace; it is not a production credit decision system.
 
-## User roles
+## What it does
 
-- **Analyst:** creates records, uploads agreements, reviews redaction/terms, attests figures, runs analysis and requests proofs.
-- **Manager:** sees a limited compliance summary and approves/rejects eligible runs; stressed breaches require risk acknowledgement.
-- **Auditor:** reads audit metadata, signatures, proof and approval evidence.
-- **Admin:** manages staff access and integration health, and can run the demo-only synthetic crypto-shred; no inherent credit approval.
+1. **Create a synthetic borrower and facility.** A per-borrower data key and a signed audit chain are created transactionally.
+2. **Upload a text-based PDF or TXT agreement.** Assay validates magic bytes, size and page count, rejects scanned or password-protected PDFs, encrypts the bytes and writes only ciphertext to private object storage.
+3. **Review redaction.** Presidio runs in a deliberately reduced profile; the analyst confirms the redacted text before any model call.
+4. **Extract one covenant.** NEAR AI Cloud extracts a single maximum Debt / Adjusted EBITDA covenant from redacted text. Every request verifies the TEE-verifiable model, fresh Intel TDX and NVIDIA NRAS evidence, nonce binding, the response ECDSA signature and request/response hashes. SERV Reasoning gates the structured branch; the analyst confirms terms and source quotes.
+5. **Attest financial inputs.** Total debt, reported EBITDA and permitted add-backs are converted to integer minor units, sealed under the borrower DEK and hashed.
+6. **Calculate deterministically.** Decimal arithmetic and an independent BigInt verifier produce the baseline and two stress scenarios. A fixed Groth16 circuit proves the baseline inequality when compliant.
+7. **Approve with maker-checker control.** The manager sees a restricted view with no raw amounts or named counterparties. The server re-locks the run and re-verifies the stored proof before one decision is written.
+8. **Verify the audit chain.** Per-borrower events are encrypted, hash-chained and Ed25519-signed. The chain remains verifiable after a demo crypto-shred.
+9. **Evaluate synthetic feedback.** An analyst correction can be submitted to Reppo as a de-identified field-level trace. The real verdict is displayed; Reppo never approves the covenant.
 
-## Getting started
+## Architecture
 
-The repository is structured as a pnpm monorepo. The implementation team must complete the one-time `OPERATOR_INTAKE.md` before coding. Required access and secrets are never committed to Git.
-
-See:
-- [Complete implementation blueprint](MASTER_BLUEPRINT.md)
-- [Setup](docs/SETUP.md)
-- [Configuration](docs/CONFIGURATION.md)
-- [API](docs/API.md)
-- [Data model](docs/DATA_MODEL.md)
-- [Security](docs/SECURITY.md)
-- [Integrations](docs/INTEGRATIONS.md)
-- [Testing](docs/TESTING.md)
-- [Deployment](docs/DEPLOYMENT.md)
-- [Operator guide](docs/OPERATOR_GUIDE.md)
-- [Troubleshooting](docs/TROUBLESHOOTING.md)
-
-## Developer quick start
-
-Prerequisites: Node.js 24 LTS, pnpm, Python 3.12 for the Presidio service, Docker where containerized services are used, Circom 2.x and SnarkJS. Neon provides the managed Postgres/Auth layer. Exact patch versions are pinned in lockfiles and image definitions.
-
-```bash
-pnpm install
-pnpm typecheck
-pnpm test
-pnpm build
-pnpm dev
+```mermaid
+flowchart LR
+  A[Analyst / Manager / Auditor] --> W[Next.js 16 workspace]
+  W -->|Neon Auth session| API[Fastify 5 API]
+  API --> DB[(Neon Postgres + jobs)]
+  API --> S3[(Private S3-compatible storage)]
+  API --> P[Presidio REDUCED_PII_MODE]
+  API --> N[NEAR AI Cloud\nTDX + NRAS attestation]
+  API --> S[SERV Reasoning]
+  S --> O[OpenRouter\nstructured judgement]
+  API --> R[Reppo Eval Router]
+  API --> K[Kite x402 policy]
+  API --> Z[Circom / SnarkJS\nfixed leverage circuit]
+  DB --> J[Postgres FOR UPDATE SKIP LOCKED worker]
+  J --> API
 ```
 
+- **Deterministic code owns** arithmetic, business rules, approval checks, audit verification and spending policy.
+- **No LLM can calculate authoritatively, approve a credit decision or pay.**
+- **Postgres is the queue.** No Redis, Kafka or Kubernetes.
+- **Provider failures are visible.** There is no fabricated verdict, receipt or proof.
+
+## Track declaration
+
+- **PRIMARY: Open Track**
+- **SECONDARY: Reppo** — feedback evaluation is live (one real synthetic evaluation completed: score 98, decision `accept`, confidence `low`, route `review`).
+- **SECONDARY: Kite** — deterministic x402 session/cap/asset/expiry policy is implemented and the over-cap rejection is verified. Payment remains **provider-blocked**: the first documented testnet endpoint returned an upstream internal error, and the second (`x402.dev.gokite.ai`) did not resolve (DNS `ENOTFOUND`) on 16 November 2026. No payment is claimed.
+- **NOT CLAIMED: Dolphin** — evaluated and rejected because its confidentiality mechanism is unverified: no TEE, no MPC and no verified zero-retention guarantee. No Dolphin adapter, key, endpoint or model is present.
+
+## Security and privacy summary
+
+- Synthetic data only; invite-only accounts; public sign-up disabled at Neon Auth.
+- Documents, financial snapshots, scenario details, redaction objects and audit payloads are encrypted with AES-256-GCM under a per-borrower DEK wrapped by a server-side KEK.
+- Private object storage holds ciphertext only. No plaintext temporary files.
+- Uploaded content is treated as hostile, untrusted data. Extraction uses strict schemas, page/quote validation and a single bounded repair attempt.
+- NEAR AI receives only redacted agreement text. Each extraction is bound to fresh, nonce-bound Intel TDX and NVIDIA NRAS attestation and a signed provider response.
+- OpenRouter receives structured, already-extracted data only.
+- Presidio is a **reduced-model profile**, not full-strength Presidio; analyst review remains mandatory.
+- The proof proves the fixed compliance predicate over the submitted witness, not the truth of the source figures.
+- The audit chain is signed and tamper-evident; it is not claimed immutable against a fully compromised signing key.
+- Reppo receives only field-level, de-identified correction traces, never agreement text, borrower identity, token maps or raw financial figures.
+
+## Quick start
+
+Prerequisites: Node.js 24 LTS, pnpm 10.34.5, Python 3.12 for Presidio, Circom 2.x and SnarkJS for circuit setup. Neon provides Postgres and managed Better Auth.
+
 ```bash
+git clone https://github.com/onyebuchidaniel60/Assay.git
+cd Assay
+pnpm install --frozen-lockfile
+cp .env.example .env.local   # fill development/test values only; never commit
 pnpm --filter @assay/db migrate
 pnpm --filter @assay/api dev
 pnpm --filter @assay/web dev
 ```
 
-The web app runs on `http://localhost:3000`; Fastify on `http://localhost:3001`. Neon Postgres/Auth, private S3-compatible storage, envelope encryption, per-borrower signed audit chains, the Postgres job worker, the fixed-circuit proof worker and the `REDUCED_PII_MODE` Presidio service are wired. The analyst/manager/auditor workflow is implemented end-to-end against synthetic data. Start Presidio separately (see `docs/SETUP.md`). Use `.env.example` as a variable catalogue; copy it to `.env.local` only for local work and never commit the real file.
+- Web: `http://localhost:3000`
+- API: `http://localhost:3001`
+- Presidio: see [docs/SETUP.md](docs/SETUP.md)
+- Proof artifacts: `packages/proof/artifacts/`
 
-Authenticated preview: **https://assay-uhhh2.vercel.app** (protected by Vercel Authentication), backed by the Render API `https://assay-api-7hy0.onrender.com` and the Neon demo database. Synthetic data only.
+See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for every variable and [docs/SETUP.md](docs/SETUP.md) for the exact verified setup.
 
-## Development operating modes
+## Verified deployment
 
-- **Local development:** Next.js app + Fastify API + Presidio; synthetic fixtures; live NEAR AI/OpenRouter/SERV calls only through the verified adapters.
-- **Preview:** Vercel frontend + Render API/Presidio + authorized database; synthetic data only; sandbox providers only; `ENABLE_DEMO_SHRED=false` unless an explicitly authorized demo session requires it.
-- **Production:** authorized by the operator, but release remains gated on the full Phase 5/9 test and security matrix. No production deployment is currently claimed.
+- **Preview:** `https://assay-uhhh2.vercel.app` (protected by Vercel Authentication)
+- **API health:** `https://assay-api-7hy0.onrender.com/health/live`
+- **Presidio:** `https://assay-presidio.onrender.com/health`
+- **Demo video:** [`artifacts/demo/assay-demo-final.mp4`](artifacts/demo/assay-demo-final.mp4)
+- **Repository:** `https://github.com/onyebuchidaniel60/Assay`
 
-## Documentation and demo
+The preview requires an invited synthetic account; the public API health endpoint is available for availability checks. The demo video is the primary public walkthrough.
 
-README and `docs/` are maintained alongside functionality. The demo is at [`artifacts/demo/assay-demo.mp4`](artifacts/demo/assay-demo.mp4) (113.5 s, 1080p). It uses real Playwright capture, local free TTS, burned captions and synthetic data only; the script, narration, captions and production notes are beside it. The deployed preview is authenticated and uses the live Render API and Neon database.
+## Documentation
+
+- [Setup](docs/SETUP.md)
+- [Configuration](docs/CONFIGURATION.md)
+- [API reference](docs/API.md)
+- [Data model](docs/DATA_MODEL.md)
+- [Security architecture](docs/SECURITY.md)
+- [Integrations](docs/INTEGRATIONS.md)
+- [Testing and evidence](docs/TESTING.md)
+- [Deployment](docs/DEPLOYMENT.md)
+- [Operator guide](docs/OPERATOR_GUIDE.md)
+- [Troubleshooting](docs/TROUBLESHOOTING.md)
+- [Design notes](docs/DESIGN_NOTES.md)
+- [Research notes](docs/RESEARCH_NOTES.md)
+- [Build log](docs/BUILD_LOG.md)
+- [Submission write-up](docs/SUBMISSION.md)
+- [Complete implementation blueprint](MASTER_BLUEPRINT.md)
 
 ## Project status
 
-Phases 1–4 are implemented: a pnpm monorepo, Fastify API with the full borrower → facility → encrypted upload → redaction review → attested extraction → confirmed terms → attested financial inputs → deterministic calculation + SERV gate → ZK proof → manager approval workflow, role-shaped UI for analyst/manager/auditor, Neon Postgres/Auth, private object storage, envelope encryption, per-borrower signed audit chains, a Postgres job worker and `REDUCED_PII_MODE` Presidio. Live NEAR AI TDX/NRAS attestation, OpenRouter and SERV checks passed. Kite testnet is enabled but the x402 payment path remains provider-blocked. Render deployment is deferred to Phase 5. Check `docs/BUILD_LOG.md` and `AI_HANDOFF.md` for exact evidence.
+Phases 1–6 are implemented: full API and authenticated analyst/manager/auditor workspace, encrypted ingestion, reduced-PII review, attested extraction, deterministic calculation and SERV gate, fixed-circuit proof, maker-checker approval, signed audit chain, Postgres worker, Reppo live feedback evaluation, Kite policy with provider-blocked payment path, and a real captured demo. Remaining Phase 9 release checks and final production deployment are recorded in [AI_HANDOFF.md](AI_HANDOFF.md) and [docs/BUILD_LOG.md](docs/BUILD_LOG.md).
 
-## License
+## License and attribution
 
-To be selected by the repository owner before public release. Do not invent or add a license without operator authorization.
+No open-source license has been selected by the repository owner; do not redistribute the repository or assets without permission. The Assay logo is operator-supplied and committed at `apps/web/public/brand/assay-logo.png`. The four AVIF design inspiration references under `design/reference/` are licensed inspiration only, are Git-ignored, and are not redistributed. Third-party libraries retain their own licenses; see lockfiles and package metadata.
