@@ -95,12 +95,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Image src="/brand/assay-logo.png" alt="Assay" width={40} height={40} priority className="size-10 rounded-xl" />
             <span>
               <span className="block text-sm font-bold uppercase tracking-[0.24em]">Assay</span>
-              <span className="block text-[10px] uppercase tracking-[0.16em] text-white/50">Covenant operations</span>
+              <span className="block text-[10px] uppercase tracking-[0.16em] text-white/70">Covenant operations</span>
             </span>
           </Link>
           <button
             type="button"
-            className="rounded-full p-2 text-white/70 hover:bg-white/10 hover:text-white lg:hidden"
+            className="rounded-full p-2 text-white/75 hover:bg-white/10 hover:text-white lg:hidden"
             onClick={() => setMobileOpen(false)}
             aria-label="Close navigation"
           >
@@ -109,22 +109,22 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
 
         <div className="scrollbar-thin flex-1 overflow-y-auto px-4 py-6">
-          <p className="px-3 pb-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/35">Monitor</p>
-          <nav className="space-y-1">
+          <p className="px-3 pb-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/65">Monitor</p>
+          <nav aria-label="Monitor navigation" className="space-y-1">
             {nav.primaryNav.map((item) => (
               <NavItem key={item.href} item={item} active={pathname === item.href || pathname.startsWith(`${item.href}/`)} />
             ))}
           </nav>
 
-          <p className="mt-8 px-3 pb-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/35">Controls</p>
-          <nav className="space-y-1">
+          <p className="mt-8 px-3 pb-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/65">Controls</p>
+          <nav aria-label="Controls navigation" className="space-y-1">
             {nav.controlNav.map((item) => (
               <NavItem key={item.href} item={item} active={pathname === item.href || pathname.startsWith(`${item.href}/`)} />
             ))}
           </nav>
 
-          <p className="mt-8 px-3 pb-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/35">Workspace</p>
-          <nav className="space-y-1">
+          <p className="mt-8 px-3 pb-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/65">Workspace</p>
+          <nav aria-label="Workspace navigation" className="space-y-1">
             {nav.systemNav.map((item) => (
               <NavItem key={item.href} item={item} active={pathname === item.href || pathname.startsWith(`${item.href}/`)} />
             ))}
@@ -134,7 +134,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="border-t border-white/10 p-4">
           <div className="rounded-2xl bg-white/[0.06] p-4">
             <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-acid">Credit workspace</p>
-            <p className="mt-2 text-xs leading-5 text-white/60">
+            <p className="mt-2 text-xs leading-5 text-white/75">
               Synthetic borrowers only. No real credit, borrower or production data.
             </p>
           </div>
@@ -181,9 +181,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <span className="hidden sm:inline">Provider status</span>
                 <ArrowUpRight className="size-3.5" />
               </Link>
-              <div className="grid size-9 place-items-center rounded-full border border-line bg-acid text-xs font-bold text-ink" aria-label="Signed-in role: Credit Analyst">
-                MC
-              </div>
+              <Link
+                href="/settings"
+                prefetch={false}
+                className="grid size-9 place-items-center rounded-full border border-line bg-acid text-xs font-bold text-ink transition hover:bg-acid-soft"
+                aria-label="Workspace account settings"
+                title="Workspace account settings"
+              >
+                AS
+              </Link>
             </div>
           </div>
         </header>
@@ -234,13 +240,14 @@ function NavItem({
   return (
     <Link
       href={item.href}
+      prefetch={false}
       aria-current={active ? "page" : undefined}
       className={cn(
         "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition",
-        active ? "bg-acid font-semibold text-ink" : "text-white/60 hover:bg-white/10 hover:text-white",
+        active ? "bg-acid font-semibold text-ink" : "text-white/75 hover:bg-white/10 hover:text-white",
       )}
     >
-      <Icon className={cn("size-4", active ? "text-ink" : "text-white/50")} />
+      <Icon className={cn("size-4", active ? "text-ink" : "text-white/70")} />
       <span>{item.label}</span>
     </Link>
   );

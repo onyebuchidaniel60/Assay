@@ -63,7 +63,7 @@ export default async function EvaluationsPage({
               </thead>
               <tbody>
                 {evaluations.map((evaluation) => (
-                  <tr key={evaluation.id} className="border-b border-line/70 last:border-0">
+                  <tr key={evaluation.id} className="border-b border-line/70 transition hover:bg-canvas/50 last:border-0">
                     <td className="px-5 py-4 sm:px-7 font-mono text-xs">{evaluation.providerEvalId ?? evaluation.id.slice(0, 8)}</td>
                     <td className="px-3 py-4"><StatusBadge tone={evaluation.status === "COMPLETED" ? "positive" : evaluation.status === "FAILED" || evaluation.status === "TIMEOUT" ? "danger" : "warning"}>{evaluation.status}</StatusBadge></td>
                     <td className="px-3 py-4 font-mono text-xs">{evaluation.score ?? "—"}</td>

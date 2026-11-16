@@ -58,9 +58,16 @@ export default async function CovenantsPage({
           <h2 className="mt-2 text-2xl font-semibold tracking-tight">Confirmed covenant snapshots</h2>
         </div>
         {covenantRuns.length === 0 && !loadError ? (
-          <p className="p-6 text-sm text-muted">
-            No confirmed covenant terms yet. Confirm terms on an analysis run to populate the register.
-          </p>
+          <div className="p-10 text-center">
+            <Scale className="mx-auto size-8 text-muted" />
+            <p className="mt-4 text-lg font-semibold">No confirmed covenant terms yet</p>
+            <p className="mx-auto mt-2 max-w-md text-sm text-muted">
+              Confirm extracted terms on an analysis run to populate the covenant register.
+            </p>
+            <Link href="/analysis-runs" className="mt-5 inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2.5 text-xs font-semibold text-paper">
+              Open analysis runs <ArrowUpRight className="size-3.5" />
+            </Link>
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[880px] text-left text-sm">
@@ -77,7 +84,7 @@ export default async function CovenantsPage({
               </thead>
               <tbody>
                 {covenantRuns.map((run) => (
-                  <tr key={run.id} className="border-b border-line/70 last:border-0">
+                  <tr key={run.id} className="border-b border-line/70 transition hover:bg-canvas/50 last:border-0">
                     <td className="px-5 py-4 sm:px-7">
                       <span className="font-semibold">{run.borrowerAlias ?? run.borrowerReference}</span>
                       <span className="mt-0.5 block text-xs text-muted">{run.facilityLabel} · {run.facilityReference}</span>

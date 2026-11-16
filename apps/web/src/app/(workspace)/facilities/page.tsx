@@ -115,7 +115,7 @@ export default async function FacilitiesPage({
               </thead>
               <tbody>
                 {facilities.map((facility) => (
-                  <tr key={facility.id} className="border-b border-line/70 last:border-0">
+                  <tr key={facility.id} className="border-b border-line/70 transition hover:bg-canvas/50 last:border-0">
                     <td className="px-5 py-4 sm:px-7">
                       <span className="font-semibold">{facility.label}</span>
                       <span className="mt-0.5 block text-xs text-muted">{facility.borrowerAlias}</span>

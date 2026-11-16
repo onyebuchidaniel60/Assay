@@ -116,8 +116,15 @@ export default async function AuditPage({
       ) : null}
 
       {borrowers.length === 0 && !loadError ? (
-        <section className="rounded-3xl border border-dashed border-ink/20 bg-paper p-10 text-center text-sm text-muted">
-          Create a synthetic borrower to start an audit chain.
+        <section className="rounded-3xl border border-dashed border-ink/20 bg-paper p-10 text-center">
+          <ShieldCheck className="mx-auto size-8 text-muted" />
+          <h2 className="mt-4 text-xl font-semibold">No audit chains yet</h2>
+          <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted">
+            Create a synthetic borrower to initialize its Ed25519-signed SHA-256 audit chain.
+          </p>
+          <Link href="/borrowers/new" className="mt-5 inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2.5 text-xs font-semibold text-paper">
+            New borrower
+          </Link>
         </section>
       ) : null}
 
@@ -147,7 +154,7 @@ export default async function AuditPage({
                 </thead>
                 <tbody>
                   {[...events].reverse().map((event) => (
-                    <tr key={event.id} className="border-b border-line/70 last:border-0">
+                    <tr key={event.id} className="border-b border-line/70 transition hover:bg-canvas/50 last:border-0">
                       <td className="px-5 py-4 font-mono text-xs sm:px-7">{String(event.sequenceNo).padStart(4, "0")}</td>
                       <td className="px-3 py-4">
                         <span className="font-semibold">{event.eventType.replaceAll("_", " ")}</span>

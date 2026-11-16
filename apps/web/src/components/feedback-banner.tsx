@@ -2,14 +2,14 @@ export function FeedbackBanner({ error, message, ok }: { error?: string | undefi
   if (!error && !ok) return null;
   if (error) {
     return (
-      <div role="alert" className="rounded-2xl border border-danger/25 bg-danger/10 px-4 py-3 text-sm text-danger">
+      <div role="alert" className="rounded-2xl border border-danger/30 bg-[#fee4e2] px-4 py-3 text-sm text-danger">
         <p className="font-semibold">{error.replaceAll("_", " ")}</p>
-        <p className="mt-1 text-danger/80">{message ?? "The action could not be completed."}</p>
+        <p className="mt-1 text-danger">{message ?? "The action could not be completed."}</p>
       </div>
     );
   }
   return (
-    <div role="status" className="rounded-2xl border border-positive/25 bg-positive/10 px-4 py-3 text-sm text-positive">
+    <div role="status" className="rounded-2xl border border-positive/30 bg-[#e6f4ed] px-4 py-3 text-sm font-medium text-positive">
       {ok}
     </div>
   );

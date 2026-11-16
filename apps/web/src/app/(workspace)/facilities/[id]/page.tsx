@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowUpRight, FileSearch, FileText, Plus, ShieldCheck, Upload } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, FileSearch, FileText, Plus, ShieldCheck } from "lucide-react";
 import { PageHeader, SectionLabel } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
 import { FeedbackBanner } from "@/components/feedback-banner";
+import { DocumentUploadForm } from "@/components/document-upload-form";
 import { apiFetch, errorCode, errorMessage, getMe, type ApiEnvelope, type FacilityDetail } from "@/lib/api-server";
-import { createAnalysisAction, uploadDocumentAction } from "@/lib/actions";
+import { createAnalysisAction } from "@/lib/actions";
 import { formatDateTime } from "@/lib/money";
 
 export const metadata = { title: "Facility detail" };
@@ -78,18 +79,18 @@ export default async function FacilityDetailPage({
             </dl>
           </div>
           <div className="rounded-3xl bg-ink p-5 text-paper sm:p-7">
-            <SectionLabel><span className="text-white/50">Latest run</span></SectionLabel>
+            <SectionLabel><span className="text-white/70">Latest run</span></SectionLabel>
             {latestRun ? (
               <>
                 <p className="mt-5 text-3xl font-semibold">Run #{latestRun.runNumber}</p>
-                <p className="mt-2 text-sm text-white/60">Status {latestRun.status.replaceAll("_", " ").toLowerCase()}</p>
+                <p className="mt-2 text-sm text-white/75">Status {latestRun.status.replaceAll("_", " ").toLowerCase()}</p>
                 <div className="mt-6 grid grid-cols-2 gap-3">
                   <div className="rounded-2xl bg-acid p-4 text-ink">
                     <p className="text-[10px] uppercase tracking-[0.14em]">Result</p>
                     <p className="mt-2 text-lg font-semibold">{latestRun.resultCode ?? "Pending"}</p>
                   </div>
-                  <div className="rounded-2xl border border-white/10 p-4">
-                    <p className="text-[10px] uppercase tracking-[0.14em] text-white/50">Updated</p>
+                  <div className="rounded-2xl border border-white/15 p-4">
+                    <p className="text-[10px] uppercase tracking-[0.14em] text-white/70">Updated</p>
                     <p className="mt-2 text-sm font-semibold">{formatDateTime(latestRun.updatedAt)}</p>
                   </div>
                 </div>
@@ -100,10 +101,10 @@ export default async function FacilityDetailPage({
             ) : (
               <>
                 <p className="mt-5 text-2xl font-semibold">No analysis run</p>
-                <p className="mt-2 text-sm leading-6 text-white/60">Upload one agreement, then create the immutable run.</p>
+                <p className="mt-2 text-sm leading-6 text-white/75">Upload one agreement, then create the immutable run.</p>
               </>
             )}
-            <p className="mt-5 text-xs leading-5 text-white/40">
+            <p className="mt-5 text-xs leading-5 text-white/70">
               Actual compliance and stress scenarios are stored separately. A stress breach never relabels the actual result.
             </p>
           </div>
@@ -115,19 +116,7 @@ export default async function FacilityDetailPage({
               <SectionLabel>Evidence</SectionLabel>
               <h2 className="mt-2 text-2xl font-semibold tracking-tight">Agreement documents</h2>
             </div>
-            {me.capabilities.writeCovenant ? (
-              <form action={uploadDocumentAction} encType="multipart/form-data" className="flex flex-wrap items-center gap-2">
-                <input type="hidden" name="facilityId" value={facility.id} />
-                <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-line bg-paper px-4 py-2 text-xs font-semibold text-ink hover:border-ink/30">
-                  <Upload className="size-3.5" />
-                  <span>Choose PDF/TXT</span>
-                  <input type="file" name="file" accept=".pdf,.txt,application/pdf,text/plain" required className="sr-only" />
-                </label>
-                <button type="submit" className="inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2 text-xs font-semibold text-paper">
-                  Upload agreement
-                </button>
-              </form>
-            ) : null}
+            {me.capabilities.writeCovenant ? <DocumentUploadForm facilityId={facility.id} /> : null}
           </div>
 
           {facility.documents.length === 0 ? (
@@ -199,7 +188,7 @@ export default async function FacilityDetailPage({
                 </thead>
                 <tbody>
                   {facility.analysisRuns.map((run) => (
-                    <tr key={run.id} className="border-b border-line/70 last:border-0">
+                    <tr key={run.id} className="border-b border-line/70 transition hover:bg-canvas/50 last:border-0">
                       <td className="py-4 pr-3 font-semibold">#{run.runNumber}</td>
                       <td className="px-3 py-4"><StatusBadge>{run.status}</StatusBadge></td>
                       <td className="px-3 py-4 text-xs">{run.resultCode ?? "—"}</td>

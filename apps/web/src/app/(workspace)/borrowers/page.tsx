@@ -125,7 +125,7 @@ export default async function BorrowersPage({
               </thead>
               <tbody>
                 {borrowers.map((borrower) => (
-                  <tr key={borrower.id} className="border-b border-line/70 last:border-0">
+                  <tr key={borrower.id} className="border-b border-line/70 transition hover:bg-canvas/50 last:border-0">
                     <td className="px-5 py-4 font-semibold sm:px-7">{borrower.displayAlias}</td>
                     <td className="px-3 py-4 font-mono text-xs text-muted">{borrower.referenceToken}</td>
                     <td className="px-3 py-4">{borrower.facilityCount ?? 0}</td>

@@ -169,7 +169,7 @@ export default async function IntegrationsPage() {
         <section className="rounded-3xl border border-line bg-paper p-5">
           <SectionLabel>Deployment</SectionLabel>
           <div className="mt-3 space-y-2 text-sm">
-            <p className="flex items-center justify-between"><span className="text-muted">Vercel</span><span className="font-semibold">Authenticated production</span></p>
+            <p className="flex items-center justify-between"><span className="text-muted">Vercel</span><span className="font-semibold">Public production · invite-only</span></p>
             <p className="flex items-center justify-between"><span className="text-muted">Render</span><span className="font-semibold">API + Presidio live</span></p>
             <p className="flex items-center justify-between"><span className="text-muted">Production</span><span className="font-semibold">Live · smoke tested</span></p>
           </div>
@@ -178,12 +178,12 @@ export default async function IntegrationsPage() {
           </Link>
         </section>
         <section className="rounded-3xl bg-ink p-5 text-paper">
-          <SectionLabel><span className="text-white/50">Wording guardrail</span></SectionLabel>
-          <p className="mt-3 text-sm leading-6 text-white/70">
+          <SectionLabel><span className="text-white/70">Wording guardrail</span></SectionLabel>
+          <p className="mt-3 text-sm leading-6 text-white/80">
             &ldquo;Sensitive inference is routed to NEAR AI Cloud&apos;s TEE-attested gateway. Each extraction is verified
             against fresh Intel TDX and NVIDIA NRAS evidence bound to a request nonce.&rdquo;
           </p>
-          <p className="mt-3 text-xs leading-5 text-white/40">
+          <p className="mt-3 text-xs leading-5 text-white/70">
             The proof proves only that the private witness satisfies the fixed circuit predicate. It does not prove that the
             source figures are accurate.
           </p>

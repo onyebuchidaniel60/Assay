@@ -229,9 +229,9 @@ export default async function AnalysisRunPage({
         {inProgress ? <AutoRefresh label={`${status.replaceAll("_", " ").toLowerCase()} — refreshing automatically`} /> : null}
 
         {status === "FAILED" && analystReport?.run.failureCode ? (
-          <div role="alert" className="rounded-2xl border border-danger/25 bg-danger/10 px-4 py-4 text-sm text-danger">
+          <div role="alert" className="rounded-2xl border border-danger/30 bg-[#fee4e2] px-4 py-4 text-sm text-danger">
             <p className="flex items-center gap-2 font-semibold"><ShieldAlert className="size-4" /> Run stopped: {analystReport.run.failureCode.replaceAll("_", " ")}</p>
-            <p className="mt-1 text-danger/80">No approval is possible from this snapshot. Correct the cause and create a new analysis run.</p>
+            <p className="mt-1 text-danger">No approval is possible from this snapshot. Correct the cause and create a new analysis run.</p>
           </div>
         ) : null}
 
@@ -269,7 +269,7 @@ export default async function AnalysisRunPage({
                   {redaction.pages.map((page) => (
                     <details key={page.number} open={page.number === 1} className="rounded-2xl border border-line bg-white/40 p-4">
                       <summary className="cursor-pointer text-sm font-semibold">Page {page.number}</summary>
-                      <pre className="mt-3 max-h-80 overflow-auto whitespace-pre-wrap break-words font-sans text-xs leading-6 text-ink">{page.text}</pre>
+                      <pre tabIndex={0} aria-label={`Page ${page.number} redacted text`} className="mt-3 max-h-80 overflow-auto whitespace-pre-wrap break-words font-sans text-xs leading-6 text-ink">{page.text}</pre>
                     </details>
                   ))}
                 </div>
@@ -284,7 +284,7 @@ export default async function AnalysisRunPage({
                   <form action={rejectRedactionAction} className="flex flex-wrap items-center gap-2">
                     <input type="hidden" name="runId" value={analystReport.run.id} />
                     <input type="hidden" name="revision" value={redaction.revision} />
-                    <input name="rationale" placeholder="Reason for stopping" className="rounded-full border border-line bg-white/60 px-4 py-2.5 text-xs outline-none focus:border-ink" />
+                    <input name="rationale" aria-label="Reason for stopping redaction review" placeholder="Reason for stopping" className="rounded-full border border-line bg-white/60 px-4 py-2.5 text-xs outline-none focus:border-ink" />
                     <button type="submit" className="rounded-full border border-danger/30 px-4 py-2.5 text-xs font-semibold text-danger">Stop run</button>
                   </form>
                 </div>
@@ -391,7 +391,7 @@ export default async function AnalysisRunPage({
                     <input type="hidden" name="runId" value={analystReport.run.id} />
                     <input type="hidden" name="decision" value="REJECT" />
                     <input type="hidden" name="revision" value={analystReport.run.version} />
-                    <input name="rationale" placeholder="Rejection reason" className="rounded-full border border-line bg-white/60 px-4 py-2.5 text-xs outline-none focus:border-ink" />
+                    <input name="rationale" aria-label="Reason for rejecting covenant terms" placeholder="Rejection reason" className="rounded-full border border-line bg-white/60 px-4 py-2.5 text-xs outline-none focus:border-ink" />
                     <button type="submit" className="rounded-full border border-danger/30 px-4 py-2.5 text-xs font-semibold text-danger">Reject terms</button>
                   </form>
                 </div>
@@ -584,10 +584,10 @@ export default async function AnalysisRunPage({
             ) : null}
 
             {status === "BREACH_REVIEW" ? (
-              <section className="rounded-3xl border border-danger/25 bg-danger/10 p-5 sm:p-7">
+              <section className="rounded-3xl border border-danger/30 bg-[#fee4e2] p-5 sm:p-7">
                 <SectionLabel><span className="text-danger">Breach review</span></SectionLabel>
                 <h2 className="mt-2 text-2xl font-semibold text-danger">Actual baseline breach</h2>
-                <p className="mt-3 max-w-3xl text-sm leading-6 text-danger/80">
+                <p className="mt-3 max-w-3xl text-sm leading-6 text-danger">
                   No compliance proof is generated for a breach and there is no manager override. Create a corrected run if
                   the underlying evidence changes.
                 </p>
@@ -595,13 +595,13 @@ export default async function AnalysisRunPage({
             ) : null}
 
             {analystReport.approval ? (
-              <section className="rounded-3xl border border-positive/25 bg-positive/10 p-5 sm:p-7">
+              <section className="rounded-3xl border border-positive/30 bg-[#e6f4ed] p-5 sm:p-7">
                 <SectionLabel><span className="text-positive">Manager decision</span></SectionLabel>
                 <h2 className="mt-2 text-2xl font-semibold text-positive">{analystReport.approval.decision}</h2>
-                <p className="mt-2 text-sm text-positive/80">
+                <p className="mt-2 text-sm text-positive">
                   Version {analystReport.approval.analysisVersion} · {formatDateTime(analystReport.approval.decidedAt)}
                 </p>
-                {analystReport.approval.rationale ? <p className="mt-3 text-sm leading-6 text-positive/80">{analystReport.approval.rationale}</p> : null}
+                {analystReport.approval.rationale ? <p className="mt-3 text-sm leading-6 text-positive">{analystReport.approval.rationale}</p> : null}
               </section>
             ) : null}
 
@@ -707,13 +707,13 @@ export default async function AnalysisRunPage({
                 </p>
               </div>
               <div className="rounded-3xl bg-ink p-5 text-paper sm:p-7">
-                <SectionLabel><span className="text-white/50">Proof</span></SectionLabel>
+                <SectionLabel><span className="text-white/70">Proof</span></SectionLabel>
                 <p className="mt-5 text-2xl font-semibold">{managerReport.proof?.status ?? "Not generated"}</p>
-                <p className="mt-2 text-sm text-white/60">{managerReport.proof?.verified ? "Verified for this exact snapshot" : "Approval requires a verified proof"}</p>
+                <p className="mt-2 text-sm text-white/75">{managerReport.proof?.verified ? "Verified for this exact snapshot" : "Approval requires a verified proof"}</p>
                 <div className="mt-6 space-y-2">
                   {managerReport.scenarioBands.map((band) => (
-                    <div key={band.scenario} className="flex items-center justify-between rounded-2xl border border-white/10 px-4 py-3 text-xs">
-                      <span className="text-white/60">{band.scenario.replaceAll("_", " ")}</span>
+                    <div key={band.scenario} className="flex items-center justify-between rounded-2xl border border-white/15 px-4 py-3 text-xs">
+                      <span className="text-white/75">{band.scenario.replaceAll("_", " ")}</span>
                       <span className="font-semibold">{band.result}{band.riskBand ? ` · ${band.riskBand}` : ""}</span>
                     </div>
                   ))}
@@ -758,10 +758,10 @@ export default async function AnalysisRunPage({
             ) : null}
 
             {managerReport.approval ? (
-              <section className="rounded-3xl border border-positive/25 bg-positive/10 p-5 sm:p-7">
+              <section className="rounded-3xl border border-positive/30 bg-[#e6f4ed] p-5 sm:p-7">
                 <SectionLabel><span className="text-positive">Decision recorded</span></SectionLabel>
                 <h2 className="mt-2 text-2xl font-semibold text-positive">{managerReport.approval.decision}</h2>
-                <p className="mt-2 text-sm text-positive/80">Version {managerReport.approval.analysisVersion} · {formatDateTime(managerReport.approval.decidedAt)}</p>
+                <p className="mt-2 text-sm text-positive">Version {managerReport.approval.analysisVersion} · {formatDateTime(managerReport.approval.decidedAt)}</p>
               </section>
             ) : null}
           </>
@@ -803,7 +803,7 @@ export default async function AnalysisRunPage({
                   </>
                 ) : null}
                 {auditorReport.approval ? (
-                  <div className="mt-5 rounded-2xl border border-positive/25 bg-positive/10 p-4 text-xs text-positive">
+                  <div className="mt-5 rounded-2xl border border-positive/30 bg-[#e6f4ed] p-4 text-xs text-positive">
                     <p className="font-semibold">{auditorReport.approval.decision} · version {auditorReport.approval.analysisVersion}</p>
                     <p className="mt-1">Manager {auditorReport.approval.managerId}</p>
                     <p className="mt-1 break-all">Proof {auditorReport.approval.proofArtifactId}</p>

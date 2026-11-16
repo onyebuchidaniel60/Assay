@@ -112,17 +112,17 @@ export default async function ApprovalsPage({
                 ))}
               </dl>
               <div className="rounded-2xl bg-ink p-4 text-paper">
-                <p className="text-[10px] uppercase tracking-[0.14em] text-white/50">Scenario bands</p>
+                <p className="text-[10px] uppercase tracking-[0.14em] text-white/70">Scenario bands</p>
                 <div className="mt-3 space-y-2">
                   {item.scenarioBands.map((band) => (
                     <div key={band.scenario} className="flex items-center justify-between gap-2 text-xs">
-                      <span className="text-white/60">{band.scenario.replaceAll("_", " ")}</span>
+                      <span className="text-white/75">{band.scenario.replaceAll("_", " ")}</span>
                       <span className="font-semibold">{band.result}{band.riskBand ? ` · ${band.riskBand}` : ""}</span>
                     </div>
                   ))}
                 </div>
                 {item.stressedBreach ? (
-                  <p className="mt-4 flex items-start gap-2 rounded-xl border border-warning/30 px-3 py-2 text-[11px] leading-5 text-warning">
+                  <p className="mt-4 flex items-start gap-2 rounded-xl border border-acid/40 bg-acid/10 px-3 py-2 text-[11px] leading-5 text-acid">
                     <ShieldCheck className="mt-0.5 size-3.5 shrink-0" /> A stress scenario breaches. Approval requires risk acknowledgement and a rationale.
                   </p>
                 ) : null}

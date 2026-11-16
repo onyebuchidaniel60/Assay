@@ -50,9 +50,9 @@ export default async function EvaluationDetailPage({
         {pending ? <AutoRefresh intervalMs={60000} label="PENDING — polling every 60 seconds" /> : null}
 
         {evaluation.errorCode ? (
-          <div role="alert" className="rounded-2xl border border-danger/25 bg-danger/10 px-4 py-3 text-sm text-danger">
+          <div role="alert" className="rounded-2xl border border-danger/30 bg-[#fee4e2] px-4 py-3 text-sm text-danger">
             <p className="flex items-center gap-2 font-semibold"><ShieldAlert className="size-4" /> {evaluation.errorCode}</p>
-            <p className="mt-1 text-danger/80">{evaluation.errorMessage ?? "The provider did not return a verdict."}</p>
+            <p className="mt-1 text-danger">{evaluation.errorMessage ?? "The provider did not return a verdict."}</p>
           </div>
         ) : null}
 
@@ -91,7 +91,7 @@ export default async function EvaluationDetailPage({
           </div>
           <div className="rounded-3xl border border-line bg-paper p-5 sm:p-7">
             <SectionLabel>Returned verdict</SectionLabel>
-            <pre className="mt-4 max-h-[28rem] overflow-auto whitespace-pre-wrap break-words rounded-2xl border border-line bg-white/50 p-4 font-mono text-[11px] leading-5">
+            <pre tabIndex={0} aria-label="Returned provider verdict JSON" className="mt-4 max-h-[28rem] overflow-auto whitespace-pre-wrap break-words rounded-2xl border border-line bg-white/50 p-4 font-mono text-[11px] leading-5">
               {evaluation.result ? JSON.stringify(evaluation.result, null, 2) : evaluation.status === "PENDING" ? "No verdict yet. The provider evaluation is still pending." : "No verdict object was returned."}
             </pre>
           </div>

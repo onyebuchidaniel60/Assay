@@ -72,13 +72,13 @@ export default async function BorrowerDetailPage({
             </dl>
           </div>
           <div className="rounded-3xl bg-ink p-5 text-paper sm:p-7">
-            <SectionLabel><span className="text-white/50">Key scope</span></SectionLabel>
+            <SectionLabel><span className="text-white/70">Key scope</span></SectionLabel>
             <p className="mt-5 text-2xl font-semibold">Per-borrower DEK</p>
-            <p className="mt-2 text-sm leading-6 text-white/60">
+            <p className="mt-2 text-sm leading-6 text-white/75">
               Documents, financial snapshots, scenario details and audit payloads are sealed with AES-256-GCM under this
               borrower&apos;s data key. The wrapped key is stored separately from the ciphertext.
             </p>
-            <p className="mt-5 text-xs text-white/40">Active · key version 1 · crypto-shred disabled by environment policy</p>
+            <p className="mt-5 text-xs text-white/70">Active · key version 1 · crypto-shred disabled by environment policy</p>
           </div>
         </section>
 

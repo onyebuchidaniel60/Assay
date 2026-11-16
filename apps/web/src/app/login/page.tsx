@@ -88,7 +88,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
       </section>
 
       <aside className="hidden bg-ink px-10 py-10 text-paper lg:flex lg:flex-col lg:justify-between">
-        <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/50">
+        <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/70">
           <KeyRound className="size-3.5" /> Control boundary
         </div>
         <div>
@@ -98,15 +98,15 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
             <br />
             exact versions.
           </h2>
-          <div className="mt-8 space-y-4 border-t border-white/10 pt-6 text-sm leading-6 text-white/60">
+          <div className="mt-8 space-y-4 border-t border-white/10 pt-6 text-sm leading-6 text-white/75">
             <p>Analysts confirm redaction, terms and financial inputs before any model call.</p>
             <p>Managers see a restricted summary, proof state and scenario risk — not raw financial values.</p>
             <p>Every approval is bound to an immutable snapshot and becomes stale when material evidence changes.</p>
           </div>
         </div>
-        <div className="flex items-center justify-between border-t border-white/10 pt-6 text-xs text-white/50">
+        <div className="flex items-center justify-between border-t border-white/10 pt-6 text-xs text-white/70">
           <span className="flex items-center gap-2"><Image src="/brand/assay-logo.png" alt="Assay" width={18} height={18} className="size-4 rounded" /> Assay · synthetic data</span>
-          <Link href="/" className="inline-flex items-center gap-1 text-white/70 hover:text-white">
+          <Link href="/" className="inline-flex items-center gap-1 text-white/80 hover:text-white">
             <ArrowLeft className="size-3.5" /> Back
           </Link>
         </div>

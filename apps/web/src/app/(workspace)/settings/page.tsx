@@ -85,17 +85,17 @@ export default async function SettingsPage({
         </section>
 
         <section className="rounded-3xl bg-ink p-5 text-paper sm:p-7">
-          <SectionLabel><span className="text-white/50">Security boundary</span></SectionLabel>
+          <SectionLabel><span className="text-white/70">Security boundary</span></SectionLabel>
           <p className="mt-5 flex items-center gap-2 text-xl font-semibold"><LockKeyhole className="size-5" /> Secrets stay server-side</p>
-          <p className="mt-3 text-sm leading-6 text-white/60">
+          <p className="mt-3 text-sm leading-6 text-white/75">
             Neon Auth, the database URL, object-storage keys, the data KEK, the Ed25519 audit key, Presidio and provider
             keys are server-only. The browser receives no provider secret and no raw borrower content outside an
             analyst-authorized document view.
           </p>
-          <div className="mt-5 rounded-2xl border border-white/10 p-4 text-xs leading-5 text-white/50">
+          <div className="mt-5 rounded-2xl border border-white/15 p-4 text-xs leading-5 text-white/75">
             Provider credentials are configured through the deployment secret store, not through this UI.
           </div>
-          <p className="mt-5 flex items-center gap-2 text-xs text-white/40"><ShieldCheck className="size-3.5" /> Manager approval is separate from any Kite payment authorization.</p>
+          <p className="mt-5 flex items-center gap-2 text-xs text-white/70"><ShieldCheck className="size-3.5" /> Manager approval is separate from any Kite payment authorization.</p>
         </section>
       </div>
 
@@ -115,7 +115,7 @@ export default async function SettingsPage({
             </thead>
             <tbody>
               {roles.map(([role, can, cannot]) => (
-                <tr key={role} className="border-b border-line/70 last:border-0">
+                <tr key={role} className="border-b border-line/70 transition hover:bg-canvas/50 last:border-0">
                   <td className="px-5 py-4 font-semibold sm:px-7">{role}</td>
                   <td className="px-3 py-4 text-xs leading-5 text-muted">{can}</td>
                   <td className="px-5 py-4 text-xs leading-5 text-muted sm:px-7">{cannot}</td>
