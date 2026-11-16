@@ -96,7 +96,7 @@ See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for every variable and [docs/
 - **Preview:** `https://assay-uhhh2.vercel.app` (protected by Vercel Authentication)
 - **API health:** `https://assay-api-7hy0.onrender.com/health/live`
 - **Presidio:** `https://assay-presidio.onrender.com/health`
-- **Demo video:** [`artifacts/demo/assay-demo-final.mp4`](artifacts/demo/assay-demo-final.mp4)
+- **Demo video:** [public release asset](https://github.com/onyebuchidaniel60/Assay/releases/download/demo-v1/assay-demo-final.mp4) · [local copy](artifacts/demo/assay-demo-final.mp4)
 - **Repository:** `https://github.com/onyebuchidaniel60/Assay`
 
 The preview requires an invited synthetic account; the public API health endpoint is available for availability checks. The demo video is the primary public walkthrough.

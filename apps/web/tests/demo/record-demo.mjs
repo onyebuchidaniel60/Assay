@@ -12,8 +12,8 @@ import { chromium } from "@playwright/test";
 const baseURL = process.env.DEMO_BASE_URL ?? "http://127.0.0.1:3000";
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../..");
 const outDir = path.join(repoRoot, "artifacts/demo/raw");
-const runId = process.env.DEMO_RUN_ID ?? "83b77b69-60c0-498e-b122-6405789efa94";
-const borrowerId = process.env.DEMO_BORROWER_ID ?? "7a755b9b-7e52-4ed4-8cc5-3efd9d20a472";
+const runId = process.env.DEMO_RUN_ID ?? "cca69468-53e3-429c-b6ff-d64f4c375ac0";
+const borrowerId = process.env.DEMO_BORROWER_ID ?? "d0031e48-7486-435f-915a-e1aed6037a8c";
 fs.mkdirSync(outDir, { recursive: true });
 
 const credentials = {
@@ -99,7 +99,7 @@ await scene("04-approval", "manager", async (page) => {
   await page.goto(`${baseURL}/approvals`, { waitUntil: "networkidle" });
   await wait(3000);
   await slowScroll(page, 380);
-  const card = page.locator("article").filter({ hasText: "BOR-013" }).first();
+  const card = page.locator("article").filter({ hasText: "BOR-018" }).first();
   await card.scrollIntoViewIfNeeded();
   await wait(1800);
   await card.locator('select[name="decision"]').selectOption("APPROVE");
@@ -121,7 +121,17 @@ await scene("04-approval", "manager", async (page) => {
 
 }
 
-await scene("05-audit", "auditor", async (page) => {
+await scene("05-evaluations", "analyst", async (page) => {
+  await page.goto(`${baseURL}/evaluations`, { waitUntil: "networkidle" });
+  await wait(2500);
+  await page.getByRole("link", { name: "Open", exact: true }).first().click();
+  await page.waitForLoadState("networkidle");
+  await wait(3000);
+  await slowScroll(page, 360);
+  await slowScroll(page, 360);
+});
+
+await scene("06-audit", "auditor", async (page) => {
   await page.goto(`${baseURL}/audit?borrower=${borrowerId}`, { waitUntil: "networkidle" });
   await wait(2500);
   await page.getByRole("button", { name: /Verify chain/i }).click();
@@ -130,7 +140,7 @@ await scene("05-audit", "auditor", async (page) => {
   await slowScroll(page, 420);
 });
 
-await scene("06-integrations", "analyst", async (page) => {
+await scene("07-integrations", "analyst", async (page) => {
   await page.goto(`${baseURL}/integrations`, { waitUntil: "networkidle" });
   await wait(2500);
   await slowScroll(page, 420);

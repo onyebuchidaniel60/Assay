@@ -70,3 +70,20 @@ test.describe("Assay authenticated workspace", () => {
     await expect(page.getByText(/Secrets stay server-side/i)).toBeVisible();
   });
 });
+
+test.describe("Assay final presentation", () => {
+  test("logo, favicon and live Reppo verdict are visible", async ({ page }) => {
+    await signIn(page, analystEmail, analystPassword);
+    await page.goto("/dashboard");
+    await expect(page.getByRole("img", { name: "Assay" }).first()).toBeVisible();
+    const favicon = await page.request.get("/favicon.ico");
+    expect(favicon.ok()).toBeTruthy();
+    await page.goto("/evaluations");
+    await expect(page.getByText("COMPLETED").first()).toBeVisible();
+    await expect(page.getByText("98", { exact: true }).first()).toBeVisible();
+    await page.getByRole("link", { name: "Open", exact: true }).first().click();
+    await expect(page.getByText("accept", { exact: true }).first()).toBeVisible();
+    await expect(page.getByText("low", { exact: true }).first()).toBeVisible();
+    await expect(page.getByText("review", { exact: true }).first()).toBeVisible();
+  });
+});

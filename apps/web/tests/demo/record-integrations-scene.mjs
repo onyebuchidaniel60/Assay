@@ -1,0 +1,20 @@
+#!/usr/bin/env node
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { chromium } from "@playwright/test";
+const baseURL = process.env.DEMO_BASE_URL ?? "http://127.0.0.1:3000";
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../..");
+const outDir = path.join(repoRoot, "artifacts/demo/raw");
+fs.mkdirSync(outDir, { recursive: true });
+const browser = await chromium.launch();
+const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, recordVideo: { dir: outDir, size: { width: 1440, height: 900 } } });
+const page = await context.newPage();
+const signIn = await page.request.post(`${baseURL}/api/auth/sign-in/email`, { data: { email: process.env.DEMO_ANALYST_EMAIL, password: process.env.DEMO_ANALYST_PASSWORD } });
+if (!signIn.ok()) throw new Error("Analyst sign-in failed.");
+await page.goto(`${baseURL}/integrations`, { waitUntil: "networkidle" });
+await page.waitForTimeout(3000);
+await page.mouse.wheel(0, 500); await page.waitForTimeout(2200);
+await page.mouse.wheel(0, 420); await page.waitForTimeout(2600);
+const video = page.video(); await context.close(); await browser.close();
+const saved = await video.path(); fs.renameSync(saved, path.join(outDir, "07-integrations.webm")); console.log("recorded 07-integrations");

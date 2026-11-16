@@ -17,7 +17,15 @@ export type AuthUser = {
 };
 
 function cookieHeader(request: FastifyRequest): string {
-  return typeof request.headers.cookie === "string" ? request.headers.cookie : "";
+  const raw = typeof request.headers.cookie === "string" ? request.headers.cookie : "";
+  // The web proxy may keep a short-lived signed session_data cache for page
+  // navigation. The API must not trust it; strip it so Neon Auth validates the
+  // actual session token on every protected request.
+  return raw
+    .split(";")
+    .map((part) => part.trim())
+    .filter((part) => part.length > 0 && !part.startsWith("__Secure-neon-auth.local.session_data=") && !part.startsWith("neon-auth.local.session_data="))
+    .join("; ");
 }
 
 function appendSetCookie(reply: FastifyReply, cookie: string) {

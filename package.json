@@ -12,9 +12,15 @@
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
     "lint": "pnpm -r lint",
-    "seed:workspace": "node --env-file=.env.local scripts/seed-demo-workspace.mjs"
+    "seed:workspace": "node --env-file=.env.local scripts/seed-demo-workspace.mjs",
+    "test:e2e": "pnpm --filter @assay/web exec playwright test"
   },
   "dependencies": {
     "pg": "8.23.1"
+  },
+  "pnpm": {
+    "overrides": {
+      "underscore": "1.13.8"
+    }
   }
 }

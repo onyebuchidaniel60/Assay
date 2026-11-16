@@ -1,13 +1,13 @@
 1
-00:00:02,500 --> 00:00:07,474
+00:00:02,500 --> 00:00:07,496
 Assay is a covenant operations workspace for synthetic credit
 data.
 
 2
-00:00:07,474 --> 00:00:19,500
+00:00:07,496 --> 00:00:19,500
 It turns a maximum leverage agreement into a reviewable
 decision trail: source-linked terms, deterministic arithmetic,
-a compliance proof, and a manager decision.
+a compliance proof and a manager decision.
 
 3
 00:00:19,500 --> 00:00:22,145
@@ -20,17 +20,17 @@ redaction step that must be confirmed before any external
 model sees the text.
 
 5
-00:00:32,500 --> 00:00:40,158
+00:00:32,500 --> 00:00:39,733
 Extraction returns one covenant with its threshold,
 definitions, permitted add-backs and verbatim evidence.
 
 6
-00:00:40,158 --> 00:00:48,818
+00:00:39,733 --> 00:00:47,912
 Every extraction is bound to fresh Intel TDX and NVIDIA NRAS
 attestation, a request nonce and a signed provider response.
 
 7
-00:00:48,818 --> 00:01:08,500
+00:00:47,912 --> 00:01:06,500
 The analyst confirms the terms. Attested financial inputs are
 converted to integer minor units and sealed. Decimal
 arithmetic produces the baseline and two stress scenarios, an
@@ -38,31 +38,47 @@ independent verifier recomputes the predicate, and a fixed
 circuit proves the baseline inequality.
 
 8
-00:01:08,500 --> 00:01:18,700
+00:01:06,500 --> 00:01:16,983
 The manager sees a deliberately restricted view: threshold,
 proof status and scenario bands, but no raw amounts or named
 counterparties.
 
 9
-00:01:18,700 --> 00:01:26,500
+00:01:16,983 --> 00:01:25,000
 Both stress cases breach, so approval requires an explicit
 risk acknowledgement and a written rationale.
 
 10
-00:01:26,500 --> 00:01:32,709
+00:01:25,000 --> 00:01:30,018
+Correction feedback can be submitted to Reppo's live Eval
+Router.
+
+11
+00:01:30,018 --> 00:01:41,905
+Only a 409-byte field-level trace is sent after a 50-kilobyte
+preflight; the returned score, decision, confidence and route
+are shown exactly as received.
+
+12
+00:01:41,905 --> 00:01:47,000
+Pending and failed states are never replaced by a fixture
+verdict.
+
+13
+00:01:47,000 --> 00:01:52,731
 The auditor verifies the per-borrower signed hash chain and
 sees
 
-11
-00:01:32,709 --> 00:01:39,500
+14
+00:01:52,731 --> 00:01:59,000
 the approval evidence, including the exact proof and analysis
 version.
 
-12
-00:01:39,500 --> 00:01:49,470
+15
+00:01:59,000 --> 00:02:08,141
 Provider status stays honest: NEAR AI attested, Kite testnet
-provider-blocked, Reppo disabled.
+provider-blocked, Reppo live.
 
-13
-00:01:49,470 --> 00:01:53,500
+16
+00:02:08,141 --> 00:02:12,000
 Assay records evidence, not a promise.
