@@ -84,9 +84,9 @@ Use Microsoft Presidio Analyzer and Anonymizer with the small spaCy model plus d
 
 Neon provides Postgres and managed Better Auth. Private S3-compatible storage holds encrypted documents and exports. Database/auth secrets remain server-only. Preview and development use separate projects/branches. No public object bucket.
 
-## Vercel — frontend preview
+## Vercel — frontend hosting
 
-Hobby/free plan only unless the operator raises the budget. Preview deployment requires explicit operator permission; production is not authorized.
+Hobby/free plan only. Production and preview deployments are protected by Vercel Authentication (Option B). The production deployment is `https://assay-omega-gray.vercel.app` at commit `de7c793`; `https://assay-uhhh2.vercel.app` aliases the same deployment. No paid plan, domain or add-on without explicit budget authority.
 
 ## Render — API and Presidio host
 

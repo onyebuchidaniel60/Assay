@@ -4,7 +4,7 @@
 **Intake completed:** 2026-11-15 (UTC)  
 **Repository:** `https://github.com/onyebuchidaniel60/Assay`  
 **Scope tier:** **CONFIRMED — Tier A (full blueprint).**  
-**Overall readiness:** **AUTHORIZED — credential presence mismatch.** The operator authorized Phases 1–9 and production, but the provider/database credentials asserted to be in `.env.local` are not present there. See §0.7. No application code, monorepo scaffold or deployment has been performed yet.
+**Overall readiness:** **COMPLETE — Phases 1–9 delivered, production deployed and smoke-tested.** The credential-presence mismatch in §0.7 was resolved on 15 November; see §4. Production release passed the full regression/security gate.
 
 This file records the single consolidated intake, the authoritative provider revision of 15 November 2026, the evidence gathered during the read-only inspection, and the exact operator actions still required before Phase 1.
 
@@ -84,7 +84,7 @@ It does **not** contain any of the following authorized-provider or database var
 
 Process-environment checks also show none of these names. The `.env.local` file was last written during the Kite setup; if provider values were added before that write, they may have been overwritten. Re-add them out-of-band; do not paste values into chat.
 
-**Consequence:** Phase 1 local scaffolding may proceed, but Phase 2/3 live database, auth, storage and provider integration and any full preview cannot be honestly completed until the credentials are present. The production authorization remains recorded, but release is gated by the full test/security matrix.
+**Consequence (historical):** Phase 1 local scaffolding could proceed immediately; live integration awaited the credentials. They were restored later on 15 November and every Phase 2–9 integration was completed and verified. The production authorization was exercised only after the full test/security matrix passed.
 
 ---
 
@@ -195,9 +195,9 @@ Additional observations:
 | Item | Required? | Status | Evidence / action |
 |---|---:|---|---|
 | Account access | Yes | `VALIDATED (CLI)` | Vercel CLI 65.8.0 authenticated as `onyebuchidaniel60-1034`; team `uhhh2`, Hobby plan |
-| Assay project | Yes | `ABSENT` | No Assay project listed |
-| Preview deployment permission | Yes | `BLOCKED` | CLI access does not equal explicit deployment authorization; operator must grant exact preview permission |
-| Production deployment permission | Yes | `NO` | Not authorized |
+| Assay project | Yes | `PRESENT` | `uhhh2/assay`; linked and deployed |
+| Preview deployment permission | Yes | `AUTHORIZED AND DEPLOYED` | Protected preview and stable alias verified |
+| Production deployment permission | Yes | `AUTHORIZED AND DEPLOYED` | `https://assay-omega-gray.vercel.app` at commit `de7c793`; Vercel Authentication enabled (Option B) |
 | Paid upgrade | No | `PROHIBITED` | Hobby/free only unless budget authority is added |
 
 ### 2.7 Render
@@ -273,16 +273,16 @@ The reference asset gate is **PASSED** for implementation. Do not copy the sourc
 | OpenRouter | Key, model IDs and live exact-model test validated | **PASS — live** |
 | SERV / OpenServ | Key, `serv-standard` exact model and live call validated | **PASS — live** |
 | Database/Neon | Connection string, auth/storage configuration and migrations verified | **PASS — 22 tables migrated** |
-| Vercel | Project access and preview deployment permission verified | **PASS (CLI access + authorization)** |
-| Render | API key present; deployment intentionally deferred to Phase 5 | **AUTHORIZED — deployment pending** |
+| Vercel | Preview and production deployment verified | **PASS — PRODUCTION LIVE** |
+| Render | API and Presidio deployed on free web services | **PASS — LIVE** |
 | Presidio | Deployment blocker resolved and recorded | **RESOLVED** |
 | Reppo | Live synthetic feedback evaluation with real provider verdict | **PASS — LIVE** |
 | Kite | Disabled or enabled with exact spend cap/asset/session | **ENABLED (TESTNET) — payment provider-blocked** |
 | Budget | Numeric ceiling and billing boundary recorded | **PASS — $0 new spend** |
-| Production | Explicit authority recorded or staging-only constraint honored | **AUTHORIZED — release gate applies** |
+| Production | Explicit authority recorded and full release gate passed | **PASS — DEPLOYED** |
 | Demo | Audience, pronunciation, redactions and output location set | **DEFAULTS RECORDED** |
 
-**Phases 1–4 are complete locally. The remaining gate is Phase 5 deployment/preview verification, the full regression/security matrix and the operator follow-ups below.**
+**Phases 1–9 are complete. Production is deployed at `de7c793`; the full regression/security matrix passed. Only operator-only submission actions remain below.**
 
 ---
 
@@ -299,6 +299,6 @@ Credentials are now present in `.env.local`. Verified on 15 November 2026:
 - Public sign-up is disabled (`disableSignUp=true`); a direct probe returned `400 EMAIL_PASSWORD_SIGN_UP_DISABLED`.
 - Full synthetic workflow, proof verification, manager approval, role restrictions and per-borrower audit verification passed; Playwright 18/18 desktop/mobile.
 
-**Render decision:** Option B — defer Render to Phase 5. Phases 2–4 run the API locally against Neon. No Render deployment is claimed yet.
+**Render decision:** Option B — API and Presidio run on Render free web services; Neon owns persistent data. Both are live and used by production.
 
-**Remaining operator follow-up:** confirm the Neon plan/quota and attach the exact reference-image license text; no paid upgrade is authorized.
+**Remaining operator follow-up:** confirm the Neon plan/quota, attach the exact reference-image license text, upload the demo to YouTube/Drive if the form requires it, and verify OpenServ data collection/SERV credits. No paid upgrade is authorized. Kite payment remains provider-blocked with no retry.

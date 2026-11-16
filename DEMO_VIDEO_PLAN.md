@@ -52,7 +52,10 @@ If optional Reppo/Kite integrations are genuinely live and provide clear value, 
 ## Render and QA
 
 Output files:
-- `artifacts/demo/assay-demo.mp4`
+- `artifacts/demo/assay-demo-final.mp4`
+- `artifacts/demo/assay-demo-final.srt`
+- `artifacts/demo/assay-demo-script-final.md`
+- `artifacts/demo/production-notes-final.md`
 - `artifacts/demo/assay-demo-script.md`
 - `artifacts/demo/assay-demo.srt`
 - `artifacts/demo/production-notes.md`

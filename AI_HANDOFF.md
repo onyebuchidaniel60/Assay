@@ -1,12 +1,13 @@
 # Assay — AI Handoff / Build State
 
-**Status:** Phases 1–6 implemented; authenticated preview deployed to Vercel with Render API/Presidio and Neon; demo video rendered and inspected. Residual Phase 9 checks are documented before any production release claim.  
+**Status:** Phases 1–9 complete. Production deployed and smoke-tested after the full regression and security matrix passed.  
 **Repository:** `https://github.com/onyebuchidaniel60/Assay` — public, default branch `main`.  
-**Preview URL:** `https://assay-uhhh2.vercel.app` — protected, authenticated preview backed by the Render API. **Latest deployed app commit:** `d608534`. Legacy `https://assay-guyo5yh6z-uhhh2.vercel.app` points to the earlier deployment.
-**Render API:** `https://assay-api-7hy0.onrender.com`. **Render Presidio:** `https://assay-presidio.onrender.com`.  
-**Production release authority:** Authorized by the operator, but release remains gated on the full Phase 5/9 test and security matrix. No production deployment is claimed.  
+**Production URL:** `https://assay-omega-gray.vercel.app` — Vercel Authentication enabled (Option B). `https://assay-uhhh2.vercel.app` aliases the same production deployment `assay-8ngveaxy0-uhhh2.vercel.app`.  
+**Production commit:** `de7c793`. **Render API:** `https://assay-api-7hy0.onrender.com` (live at `de7c793`). **Render Presidio:** `https://assay-presidio.onrender.com`.  
+**Public demo:** `https://github.com/onyebuchidaniel60/Assay/releases/download/demo-v1/assay-demo-final.mp4` — 131.97 s, 1080p/30 fps.  
+**Production release authority:** Exercised after the gate passed; no unresolved critical/high finding.  
 **Data boundary:** Synthetic data only; no real borrower, lender or production records.  
-**New spend authority:** `$0` beyond existing NEAR AI and SERV credits.
+**New spend authority:** `$0` beyond existing NEAR AI, SERV, Reppo and OpenRouter credits.
 
 ## Phase 1 — complete
 
@@ -25,7 +26,7 @@
 ## Phase 3 — complete
 
 - Canonical schema realigned to `MASTER_BLUEPRINT.md` §7: borrowers, borrower keys, facilities, documents, analysis runs, covenant terms, sealed financial inputs, scenario results, proof artifacts, approvals, redaction revisions, extraction runs, feedback/Reppo evaluations, per-borrower audit events/heads, jobs, idempotency records. Roles are `ANALYST | MANAGER | AUDITOR | ADMIN`.
-- Full Fastify domain/API surface: borrower/facility CRUD; encrypted upload with PDF/TXT magic-byte, 10 MiB, 40-page and scanned-PDF rejection; in-memory preview; run create/list/detail; redaction read/review; asynchronous extraction; terms review; financial inputs with deterministic add-back caps; calculation + independent BigInt verifier + SERV gate; fixed-circuit proof; role-shaped reports; manager approval queue/decision; cancellation; audit read/verify/payload; feedback; integration status; Reppo disabled; Kite local policy → provider-blocked; demo shred.
+- Full Fastify domain/API surface: borrower/facility CRUD; encrypted upload with PDF/TXT magic-byte, 10 MiB, 40-page and scanned-PDF rejection; in-memory preview; run create/list/detail; redaction read/review; asynchronous extraction; terms review; financial inputs with deterministic add-back caps; calculation + independent BigInt verifier + SERV gate; fixed-circuit proof; role-shaped reports; manager approval queue/decision; cancellation; audit read/verify/payload; feedback; integration status; Reppo live adapter; Kite local policy → provider-blocked; demo shred.
 - NEAR AI extraction is attested per request: exact model, `verifiable`/`attestationSupported`, fresh 32-byte nonce, Intel TDX via `@phala/dcap-qvl`, NVIDIA NRAS, signer/nonce binding, response ECDSA signature, request/response hashes, compose-manager quote. Failure blocks terms.
 - Extraction runs as a background Postgres job (`analysis.extract`), returning `202`; parse also runs as `analysis.parse`.
 - Proof generation runs in a one-shot child process; witness is passed over stdin and never persisted. Server checks public signals `["1","35000"]` before storing a verified artifact.
@@ -58,13 +59,13 @@
 | Playwright | 18/18 desktop + mobile |
 | Kite | Testnet session active; payment path provider-blocked; no retry; no receipt claimed |
 | Public signup | Disabled at the auth service; direct probe returned `400 EMAIL_PASSWORD_SIGN_UP_DISABLED` |
-| Reppo | Disabled; no synthetic-feedback contract enabled |
+| Reppo | **LIVE** — real evaluation `cmwikqtsn000f08l4y73d9a8m`, score 98, `accept`, confidence `low`, route `review`, 440 credits, 409-byte safe trace |
 
 ## Current data state (synthetic demo)
 
 - Organizations: `Assay Demo Credit Partners` (`00000000-0000-4000-8000-000000000001`).
 - Demo staff: `analyst@assay.test` (Maya Chen, ANALYST), `manager@assay.test` (Jon Bell, MANAGER), `auditor@assay.test` (Priya Raman, AUDITOR). Credentials live only in `/root/assay-secrets/demo-users.env`.
-- Borrowers BOR-004 and BOR-005 exist. Both runs are manager-approved; BOR-004 baseline and stress cases compliant; BOR-005 baseline compliant with two acknowledged stress breaches.
+- Borrowers BOR-004, BOR-005, BOR-006, BOR-013 and BOR-018 exist, all manager-approved. BOR-004/006/013/018 are baseline compliant with two acknowledged stress breaches; BOR-005 is the stressed-breach fixture. One real Reppo evaluation (`cmwikqtsn000f08l4y73d9a8m`) remains. All security-test and IDOR records were deleted.
 - Old BOR-001/2/3 test runs were deleted before the final schema/workflow checks. No real data was involved.
 
 ## Phase 5 — deployed preview verified
@@ -91,24 +92,67 @@
 - XSS probe escaped; SQL-injection probe rejected 422; secret scan clean; CI secret-hygiene step added.
 - Public signup disabled (`400 EMAIL_PASSWORD_SIGN_UP_DISABLED`).
 
-## Residual Phase 9 checks before production
+## Phase 7 — complete
 
-1. Proof-mutation test on a fresh pending run (altered threshold/witness/artifact must block approval).
-2. Full cross-tenant IDOR matrix with a second organization/membership.
-3. Token expiry/revocation and CORS/browser matrix on the final deployed commit.
-4. Prompt-injection fixture against extraction (document text must not alter schema/policy).
-5. Log-redaction review under provider failures.
-6. Kite duplicate-payment/reconciliation policy test; no live payment without exact authority.
-7. Final secret scan on the release commit (the demo-shred and preview-denial paths are verified).
+- README rewritten for end users/developers: logo, problem/audience, workflow, Mermaid architecture, track declaration, accurate security language, quick start, verified deployment links, docs index and license/attribution.
+- `docs/SUBMISSION.md` created: problem-first write-up, SERV's two bounded roles, Open Track primary with Reppo/Kite secondary claims and no Dolphin claim, architecture, privacy summary, links, X post and checklist.
+- API, data model, configuration, integrations, operator guide, troubleshooting, design notes, reference assets and operator intake updated to the built behavior and provider states.
+- Security-language audit: no `zero retention guaranteed`, `GDPR compliant`, `differentially private`, unqualified `TEE protected` or `Presidio-verified` claims; the reduced Presidio profile, predicate-only ZK proof and tamper-evident (not immutable) audit chain are stated explicitly.
+- `docs/INTEGRATIONS.md` records the Reppo endpoint migration and live verdict, and the Kite provider block with timestamps.
+- Footer/docs links resolve to real pages; no `href="#"`, fake contact URL or private repository link.
 
-## Next exact task
+## Phase 8 — complete
 
-Re-run the full typecheck/test/build and Playwright suites on the final commit; push; redeploy the protected preview; record the final commit/URL here and in `docs/DEPLOYMENT.md`. Do not claim production release until the residual Phase 9 checks above pass.
+- Final demo `artifacts/demo/assay-demo-final.mp4`: 131.97 s, 1920×1080, 30 fps, H.264 High/yuv420p + AAC mono, 7.48 MB.
+- Microsoft Edge TTS `en-US-AndrewNeural` (free, no account, no billing) replaced the robotic espeak-ng render. Gemini TTS was not used because no Google AI credential/free-tier activation was present.
+- Opening title and app header show the operator logo. Scenes cover dashboard, facility/redaction, extraction/attestation/scenarios/proof, real manager approval of BOR-018, the real Reppo verdict (`cmwikqtsn000f08l4y73d9a8m`), auditor chain verification and honest integration status.
+- Script `assay-demo-script-final.md`, captions `assay-demo-final.srt`, production notes `production-notes-final.md` and rebuild script `build-video-final.sh` are committed beside the MP4.
+- Complete render inspected with extracted frames; no secrets, private URLs or real data. Public URL: `https://github.com/onyebuchidaniel60/Assay/releases/download/demo-v1/assay-demo-final.mp4` (YouTube/Drive upload requires operator OAuth).
+
+## Phase 9 — complete
+
+- **Proof mutation (D1):** stored `pi_a[0]` replaced with `1`; `/proof/verify` `422 PROOF_FAILED`; run `PROOF_FAILED`; approval `409 PROOF_FAILED`. Stored proof is re-verified inside the approval path.
+- **Cross-tenant IDOR (D2):** second org/user created; borrower, facility, document, preview, run, report, redaction, proof, audit events and audit verify all `404`; approval `404` with idempotency key; shred `403`. No 200.
+- **Sessions (D3):** malformed `401`, expired token `401`, disabled profile `401`, expired full cookie `401`. Web cache TTL 60 s; API strips signed session-data cache and revalidates every request.
+- **Prompt injection (D4):** embedded instruction to set 9999 bps ignored; extracted `32500` with quote evidence; SERV `ANALYST_REVIEW_REQUIRED`.
+- **Log redaction (D5):** forced attestation failure logged only `analysis.extract failed code=ATTESTATION_FAILED error=Configured model is not present.`; marker, email, account, figure, reference, borrower name and token-map values absent.
+- **Kite duplicate/reconciliation (D6):** code-reviewed control only — idempotency key, receipt-before-retry, `RECONCILIATION_REQUIRED` on timeout; not tested because both documented testnet endpoints are provider-blocked. No payment/receipt claimed.
+- **Reppo:** live real evaluation completed (score 98, accept, low confidence, review, 440 credits, 409-byte payload).
+- **Kite:** both documented testnet endpoints provider-blocked (upstream internal error; second endpoint DNS `ENOTFOUND` at `2026-11-16T01:23:30Z`). No retry, no spend.
+- **Dependency/secret scans:** `pnpm audit` 0 high/critical (1 moderate dev-only esbuild, 1 low elliptic); `underscore` overridden to 1.13.8; Gitleaks worktree/history clean of real secrets; `scripts/check-secrets.sh` passes.
+
+## Final regression matrix
+
+| Check | Result |
+|---|---|
+| `pnpm lint` | Pass |
+| `pnpm typecheck` | Pass |
+| `pnpm build` | Pass |
+| `pnpm test` | Pass — 61 tests: domain 18, crypto 4, contracts 6, document 8, proof 3, reppo 8, AI 10, API 4 |
+| `pnpm test:e2e` | 20/20 desktop + mobile (after warming Render API) |
+| `pnpm audit` | 0 critical, 0 high, 1 moderate dev-only esbuild, 1 low elliptic |
+| Secret scan | Pass — no real secret in tracked files or 27-commit history |
+| Production smoke | `/`, `/login`, logo, favicon, OG, manifest, authenticated dashboard/evaluations/integrations/settings, `/v1/me`, `/v1/integrations/status`, API health all pass |
+
+## Production deployment
+
+- **Frontend:** `https://assay-omega-gray.vercel.app`; deployment `assay-8ngveaxy0-uhhh2.vercel.app`; commit `de7c793`; Vercel Authentication enabled (Option B). `https://assay-uhhh2.vercel.app` aliases the same deployment.
+- **API:** `https://assay-api-7hy0.onrender.com`, live at `de7c793`, worker enabled, Reppo live.
+- **Presidio:** `https://assay-presidio.onrender.com`, `REDUCED_PII_MODE`.
+- **Database/auth/storage:** Neon Postgres/Neon Auth/private S3-compatible storage; trusted origins include the production and stable alias domains; public signup disabled.
+- **Production env names:** `NEON_AUTH_COOKIE_SECRET`, `NEON_AUTH_BASE_URL`, `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_API_URL`, `API_PUBLIC_URL`, `APP_ENV`.
+
+## Residual operator actions
+
+1. Upload the demo to YouTube (unlisted) or Google Drive if the hackathon form requires that host; the GitHub release asset is public and currently linked.
+2. Confirm OpenServ data-collection is enabled and the SERV API credit balance is adequate in the operator console.
+3. Kite payment remains provider-blocked on both documented testnet endpoints; do not retry or claim a receipt without new provider evidence.
+4. Production is protected by Vercel Authentication; if judges require interactive access, use the submission note or provide invited synthetic credentials through the official channel.
 
 ## Authorization boundaries
 
 - Synthetic data only; no public signup.
-- No Kite wallet spend beyond the approved testnet session; payment path is provider-blocked and must not be retried.
-- No production deployment claim until the full gate passes.
+- No Kite wallet spend; payment path is provider-blocked and must not be retried.
+- Production was deployed only after the full gate passed; no critical/high finding remains.
 - Never fabricate provider output, receipts, attestation or verification results.
 - Do not expose secrets. `.env.local`, `.kite-passport/` and `/root/assay-secrets/` are outside Git.

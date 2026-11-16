@@ -73,9 +73,9 @@ flowchart LR
 ## Links
 
 - **Repository:** https://github.com/onyebuchidaniel60/Assay
-- **Demo video:** `[YouTube unlisted / Drive URL — pending upload]`
+- **Demo video:** https://github.com/onyebuchidaniel60/Assay/releases/download/demo-v1/assay-demo-final.mp4 (public GitHub release asset; YouTube/Drive upload requires operator OAuth)
 - **Public API health:** https://assay-api-7hy0.onrender.com/health/live
-- **Preview:** https://assay-uhhh2.vercel.app — protected by Vercel Authentication; interactive access requires an invited synthetic account. The demo video is the public walkthrough.
+- **Production:** https://assay-omega-gray.vercel.app — protected by Vercel Authentication (Option B); interactive access requires an invited synthetic account. Stable alias: https://assay-uhhh2.vercel.app. The demo video is the public walkthrough.
 - **Documentation:** https://github.com/onyebuchidaniel60/Assay/tree/main/docs
 
 ## X post
@@ -87,14 +87,14 @@ flowchart LR
 > Built for @OpenServAI #SERVHackathon.
 >
 > Repo: https://github.com/onyebuchidaniel60/Assay
-> Demo: [demo URL]
+> Demo: https://github.com/onyebuchidaniel60/Assay/releases/download/demo-v1/assay-demo-final.mp4
 > Docs: https://github.com/onyebuchidaniel60/Assay/tree/main/docs
 
 ## Submission checklist
 
 - [x] Public GitHub repository: https://github.com/onyebuchidaniel60/Assay
-- [ ] Demo video public URL — upload pending
-- [ ] Live interactive preview — protected by Vercel Authentication; documented as protected
+- [x] Demo video public URL — GitHub release asset (YouTube/Drive upload requires operator OAuth)
+- [x] Live production deployment — protected by Vercel Authentication (Option B); documented as protected
 - [x] Write-up ready (this file)
 - [x] X post drafted
 - [ ] X post will link to the submission — operator action

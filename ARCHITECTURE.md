@@ -60,7 +60,7 @@ Current OpenServ public materials identify `https://inference-api.openserv.ai/v1
 - **NEAR AI Cloud (Layer 2):** receives only tokenized credit-agreement text and structured financial figures for extraction. Never send token maps, borrower identities or raw documents. Requests must carry fresh Intel TDX/NVIDIA NRAS attestation evidence bound to a client-supplied nonce; fail closed if attestation is missing or invalid.
 - **OpenRouter (general):** receives only structured, already-extracted data for SERV judgement and generation nodes. Never send raw documents or tokenized agreement text.
 - **SERV:** receives structured, non-identifying inputs and orchestrates the graph; it does not itself perform inference.
-- **Reppo:** receives synthetic/de-identified correction records only; disabled unless credentials and authority exist.
+- **Reppo:** receives synthetic/de-identified correction records only; the live adapter submits field-level traces after a 50 KB preflight and displays the real provider verdict.
 - **Kite:** receives payment/service metadata; no borrower payload is sent to Kite services by default.
 - **Token-to-identity maps** never leave backend storage.
 - **Dolphin:** removed and rejected; no adapter or endpoint is part of the architecture.

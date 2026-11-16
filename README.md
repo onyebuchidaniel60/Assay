@@ -93,13 +93,13 @@ See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for every variable and [docs/
 
 ## Verified deployment
 
-- **Preview:** `https://assay-uhhh2.vercel.app` (protected by Vercel Authentication)
+- **Production:** `https://assay-omega-gray.vercel.app` (Vercel Authentication enabled; stable alias `https://assay-uhhh2.vercel.app`)
 - **API health:** `https://assay-api-7hy0.onrender.com/health/live`
 - **Presidio:** `https://assay-presidio.onrender.com/health`
 - **Demo video:** [public release asset](https://github.com/onyebuchidaniel60/Assay/releases/download/demo-v1/assay-demo-final.mp4) · [local copy](artifacts/demo/assay-demo-final.mp4)
 - **Repository:** `https://github.com/onyebuchidaniel60/Assay`
 
-The preview requires an invited synthetic account; the public API health endpoint is available for availability checks. The demo video is the primary public walkthrough.
+The production workspace requires an invited synthetic account. The public API health endpoint is available for availability checks; the demo video is the primary public walkthrough.
 
 ## Documentation
 
@@ -121,7 +121,7 @@ The preview requires an invited synthetic account; the public API health endpoin
 
 ## Project status
 
-Phases 1–6 are implemented: full API and authenticated analyst/manager/auditor workspace, encrypted ingestion, reduced-PII review, attested extraction, deterministic calculation and SERV gate, fixed-circuit proof, maker-checker approval, signed audit chain, Postgres worker, Reppo live feedback evaluation, Kite policy with provider-blocked payment path, and a real captured demo. Remaining Phase 9 release checks and final production deployment are recorded in [AI_HANDOFF.md](AI_HANDOFF.md) and [docs/BUILD_LOG.md](docs/BUILD_LOG.md).
+Phases 1–9 are complete and production is deployed at commit `de7c793`: full API and authenticated analyst/manager/auditor workspace, encrypted ingestion, reduced-PII review, attested extraction, deterministic calculation and SERV gate, fixed-circuit proof, maker-checker approval, signed audit chain, Postgres worker, a live Reppo feedback evaluation, Kite policy with a provider-blocked payment path, the logo, a real captured demo, and a passing final regression/security matrix. Evidence is recorded in [AI_HANDOFF.md](AI_HANDOFF.md) and [docs/BUILD_LOG.md](docs/BUILD_LOG.md).
 
 ## License and attribution
 

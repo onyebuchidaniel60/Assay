@@ -37,11 +37,11 @@ See `MASTER_BLUEPRINT.md` §13 for the risk/mitigation matrix. This file records
 - Fixed circuit version and verification-key hash; proof bound to the immutable snapshot hash and threshold. The witness is passed to a one-shot proof process over stdin and never written to disk, argv or a table.
 - Demo shred requires `APP_ENV=demo`, `ENABLE_DEMO_SHRED=true`, an Admin role, a synthetic `BOR-*` reference and the typed confirmation phrase. The wrapped DEK is deleted; ciphertext remains undecryptable through the application key store.
 
-## Verified controls and required remaining tests
+## Verified controls
 
-Verified locally: unauthenticated `/v1/me` returns 401; analyst approval attempt returns 403; manager-only queue; tenant-scoped queries; upload magic-byte/page/scan rejection; role-shaped manager/auditor DTOs; idempotency replay/conflict; versioned run transitions; stressed-breach risk acknowledgement; duplicate approval conflict; signature/hash-chain verification after a real signed event sequence; proof public-signal check; production-mode shred denial (demo flag).
+Verified locally and on the deployed stack: unauthenticated `/v1/me` returns 401; analyst approval attempt returns 403; manager-only queue; tenant-scoped queries; upload magic-byte/page/scan rejection; role-shaped manager/auditor DTOs; idempotency replay/conflict; versioned run transitions; stressed-breach risk acknowledgement; duplicate approval conflict; signature/hash-chain verification after a real signed event sequence; production-mode shred denial (demo flag).
 
-Still required before production release: IDOR matrix across every route, XSS review of rendered evidence, SQL-injection probes, prompt-injection fixtures, CORS/token-expiry tests, secret scanning in CI, log-redaction review, concurrent approval stress, Kite duplicate-payment reconciliation, audit-tamper fixtures, proof-mutation fixtures, and a full production-mode shred denial test on the deployed stack.
+Phase 9 final evidence: full cross-tenant IDOR matrix `404` on every borrower/facility/document/preview/run/report/redaction/proof/audit route and `403` on shred; malformed/expired/revoked sessions `401`; prompt-injection fixture extracted the true `32500` bps rather than the injected `9999`; forced attestation failure logs contained no document marker, email, account, amount, reference or token-map value; a mutated stored proof returned `422 PROOF_FAILED` and blocked approval with `409`; Gitleaks and `pnpm audit` found no real secret or high/critical dependency. Kite duplicate-payment/reconciliation is implemented but code-reviewed only because both documented testnet endpoints are provider-blocked; no receipt is claimed.
 
 ## Incident response
 

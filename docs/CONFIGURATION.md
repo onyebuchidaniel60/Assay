@@ -63,10 +63,10 @@ The adapter must enforce `KITE_MAX_PER_PAYMENT_MINOR` and `KITE_MAX_TOTAL_MINOR`
 ## Jobs and auth
 
 - `WORKER_ENABLED=true` runs the in-process Postgres job poller. The worker claims `analysis.parse` and `analysis.extract` jobs with `FOR UPDATE SKIP LOCKED`.
-- Public sign-up is disabled in Neon Auth (`email_and_password.disableSignUp=true`). Provision staff accounts in Neon, then run `ALLOW_DEMO_SEED=true pnpm seed:workspace` to create profiles/memberships. Seed scripts refuse `APP_ENV=production`. The web session-data cache TTL is 1 second so expired/revoked sessions are rechecked promptly; the API still loads the current profile status on every protected request.
+- Public sign-up is disabled in Neon Auth (`email_and_password.disableSignUp=true`). Provision staff accounts in Neon, then run `ALLOW_DEMO_SEED=true pnpm seed:workspace` to create profiles/memberships. Seed scripts refuse `APP_ENV=production`. The web session-data cache TTL is 60 seconds; the API strips `local.session_data` so every protected API request revalidates the Neon Auth session token and loads the current profile status.
 
 ## Environment separation
 
-Use separate Neon projects/branches and storage credentials for local development, preview and any production environment. Do not reuse a production key in a preview deployment. Preview must never connect to production borrower records. Production release remains gated on the full test/security matrix.
+Use separate Neon projects/branches and storage credentials for local development, preview and any production environment. Do not reuse a production key in a preview deployment. Preview must never connect to production borrower records. The current production deployment uses the synthetic demo project after the full test/security matrix passed; future releases must repeat that gate.
 
 The app validates the environment with Zod at startup. Logs may show variable names that are missing, never values. Provider failures must be visible; never fabricate an inference, Reppo verdict or payment receipt.
