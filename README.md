@@ -8,7 +8,7 @@
 
 ---
 
-## 🔑 Try it — demo accounts
+## Try it — demo accounts
 
 The app is invite-only and contains **synthetic data only**. Sign in with any of these:
 
