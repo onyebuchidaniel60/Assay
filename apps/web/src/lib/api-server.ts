@@ -149,6 +149,26 @@ export type RunDetail = RunSummary & {
   redaction: Array<{ revision: number; entityCount: number; reviewedAt: string | null }>;
 };
 
+export type ReppoEvaluation = {
+  id: string;
+  feedbackRecordId: string;
+  providerEvalId: string | null;
+  status: "PENDING" | "COMPLETED" | "FAILED" | "TIMEOUT" | string;
+  providerStatus: string | null;
+  score: number | null;
+  decision: string | null;
+  confidence: string | null;
+  route: string | null;
+  result: Record<string, unknown> | null;
+  creditsCharged: number | null;
+  errorCode: string | null;
+  errorMessage: string | null;
+  maxWaitMinutes: number;
+  submittedAt: string | null;
+  completedAt: string | null;
+  lastPolledAt: string | null;
+};
+
 export function errorMessage(error: unknown): string {
   if (error instanceof ApiClientError) return error.message;
   if (error instanceof Error) return error.message;

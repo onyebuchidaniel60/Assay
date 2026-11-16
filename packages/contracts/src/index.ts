@@ -190,10 +190,20 @@ export const approvalDecisionSchema = z
 
 export const feedbackCreateSchema = z
   .object({
+    analysisRunId: z.string().uuid(),
     correctionType: z.enum(["TERMS", "FINANCIAL_INPUT", "REDACTION", "OTHER"]),
     beforeValue: z.record(z.string(), z.unknown()),
     afterValue: z.record(z.string(), z.unknown()),
     note: z.string().max(1000).optional(),
+    submitToReppo: z.boolean().default(false),
+    maxWaitMinutes: z.union([z.literal(10), z.literal(15), z.literal(30)]).default(10),
+  })
+  .strict();
+
+export const reppoSubmitSchema = z
+  .object({
+    feedbackRecordId: z.string().uuid(),
+    maxWaitMinutes: z.union([z.literal(10), z.literal(15), z.literal(30)]).default(10),
   })
   .strict();
 

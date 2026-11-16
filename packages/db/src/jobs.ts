@@ -104,6 +104,21 @@ export async function failJob(db: AssayDb, jobId: string, errorCode: string): Pr
   return nextStatus;
 }
 
+export async function rescheduleJob(db: AssayDb, jobId: string, nextRunAt: Date): Promise<void> {
+  await db
+    .update(jobs)
+    .set({
+      status: "QUEUED",
+      attempts: 0,
+      nextRunAt,
+      leaseUntil: null,
+      lockedAt: null,
+      lockedBy: null,
+      updatedAt: new Date(),
+    })
+    .where(eq(jobs.id, jobId));
+}
+
 export async function reclaimExpiredJobs(db: AssayDb): Promise<number> {
   const result = await db
     .update(jobs)

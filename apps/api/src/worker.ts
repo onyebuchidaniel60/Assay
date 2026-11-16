@@ -9,6 +9,7 @@ import {
   failJob,
   reclaimExpiredJobs,
   redactionRevisions,
+  rescheduleJob,
   type ClaimedJob,
 } from "@assay/db";
 import { PrivateObjectStorage } from "@assay/storage";
@@ -21,6 +22,7 @@ import {
 } from "@assay/document";
 import { buildRedaction } from "./lib/redaction.js";
 import { runExtraction } from "./lib/extraction.js";
+import { pollReppoJob } from "./lib/reppo.js";
 import { loadBorrowerDek } from "@assay/db";
 
 const db = createDb();
@@ -160,10 +162,20 @@ async function handleAnalysisExtract(job: ClaimedJob): Promise<void> {
   await runExtraction(job.organizationId, analysisRunId, actorId);
 }
 
+async function handleReppoPoll(job: ClaimedJob): Promise<void> {
+  const evaluationId = String(job.payload.evaluationId ?? "");
+  if (!evaluationId) return;
+  const status = await pollReppoJob(evaluationId);
+  if (status === "PENDING") {
+    await rescheduleJob(db, job.id, new Date(Date.now() + 60_000));
+  }
+}
+
 const handlers = new Map<string, (job: ClaimedJob) => Promise<void>>([
   ["healthcheck", async () => undefined],
   ["analysis.parse", handleAnalysisParse],
   ["analysis.extract", handleAnalysisExtract],
+  ["reppo.poll", handleReppoPoll],
 ]);
 
 let running = false;

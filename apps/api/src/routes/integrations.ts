@@ -1,12 +1,17 @@
 import type { FastifyInstance } from "fastify";
 import { randomUUID } from "node:crypto";
-import { and, eq } from "@assay/db";
-import { analysisRuns, borrowers, createDb } from "@assay/db";
-import { feedbackCreateSchema, kitePaymentIntentSchema } from "@assay/contracts";
+import { and, desc, eq } from "@assay/db";
+import { analysisRuns, borrowers, createDb, reppoEvaluations } from "@assay/db";
+import { feedbackCreateSchema, kitePaymentIntentSchema, reppoSubmitSchema } from "@assay/contracts";
 import { evaluateKitePayment } from "@assay/domain";
 import { appendBorrowerAuditEventInTx } from "@assay/db";
 import { meta, parseBody, requireAuth, requireRole } from "../lib/http.js";
-import { notFound } from "../lib/errors.js";
+import { ApiError, notFound } from "../lib/errors.js";
+import {
+  loadReppoEvaluation,
+  serializeEvaluation,
+  submitFeedbackToReppo,
+} from "../lib/reppo.js";
 
 const db = createDb();
 
@@ -50,7 +55,15 @@ export function registerIntegrationRoutes(app: FastifyInstance) {
         serv: { configured: Boolean(process.env.SERV_REASONING_API_KEY), model: process.env.SERV_MODEL ?? null },
         presidio: { configured: Boolean(process.env.PRESIDIO_URL), mode: process.env.PRESIDIO_MODE ?? "REDUCED_PII_MODE" },
         storage: { configured: Boolean(process.env.NEON_STORAGE_BUCKET && process.env.AWS_ENDPOINT_URL_S3) },
-        reppo: { enabled: booleanEnv("REPPO_ENABLED"), status: booleanEnv("REPPO_ENABLED") ? "configured" : "disabled" },
+        reppo: {
+          enabled: booleanEnv("REPPO_ENABLED"),
+          configured: Boolean(process.env.REPPO_API_KEY),
+          status: booleanEnv("REPPO_ENABLED")
+            ? process.env.REPPO_API_KEY
+              ? "live"
+              : "missing-key"
+            : "disabled",
+        },
         kite: {
           enabled: booleanEnv("KITE_ENABLED"),
           session: kiteSession(),
@@ -66,15 +79,11 @@ export function registerIntegrationRoutes(app: FastifyInstance) {
   app.post("/v1/feedback", async (request, reply) => {
     const user = await requireAuth(request, reply);
     requireRole(user, ["ANALYST", "ADMIN"]);
-    const raw = (request.body ?? {}) as Record<string, unknown>;
-    const { analysisRunId: rawRunId, ...feedback } = raw;
-    if (typeof rawRunId !== "string" || rawRunId.length === 0) throw notFound("Analysis run");
-    const analysisRunId = rawRunId;
-    const body = parseBody(feedbackCreateSchema, feedback);
+    const body = parseBody(feedbackCreateSchema, request.body);
     const [run] = await db
       .select()
       .from(analysisRuns)
-      .where(and(eq(analysisRuns.id, analysisRunId), eq(analysisRuns.organizationId, user.organizationId)))
+      .where(and(eq(analysisRuns.id, body.analysisRunId), eq(analysisRuns.organizationId, user.organizationId)))
       .limit(1);
     if (!run) throw notFound("Analysis run");
     const [borrower] = await db
@@ -89,7 +98,7 @@ export function registerIntegrationRoutes(app: FastifyInstance) {
       await tx.insert(feedbackRecords).values({
         id,
         organizationId: user.organizationId,
-        analysisRunId,
+        analysisRunId: body.analysisRunId,
         createdBy: user.userId,
         correctionType: body.correctionType,
         beforeValue: body.beforeValue,
@@ -108,32 +117,77 @@ export function registerIntegrationRoutes(app: FastifyInstance) {
         payload: { beforeValue: body.beforeValue, afterValue: body.afterValue, note: body.note ?? null },
       });
     });
-    return {
-      data: { id, syntheticOnly: true, reppoStatus: booleanEnv("REPPO_ENABLED") ? "disabled-until-contract-verified" : "disabled" },
-      meta: meta(request),
-    };
+
+    let reppo: Record<string, unknown> = { status: "NOT_SUBMITTED" };
+    if (body.submitToReppo) {
+      try {
+        const evaluation = await submitFeedbackToReppo({
+          organizationId: user.organizationId,
+          actorId: user.userId,
+          feedbackRecordId: id,
+          maxWaitMinutes: body.maxWaitMinutes,
+        });
+        reppo = { ...evaluation };
+      } catch (error) {
+        if (error instanceof ApiError) {
+          reppo = { status: "FAILED", errorCode: error.code, errorMessage: error.message };
+        } else {
+          reppo = {
+            status: "FAILED",
+            errorCode: "REPPO_SUBMIT_FAILED",
+            errorMessage: error instanceof Error ? error.message : "Reppo submission failed.",
+          };
+        }
+      }
+    }
+    reply.code(201);
+    return { data: { id, syntheticOnly: true, reppo }, meta: meta(request) };
+  });
+
+  app.get("/v1/integrations/reppo/evaluations", async (request, reply) => {
+    const user = await requireAuth(request, reply);
+    requireRole(user, ["ANALYST", "MANAGER", "AUDITOR", "ADMIN"]);
+    const rows = await db
+      .select()
+      .from(reppoEvaluations)
+      .where(eq(reppoEvaluations.organizationId, user.organizationId))
+      .orderBy(desc(reppoEvaluations.submittedAt))
+      .limit(50);
+    return { data: rows.map(serializeEvaluation), meta: meta(request) };
   });
 
   app.post("/v1/integrations/reppo/evaluations", async (request, reply) => {
     const user = await requireAuth(request, reply);
     requireRole(user, ["ANALYST", "ADMIN"]);
-    reply.code(503);
-    return {
-      error: {
-        code: "PROVIDER_DISABLED",
-        message: "Reppo evaluation is disabled until its synthetic-feedback contract and quota are verified.",
-        requestId: String(request.id),
-      },
-    };
+    const body = parseBody(reppoSubmitSchema, request.body);
+    const evaluation = await submitFeedbackToReppo({
+      organizationId: user.organizationId,
+      actorId: user.userId,
+      feedbackRecordId: body.feedbackRecordId,
+      maxWaitMinutes: body.maxWaitMinutes,
+    });
+    if (evaluation.status === "FAILED") {
+      reply.code(502);
+      return {
+        error: {
+          code: evaluation.errorCode ?? "REPPO_SUBMIT_FAILED",
+          message: evaluation.errorMessage ?? "Reppo rejected the evaluation submission.",
+          requestId: String(request.id),
+          details: { evaluation },
+        },
+      };
+    }
+    reply.code(202);
+    return { data: evaluation, meta: meta(request) };
   });
 
   app.get("/v1/integrations/reppo/evaluations/:id", async (request, reply) => {
     const user = await requireAuth(request, reply);
     requireRole(user, ["ANALYST", "MANAGER", "AUDITOR", "ADMIN"]);
-    reply.code(404);
-    return {
-      error: { code: "NOT_FOUND", message: "No Reppo evaluation exists.", requestId: String(request.id) },
-    };
+    const { id } = request.params as { id: string };
+    const refresh = (request.query as { refresh?: string }).refresh === "1";
+    const evaluation = await loadReppoEvaluation(user.organizationId, id, refresh);
+    return { data: evaluation, meta: meta(request) };
   });
 
   app.post("/v1/integrations/kite/benchmark-requests", async (request, reply) => {

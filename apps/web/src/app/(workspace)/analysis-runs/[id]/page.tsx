@@ -16,6 +16,7 @@ import {
   saveFinancialsAction,
   startExtractionAction,
   approvalAction,
+  submitFeedbackAction,
 } from "@/lib/actions";
 import { formatDateTime, formatUsdMinor, minorToDecimal } from "@/lib/money";
 
@@ -598,6 +599,68 @@ export default async function AnalysisRunPage({
                 {analystReport.approval.rationale ? <p className="mt-3 text-sm leading-6 text-positive/80">{analystReport.approval.rationale}</p> : null}
               </section>
             ) : null}
+
+            <section className="rounded-3xl border border-line bg-paper p-5 sm:p-7">
+              <div className="flex flex-wrap items-end justify-between gap-4">
+                <div>
+                  <SectionLabel>Synthetic feedback</SectionLabel>
+                  <h2 className="mt-2 text-2xl font-semibold tracking-tight">Correction and Reppo evaluation</h2>
+                </div>
+                <Link href="/evaluations" className="text-xs font-semibold underline decoration-line underline-offset-4 hover:text-ink">Evaluation register</Link>
+              </div>
+              <p className="mt-3 max-w-3xl text-sm leading-6 text-muted">
+                Record a correction to an extraction or financial field. If selected, Assay sends only a de-identified
+                field-level trace to Reppo after a 50 KB preflight check; amounts, free text, borrower identity, the token
+                map and agreement content are removed. Reppo never approves the covenant.
+              </p>
+              <form action={submitFeedbackAction} className="mt-5 space-y-4">
+                <input type="hidden" name="runId" value={analystReport.run.id} />
+                <div className="grid gap-4 sm:grid-cols-3">
+                  <label className="block text-xs">
+                    <span className="mb-1.5 block font-semibold uppercase tracking-[0.12em] text-muted">Correction type</span>
+                    <select name="correctionType" className="w-full rounded-xl border border-line bg-white/60 px-3 py-2.5 outline-none focus:border-ink">
+                      <option value="TERMS">Terms / extraction</option>
+                      <option value="FINANCIAL_INPUT">Financial input</option>
+                      <option value="REDACTION">Redaction</option>
+                      <option value="OTHER">Other</option>
+                    </select>
+                  </label>
+                  <label className="block text-xs">
+                    <span className="mb-1.5 block font-semibold uppercase tracking-[0.12em] text-muted">Changed field</span>
+                    <input name="changedField" placeholder="thresholdBps" className="w-full rounded-xl border border-line bg-white/60 px-3 py-2.5 font-mono outline-none focus:border-ink" />
+                  </label>
+                  <label className="block text-xs">
+                    <span className="mb-1.5 block font-semibold uppercase tracking-[0.12em] text-muted">Polling window</span>
+                    <select name="maxWaitMinutes" className="w-full rounded-xl border border-line bg-white/60 px-3 py-2.5 outline-none focus:border-ink">
+                      <option value="10">10 minutes</option>
+                      <option value="15">15 minutes</option>
+                      <option value="30">30 minutes</option>
+                    </select>
+                  </label>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <label className="block text-xs">
+                    <span className="mb-1.5 block font-semibold uppercase tracking-[0.12em] text-muted">Before (synthetic)</span>
+                    <input name="beforeValue" className="w-full rounded-xl border border-line bg-white/60 px-3 py-2.5 outline-none focus:border-ink" placeholder="Synthetic value before correction" />
+                  </label>
+                  <label className="block text-xs">
+                    <span className="mb-1.5 block font-semibold uppercase tracking-[0.12em] text-muted">After (synthetic)</span>
+                    <input name="afterValue" className="w-full rounded-xl border border-line bg-white/60 px-3 py-2.5 outline-none focus:border-ink" placeholder="Synthetic value after correction" />
+                  </label>
+                </div>
+                <label className="block text-xs">
+                  <span className="mb-1.5 block font-semibold uppercase tracking-[0.12em] text-muted">Internal note (optional)</span>
+                  <input name="note" className="w-full rounded-xl border border-line bg-white/60 px-3 py-2.5 outline-none focus:border-ink" placeholder="Why the correction was made" />
+                </label>
+                <label className="flex items-center gap-3 text-xs">
+                  <input type="checkbox" name="submitToReppo" className="size-4" />
+                  Submit the de-identified trace to Reppo for an independent evaluation.
+                </label>
+                <button type="submit" className="inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2.5 text-xs font-semibold text-paper">
+                  Record correction
+                </button>
+              </form>
+            </section>
 
             {CANCELLABLE.includes(status) ? (
               <form action={cancelRunAction} className="flex items-center justify-end gap-3">

@@ -249,6 +249,33 @@ export async function cancelRunAction(formData: FormData): Promise<void> {
   redirect(withQuery(runPath(runId), { ok: "Analysis cancelled" }));
 }
 
+export async function submitFeedbackAction(formData: FormData): Promise<void> {
+  const runId = field(formData, "runId");
+  const changedField = field(formData, "changedField") || "correction";
+  const before = field(formData, "beforeValue");
+  const after = field(formData, "afterValue");
+  const result = await perform<ApiEnvelope<{ id: string; reppo: { id?: string; status: string; errorMessage?: string } }>>(
+    "/v1/feedback",
+    {
+      method: "POST",
+      body: JSON.stringify({
+        analysisRunId: runId,
+        correctionType: field(formData, "correctionType") || "OTHER",
+        beforeValue: { [changedField]: before },
+        afterValue: { [changedField]: after },
+        note: field(formData, "note") || undefined,
+        submitToReppo: formData.get("submitToReppo") === "on",
+        maxWaitMinutes: Number(field(formData, "maxWaitMinutes")) || 10,
+      }),
+    },
+  );
+  if (!result.ok) redirect(withQuery(runPath(runId), { error: result.code, message: result.message }));
+  const reppoId = result.data.data.reppo?.id;
+  revalidatePath(runPath(runId));
+  if (reppoId) redirect(`/evaluations/${reppoId}`);
+  redirect(withQuery(runPath(runId), { ok: "Correction recorded; Reppo submission not requested" }));
+}
+
 export async function verifyAuditAction(formData: FormData): Promise<void> {
   const borrowerId = field(formData, "borrowerId");
   const result = await perform<ApiEnvelope<{ result: string; checkedCount: number }>>(

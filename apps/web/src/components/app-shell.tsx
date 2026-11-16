@@ -31,6 +31,7 @@ const primaryNav = [
 
 const controlNav = [
   { href: "/cases", label: "Exception cases", icon: FolderKanban },
+  { href: "/evaluations", label: "Evaluations", icon: ClipboardCheck },
   { href: "/approvals", label: "Approvals", icon: ClipboardCheck },
   { href: "/audit", label: "Audit trail", icon: ShieldCheck },
 ];
@@ -52,6 +53,7 @@ const labels: Record<string, string> = {
   settings: "Settings",
   login: "Sign in",
   cases: "Exception cases",
+  evaluations: "Evaluations",
 };
 
 function navigationFor(pathname: string) {

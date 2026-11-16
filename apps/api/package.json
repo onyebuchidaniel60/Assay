@@ -19,6 +19,7 @@
     "@assay/document": "workspace:*",
     "@assay/domain": "workspace:*",
     "@assay/proof": "workspace:*",
+    "@assay/reppo": "workspace:*",
     "@assay/storage": "workspace:*",
     "@fastify/cors": "11.4.3",
     "@fastify/multipart": "10.1.8",

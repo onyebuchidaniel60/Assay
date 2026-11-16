@@ -14,7 +14,7 @@ type IntegrationStatus = {
   serv: { configured: boolean; model: string | null };
   presidio: { configured: boolean; mode: string };
   storage: { configured: boolean };
-  reppo: { enabled: boolean; status: string };
+  reppo: { enabled: boolean; configured?: boolean; status: string };
   kite: {
     enabled: boolean;
     paymentPath: string;
@@ -82,11 +82,11 @@ export default async function IntegrationsPage() {
           detail: "Reduced mode: en_core_web_sm plus deterministic financial recognizers. Analyst review remains mandatory before any provider call.",
         },
         {
-          name: "Reppo",
-          role: "Optional synthetic feedback evaluation",
-          configured: status.reppo.enabled,
-          state: status.reppo.enabled ? "Enabled" : "Disabled",
-          detail: "Only synthetic/de-identified records are eligible. No verdict is fabricated when the provider is unavailable.",
+          name: "Reppo Eval Router",
+          role: "Synthetic feedback evaluation",
+          configured: status.reppo.enabled && (status.reppo.configured ?? true),
+          state: status.reppo.status === "live" ? "LIVE" : status.reppo.status === "missing-key" ? "Missing key" : "Disabled",
+          detail: "Live endpoint eval.reppo.xyz. Only field-level, de-identified correction traces are submitted after a 50 KB preflight; verdicts stay PENDING/COMPLETED/FAILED exactly as returned.",
         },
         {
           name: "Kite Passport",
@@ -157,6 +157,15 @@ export default async function IntegrationsPage() {
       ) : null}
 
       <div className="grid gap-4 md:grid-cols-2">
+        <section className="rounded-3xl border border-line bg-paper p-5">
+          <SectionLabel>Feedback evaluations</SectionLabel>
+          <p className="mt-3 text-sm leading-6 text-muted">
+            Review the real Reppo provider state, score, decision, confidence and critique for synthetic correction traces.
+          </p>
+          <Link href="/evaluations" className="mt-4 inline-flex items-center gap-1 text-xs font-semibold underline decoration-line underline-offset-4 hover:text-ink">
+            Evaluation register <ArrowUpRight className="size-3.5" />
+          </Link>
+        </section>
         <section className="rounded-3xl border border-line bg-paper p-5">
           <SectionLabel>Deployment</SectionLabel>
           <div className="mt-3 space-y-2 text-sm">
