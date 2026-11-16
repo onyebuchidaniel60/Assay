@@ -5,7 +5,7 @@ import { PageHeader, SectionLabel } from "@/components/page-header";
 import { FeedbackBanner } from "@/components/feedback-banner";
 import { apiFetch, errorCode, errorMessage, getMe, type ApiEnvelope } from "@/lib/api-server";
 
-export const metadata = { title: "Document preview" };
+export const metadata = { title: "Document view" };
 export const dynamic = "force-dynamic";
 
 type Preview = {
@@ -23,7 +23,7 @@ export default async function DocumentPreviewPage({ params }: { params: Promise<
     if (me.user.role !== "ANALYST" && me.user.role !== "ADMIN") {
       return (
         <div className="space-y-6">
-          <PageHeader title="Preview restricted" description="Only an analyst may decrypt the original agreement." />
+          <PageHeader title="Document restricted" description="Only an analyst may decrypt the original agreement." />
           <FeedbackBanner error="FORBIDDEN" message="Your role cannot retrieve original document bytes." />
         </div>
       );
@@ -36,7 +36,7 @@ export default async function DocumentPreviewPage({ params }: { params: Promise<
         </Link>
         <PageHeader
           eyebrow="Analyst-only · decrypted in server memory"
-          title="Agreement preview"
+          title="Agreement text"
           description="This view decrypts the stored ciphertext for the authorized analyst. It is never cached and never written to a plaintext temporary file."
         />
         <div className="rounded-2xl border border-warning/25 bg-warning/10 px-4 py-3 text-xs text-warning">
@@ -56,7 +56,7 @@ export default async function DocumentPreviewPage({ params }: { params: Promise<
     if (errorCode(error) === "NOT_FOUND") notFound();
     return (
       <div className="space-y-6">
-        <PageHeader title="Preview unavailable" description="The document could not be decrypted or parsed." />
+        <PageHeader title="Document unavailable" description="The document could not be decrypted or parsed." />
         <FeedbackBanner error={errorCode(error)} message={errorMessage(error)} />
       </div>
     );

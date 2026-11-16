@@ -11,6 +11,9 @@ try {
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  async rewrites() {
+    return [{ source: "/opengraph-image", destination: "/opengraph-image.png" }];
+  },
   async headers() {
     return [
       {

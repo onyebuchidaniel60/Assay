@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, ShieldAlert } from "lucide-react";
 
 export const metadata = { title: "Access denied" };
@@ -7,6 +8,7 @@ export default function ForbiddenPage() {
   return (
     <main className="grid min-h-screen place-items-center px-5">
       <div className="max-w-lg text-center">
+        <Image src="/brand/assay-logo.png" alt="Assay" width={64} height={64} priority className="mx-auto mb-6 rounded-2xl" />
         <span className="mx-auto grid size-14 place-items-center rounded-full bg-ink text-acid"><ShieldAlert className="size-6" /></span>
         <p className="mt-6 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted">403 · Access denied</p>
         <h1 className="display mt-3 text-5xl font-semibold">This view is outside your role.</h1>
@@ -21,6 +23,7 @@ export default function ForbiddenPage() {
             Sign in with another account
           </Link>
         </div>
+        <p className="mt-10 flex items-center justify-center gap-2 text-[11px] text-muted"><Image src="/brand/assay-logo.png" alt="Assay" width={16} height={16} className="size-4 rounded" /> Assay · synthetic-data covenant operations</p>
       </div>
     </main>
   );

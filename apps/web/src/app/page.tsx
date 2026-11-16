@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowUpRight, LockKeyhole, Scale, ShieldCheck, Sparkles } from "lucide-react";
 import { StatusBadge } from "@/components/status-badge";
 
@@ -25,7 +26,7 @@ export default function LandingPage() {
     <main className="min-h-screen">
       <header className="mx-auto flex max-w-[1180px] items-center justify-between px-5 py-6 sm:px-8">
         <div className="flex items-center gap-3">
-          <span className="grid size-9 place-items-center rounded-full bg-ink text-lg font-black text-acid">A</span>
+          <Image src="/brand/assay-logo.png" alt="Assay" width={40} height={40} priority className="size-10 rounded-xl" />
           <span className="text-sm font-bold uppercase tracking-[0.24em]">Assay</span>
         </div>
         <div className="flex items-center gap-3">
@@ -39,14 +40,14 @@ export default function LandingPage() {
             href="/dashboard"
             className="hidden items-center gap-2 rounded-full bg-ink px-4 py-2 text-xs font-semibold text-paper transition hover:bg-ink-soft sm:inline-flex"
           >
-            Open preview <ArrowUpRight className="size-3.5" />
+            Open app <ArrowUpRight className="size-3.5" />
           </Link>
         </div>
       </header>
 
       <section className="mx-auto grid max-w-[1180px] gap-10 px-5 pb-20 pt-12 sm:px-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-end lg:pb-28 lg:pt-20">
         <div>
-          <p className="mb-5 text-[10px] font-semibold uppercase tracking-[0.24em] text-muted">Covenant operations · synthetic preview</p>
+          <p className="mb-5 text-[10px] font-semibold uppercase tracking-[0.24em] text-muted">Covenant operations · synthetic data</p>
           <h1 className="display max-w-4xl text-6xl font-semibold sm:text-7xl lg:text-[6.6rem]">
             Read the clause.
             <br />
@@ -61,7 +62,7 @@ export default function LandingPage() {
               href="/dashboard"
               className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-paper transition hover:bg-ink-soft"
             >
-              Enter the preview workspace <ArrowUpRight className="size-4" />
+              Enter the workspace <ArrowUpRight className="size-4" />
             </Link>
             <Link
               href="/login"
@@ -130,7 +131,7 @@ export default function LandingPage() {
       </section>
 
       <footer className="mx-auto flex max-w-[1180px] flex-col gap-3 px-5 py-8 text-xs text-muted sm:flex-row sm:items-center sm:justify-between sm:px-8">
-        <p>Assay · synthetic-data preview · not a production credit decision system.</p>
+        <p className="flex items-center gap-2"><Image src="/brand/assay-logo.png" alt="Assay" width={20} height={20} className="size-5 rounded" /> Assay · synthetic-data workspace · not a production credit decision system.</p>
         <div className="flex gap-4">
           <a className="underline decoration-line underline-offset-4 hover:text-ink" href="https://github.com/onyebuchidaniel60/Assay/tree/main/docs">
             Documentation

@@ -171,7 +171,7 @@ export default async function AuditPage({
       ) : null}
 
       <p className="text-xs leading-5 text-muted">
-        Audit payloads are encrypted per borrower. Chain verification never requires decrypting them, so a demo crypto-shred
+        Audit payloads are encrypted per borrower. Chain verification never requires decrypting them, so a crypto-shred
         can remove the key while the signed sequence remains verifiable.
       </p>
     </div>

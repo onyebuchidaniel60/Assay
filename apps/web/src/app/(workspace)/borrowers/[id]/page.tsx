@@ -78,7 +78,7 @@ export default async function BorrowerDetailPage({
               Documents, financial snapshots, scenario details and audit payloads are sealed with AES-256-GCM under this
               borrower&apos;s data key. The wrapped key is stored separately from the ciphertext.
             </p>
-            <p className="mt-5 text-xs text-white/40">Active · key version 1 · demo shred disabled outside demo mode</p>
+            <p className="mt-5 text-xs text-white/40">Active · key version 1 · crypto-shred disabled by environment policy</p>
           </div>
         </section>
 

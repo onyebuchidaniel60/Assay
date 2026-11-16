@@ -17,14 +17,14 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
             <span className="text-sm font-bold uppercase tracking-[0.24em]">Assay</span>
           </Link>
           <Link href="/dashboard" className="inline-flex items-center gap-2 text-xs font-semibold text-muted hover:text-ink">
-            Preview workspace <ArrowUpRight className="size-3.5" />
+            Open app <ArrowUpRight className="size-3.5" />
           </Link>
         </div>
 
         <div className="mx-auto w-full max-w-md py-16">
           <Image src="/brand/assay-logo.png" alt="Assay" width={88} height={88} priority className="mb-6 size-20 rounded-3xl" />
           <StatusBadge tone="proof">Invite-only staff access</StatusBadge>
-          <h1 className="display mt-5 text-5xl font-semibold sm:text-6xl">Sign in to review.</h1>
+          <h1 className="display mt-5 text-5xl font-semibold sm:text-6xl">Sign in to Assay.</h1>
           <p className="mt-4 text-sm leading-6 text-muted">
             Assay accounts are provisioned by a workspace administrator. Public signup is disabled.
           </p>
@@ -83,7 +83,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
 
         <p className="text-xs text-muted">
           <LockKeyhole className="mr-1 inline size-3.5" />
-          Secure session handling, invite acceptance and role checks arrive in Phase 2.
+          Sessions, invite-only access and role checks are enforced server-side.
         </p>
       </section>
 
@@ -105,7 +105,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
           </div>
         </div>
         <div className="flex items-center justify-between border-t border-white/10 pt-6 text-xs text-white/50">
-          <span className="flex items-center gap-2"><Image src="/brand/assay-logo.png" alt="Assay" width={18} height={18} className="size-4 rounded" /> Assay preview · synthetic data</span>
+          <span className="flex items-center gap-2"><Image src="/brand/assay-logo.png" alt="Assay" width={18} height={18} className="size-4 rounded" /> Assay · synthetic data</span>
           <Link href="/" className="inline-flex items-center gap-1 text-white/70 hover:text-white">
             <ArrowLeft className="size-3.5" /> Back
           </Link>

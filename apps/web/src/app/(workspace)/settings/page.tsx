@@ -14,7 +14,7 @@ const roles = [
   ["Analyst", "Create borrowers/facilities, upload agreements, review redaction and terms, attest financial inputs, run analysis and request proofs", "Cannot approve; cannot activate critical actions"],
   ["Manager", "Restricted decision view, approve/reject eligible analysis, acknowledge stress risk", "Cannot approve their own run; no raw amounts"],
   ["Auditor", "Evidence metadata, proof status, approval identity and signed audit chain", "Read-only"],
-  ["Admin", "Invite/manage staff, integration health, demo-only crypto-shred", "No inherent credit approval"],
+  ["Admin", "Invite/manage staff, integration health, environment-gated crypto-shred", "No inherent credit approval"],
 ];
 
 export default async function SettingsPage({
@@ -90,7 +90,7 @@ export default async function SettingsPage({
           <p className="mt-3 text-sm leading-6 text-white/60">
             Neon Auth, the database URL, object-storage keys, the data KEK, the Ed25519 audit key, Presidio and provider
             keys are server-only. The browser receives no provider secret and no raw borrower content outside an
-            analyst-authorized preview.
+            analyst-authorized document view.
           </p>
           <div className="mt-5 rounded-2xl border border-white/10 p-4 text-xs leading-5 text-white/50">
             Provider credentials are configured through the deployment secret store, not through this UI.

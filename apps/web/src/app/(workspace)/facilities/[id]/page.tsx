@@ -153,7 +153,7 @@ export default async function FacilityDetailPage({
                       <StatusBadge>{doc.status}</StatusBadge>
                       {(me.user.role === "ANALYST" || me.user.role === "ADMIN") ? (
                         <Link href={`/documents/${doc.id}`} className="text-xs font-semibold underline decoration-line underline-offset-4 hover:text-ink">
-                          Preview text
+                          View text
                         </Link>
                       ) : null}
                       {me.capabilities.writeCovenant ? (

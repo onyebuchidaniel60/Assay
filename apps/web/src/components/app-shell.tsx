@@ -133,7 +133,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         <div className="border-t border-white/10 p-4">
           <div className="rounded-2xl bg-white/[0.06] p-4">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-acid">Demo workspace</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-acid">Credit workspace</p>
             <p className="mt-2 text-xs leading-5 text-white/60">
               Synthetic borrowers only. No real credit, borrower or production data.
             </p>
@@ -171,7 +171,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
             <div className="ml-auto flex items-center gap-2">
               <span className="hidden rounded-full border border-line bg-paper px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted sm:inline">
-                Live preview
+                Live production
               </span>
               <Link
                 href="/integrations"
@@ -194,7 +194,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         <footer className="border-t border-line px-4 py-6 sm:px-6 lg:px-10">
           <div className="mx-auto flex max-w-[1240px] flex-col gap-3 text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
-            <p className="flex items-center gap-2"><Image src="/brand/assay-logo.png" alt="Assay" width={20} height={20} className="size-5 rounded" /> Assay — synthetic-data covenant operations preview. Not a production credit decision system.</p>
+            <p className="flex items-center gap-2"><Image src="/brand/assay-logo.png" alt="Assay" width={20} height={20} className="size-5 rounded" /> Assay — synthetic-data covenant operations. Not a production credit decision system.</p>
             <div className="flex flex-wrap items-center gap-4">
               <Link className="underline decoration-line underline-offset-4 hover:text-ink" href="/audit">
                 Audit evidence

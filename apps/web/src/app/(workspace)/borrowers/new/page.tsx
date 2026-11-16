@@ -39,7 +39,7 @@ export default async function NewBorrowerPage({
               minLength={1}
               maxLength={120}
               className="w-full rounded-xl border border-line bg-white/50 px-4 py-3 outline-none focus:border-ink"
-              placeholder="Borrower Demo 05"
+              placeholder="Borrower 05"
             />
           </label>
           <label className="block text-sm">
