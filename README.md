@@ -121,7 +121,7 @@ The production workspace requires an invited synthetic account. The public API h
 
 ## Project status
 
-Phases 1–9 are complete and production is deployed at commit `de7c793`: full API and authenticated analyst/manager/auditor workspace, encrypted ingestion, reduced-PII review, attested extraction, deterministic calculation and SERV gate, fixed-circuit proof, maker-checker approval, signed audit chain, Postgres worker, a live Reppo feedback evaluation, Kite policy with a provider-blocked payment path, the logo, a real captured demo, and a passing final regression/security matrix. Evidence is recorded in [AI_HANDOFF.md](AI_HANDOFF.md) and [docs/BUILD_LOG.md](docs/BUILD_LOG.md).
+Phases 1–9 are complete and production is deployed at commit `60fac34`: full API and authenticated analyst/manager/auditor workspace, encrypted ingestion, reduced-PII review, attested extraction, deterministic calculation and SERV gate, fixed-circuit proof, maker-checker approval, signed audit chain, Postgres worker, a live Reppo feedback evaluation, Kite policy with a provider-blocked payment path, the logo, a real captured demo, and a passing final regression/security matrix. Evidence is recorded in [AI_HANDOFF.md](AI_HANDOFF.md) and [docs/BUILD_LOG.md](docs/BUILD_LOG.md).
 
 ## License and attribution
 

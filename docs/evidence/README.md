@@ -1,6 +1,6 @@
 # Final UI evidence
 
-These screenshots were captured from the final production build (`de7c793`) running locally against the deployed Render API `https://assay-api-7hy0.onrender.com`, using a real invited analyst session and synthetic data.
+These screenshots were captured from the final production build (`60fac34`) running locally against the deployed Render API `https://assay-api-7hy0.onrender.com`, using a real invited analyst session and synthetic data.
 
 | File | Screen |
 |---|---|

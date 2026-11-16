@@ -16,7 +16,7 @@
 | 1:06.5–1:25 | Manager restricted approval | The manager sees a deliberately restricted view: threshold, proof status and scenario bands, but no raw amounts or named counterparties. Both stress cases breach, so approval requires an explicit risk acknowledgement and a written rationale. |
 | 1:25–1:47 | Reppo evaluation detail | Correction feedback can be submitted to Reppo's live Eval Router. Only a 409-byte field-level trace is sent after a 50-kilobyte preflight; the returned score, decision, confidence and route are shown exactly as received. Pending and failed states are never replaced by a fixture verdict. |
 | 1:47–1:59 | Auditor chain verification | The auditor verifies the per-borrower signed hash chain and sees the approval evidence, including the exact proof and analysis version. |
-| 1:59–2:12 | Integrations status | Provider status stays honest: NEAR AI attested, Kite testnet provider-blocked, Reppo live. Assay records evidence, not a promise. |
+| 1:59–2:12 | Integrations status | Provider status stays honest: NEAR AI attested, Kite testnet provider-blocked (exact DNS `ENOTFOUND` / upstream-error evidence, 16 Nov 2026 01:23 UTC), Reppo live. Assay records evidence, not a promise. |
 
 ## Caption source
 

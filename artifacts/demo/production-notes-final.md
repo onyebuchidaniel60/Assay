@@ -1,6 +1,6 @@
 # Assay Demo — Final Production Notes
 
-**Final file:** `artifacts/demo/assay-demo-final.mp4`  
+**Final file:** `artifacts/demo/assay-demo-final.mp4` (7.34 MB; production commit `60fac34`)  
 **Duration:** 131.97 seconds  
 **Video:** H.264 High, yuv420p, 1920×1080, 30 fps  
 **Audio:** AAC LC, 22050 Hz, mono  
@@ -33,7 +33,8 @@ Checklist:
 - [x] Captions accurate and legible
 - [x] No secrets, private URLs or real borrower data
 - [x] Reppo status shown as LIVE with real verdict
-- [x] Kite status shown as testnet/provider-blocked
+- [x] Kite status shown as testnet/provider-blocked with the exact 16 Nov 2026 01:23 UTC `DNS ENOTFOUND` / upstream-error note
+- [x] Deployment block shows the live production state, not a pre-release gate
 - [x] No Dolphin claim
 - [x] Representative frames inspected
 

@@ -2,8 +2,8 @@
 
 **Status:** Phases 1–9 complete. Production deployed and smoke-tested after the full regression and security matrix passed.  
 **Repository:** `https://github.com/onyebuchidaniel60/Assay` — public, default branch `main`.  
-**Production URL:** `https://assay-omega-gray.vercel.app` — Vercel Authentication enabled (Option B). `https://assay-uhhh2.vercel.app` aliases the same production deployment `assay-8ngveaxy0-uhhh2.vercel.app`.  
-**Production commit:** `de7c793`. **Render API:** `https://assay-api-7hy0.onrender.com` (live at `de7c793`). **Render Presidio:** `https://assay-presidio.onrender.com`.  
+**Production URL:** `https://assay-omega-gray.vercel.app` — Vercel Authentication enabled (Option B). `https://assay-uhhh2.vercel.app` aliases the same production deployment `assay-c1l1ridga-uhhh2.vercel.app`.  
+**Production commit:** `60fac34`. **Render API:** `https://assay-api-7hy0.onrender.com` (live at `60fac34`). **Render Presidio:** `https://assay-presidio.onrender.com`.  
 **Public demo:** `https://github.com/onyebuchidaniel60/Assay/releases/download/demo-v1/assay-demo-final.mp4` — 131.97 s, 1080p/30 fps.  
 **Production release authority:** Exercised after the gate passed; no unresolved critical/high finding.  
 **Data boundary:** Synthetic data only; no real borrower, lender or production records.  
@@ -103,7 +103,7 @@
 
 ## Phase 8 — complete
 
-- Final demo `artifacts/demo/assay-demo-final.mp4`: 131.97 s, 1920×1080, 30 fps, H.264 High/yuv420p + AAC mono, 7.48 MB.
+- Final demo `artifacts/demo/assay-demo-final.mp4`: 131.97 s, 1920×1080, 30 fps, H.264 High/yuv420p + AAC mono, 7.34 MB.
 - Microsoft Edge TTS `en-US-AndrewNeural` (free, no account, no billing) replaced the robotic espeak-ng render. Gemini TTS was not used because no Google AI credential/free-tier activation was present.
 - Opening title and app header show the operator logo. Scenes cover dashboard, facility/redaction, extraction/attestation/scenarios/proof, real manager approval of BOR-018, the real Reppo verdict (`cmwikqtsn000f08l4y73d9a8m`), auditor chain verification and honest integration status.
 - Script `assay-demo-script-final.md`, captions `assay-demo-final.srt`, production notes `production-notes-final.md` and rebuild script `build-video-final.sh` are committed beside the MP4.
@@ -113,7 +113,7 @@
 
 - **Proof mutation (D1):** stored `pi_a[0]` replaced with `1`; `/proof/verify` `422 PROOF_FAILED`; run `PROOF_FAILED`; approval `409 PROOF_FAILED`. Stored proof is re-verified inside the approval path.
 - **Cross-tenant IDOR (D2):** second org/user created; borrower, facility, document, preview, run, report, redaction, proof, audit events and audit verify all `404`; approval `404` with idempotency key; shred `403`. No 200.
-- **Sessions (D3):** malformed `401`, expired token `401`, disabled profile `401`, expired full cookie `401`. Re-verified on the production API at `de7c793`: expired cookie with a fresh 60 s cache `401`; disabled profile `401`; re-enabled profile `200`. Web cache TTL 60 s; API strips signed session-data cache and revalidates every request.
+- **Sessions (D3):** malformed `401`, expired token `401`, disabled profile `401`, expired full cookie `401`. Re-verified on the production API at `60fac34`: expired cookie with a fresh 60 s cache `401`; disabled profile `401`; re-enabled profile `200`. Web cache TTL 60 s; API strips signed session-data cache and revalidates every request.
 - **Prompt injection (D4):** embedded instruction to set 9999 bps ignored; extracted `32500` with quote evidence; SERV `ANALYST_REVIEW_REQUIRED`.
 - **Log redaction (D5):** forced attestation failure logged only `analysis.extract failed code=ATTESTATION_FAILED error=Configured model is not present.`; marker, email, account, figure, reference, borrower name and token-map values absent.
 - **Kite duplicate/reconciliation (D6):** code-reviewed control only — idempotency key, receipt-before-retry, `RECONCILIATION_REQUIRED` on timeout; not tested because both documented testnet endpoints are provider-blocked. No payment/receipt claimed.
@@ -136,8 +136,8 @@
 
 ## Production deployment
 
-- **Frontend:** `https://assay-omega-gray.vercel.app`; deployment `assay-8ngveaxy0-uhhh2.vercel.app`; commit `de7c793`; Vercel Authentication enabled (Option B). `https://assay-uhhh2.vercel.app` aliases the same deployment. Final-build screenshots are in `docs/evidence/`.
-- **API:** `https://assay-api-7hy0.onrender.com`, live at `de7c793`, worker enabled, Reppo live.
+- **Frontend:** `https://assay-omega-gray.vercel.app`; deployment `assay-c1l1ridga-uhhh2.vercel.app`; commit `60fac34`; Vercel Authentication enabled (Option B). `https://assay-uhhh2.vercel.app` aliases the same deployment. Final-build screenshots are in `docs/evidence/`.
+- **API:** `https://assay-api-7hy0.onrender.com`, live at `60fac34`, worker enabled, Reppo live.
 - **Presidio:** `https://assay-presidio.onrender.com`, `REDUCED_PII_MODE`.
 - **Database/auth/storage:** Neon Postgres/Neon Auth/private S3-compatible storage; trusted origins include the production and stable alias domains; public signup disabled.
 - **Production env names:** `NEON_AUTH_COOKIE_SECRET`, `NEON_AUTH_BASE_URL`, `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_API_URL`, `API_PUBLIC_URL`, `APP_ENV`.

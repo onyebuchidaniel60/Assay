@@ -4,7 +4,7 @@
 
 - **Local:** Neon development branch/project, synthetic fixtures, live providers only through verified server-side adapters.
 - **Preview:** Vercel frontend, Render API/Presidio, Neon demo project. Synthetic fixtures only. Sandbox integrations. No production secrets/data/payments.
-- **Production:** Vercel frontend `https://assay-omega-gray.vercel.app`, Render API/Presidio, Neon demo project. Deployed at commit `de7c793` after the full Phase 5/9 regression and security matrix passed. Synthetic data only; Vercel Authentication is enabled.
+- **Production:** Vercel frontend `https://assay-omega-gray.vercel.app`, Render API/Presidio, Neon demo project. Deployed at commit `60fac34` after the full Phase 5/9 regression and security matrix passed. Synthetic data only; Vercel Authentication is enabled.
 
 ## Platform allocation
 
@@ -19,10 +19,10 @@
 
 ## Current production deployment
 
-- **Frontend:** `https://assay-omega-gray.vercel.app` (deployment `assay-8ngveaxy0-uhhh2.vercel.app`; stable alias `https://assay-uhhh2.vercel.app`).
-- **Commit:** `de7c793`.
+- **Frontend:** `https://assay-omega-gray.vercel.app` (deployment `assay-c1l1ridga-uhhh2.vercel.app`; stable alias `https://assay-uhhh2.vercel.app`).
+- **Commit:** `60fac34`.
 - **Protection:** Vercel Authentication (Option B — kept enabled; the public demo video and API health are the accessible artifacts).
-- **API:** `https://assay-api-7hy0.onrender.com` (Render free web service, live at `de7c793`, health `/health/ready`; worker enabled, Reppo live).
+- **API:** `https://assay-api-7hy0.onrender.com` (Render free web service, live at `60fac34`, health `/health/ready`; worker enabled, Reppo live).
 - **Presidio:** `https://assay-presidio.onrender.com` (Render free Python service, `REDUCED_PII_MODE`).
 - **State:** production analyst/manager/auditor journeys backed by Neon and the live providers. Synthetic data only.
 - **Production environment names:** `NEON_AUTH_COOKIE_SECRET`, `NEON_AUTH_BASE_URL`, `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_API_URL`, `API_PUBLIC_URL`, `APP_ENV`.
@@ -38,7 +38,7 @@
 5. Add only synthetic test data and sandbox secrets.
 6. Redeploy and smoke-test after verified checkpoints.
 
-A production build was auto-triggered by the GitHub connection during Phase 1; the Git integration was disconnected and production remained gated until the final Phase 9 matrix passed. Production has since been deployed manually from `de7c793` and smoke-tested.
+A production build was auto-triggered by the GitHub connection during Phase 1; the Git integration was disconnected and production remained gated until the final Phase 9 matrix passed. Production has since been deployed manually from `60fac34` and smoke-tested.
 
 ## Secrets
 

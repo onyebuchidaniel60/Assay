@@ -197,7 +197,7 @@ Additional observations:
 | Account access | Yes | `VALIDATED (CLI)` | Vercel CLI 65.8.0 authenticated as `onyebuchidaniel60-1034`; team `uhhh2`, Hobby plan |
 | Assay project | Yes | `PRESENT` | `uhhh2/assay`; linked and deployed |
 | Preview deployment permission | Yes | `AUTHORIZED AND DEPLOYED` | Protected preview and stable alias verified |
-| Production deployment permission | Yes | `AUTHORIZED AND DEPLOYED` | `https://assay-omega-gray.vercel.app` at commit `de7c793`; Vercel Authentication enabled (Option B) |
+| Production deployment permission | Yes | `AUTHORIZED AND DEPLOYED` | `https://assay-omega-gray.vercel.app` at commit `60fac34`; Vercel Authentication enabled (Option B) |
 | Paid upgrade | No | `PROHIBITED` | Hobby/free only unless budget authority is added |
 
 ### 2.7 Render
@@ -282,7 +282,7 @@ The reference asset gate is **PASSED** for implementation. Do not copy the sourc
 | Production | Explicit authority recorded and full release gate passed | **PASS — DEPLOYED** |
 | Demo | Audience, pronunciation, redactions and output location set | **DEFAULTS RECORDED** |
 
-**Phases 1–9 are complete. Production is deployed at `de7c793`; the full regression/security matrix passed. Only operator-only submission actions remain below.**
+**Phases 1–9 are complete. Production is deployed at `60fac34`; the full regression/security matrix passed. Only operator-only submission actions remain below.**
 
 ---
 
