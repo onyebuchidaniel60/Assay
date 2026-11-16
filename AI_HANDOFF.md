@@ -144,7 +144,7 @@
 
 ## Post-submission access and branding — complete
 
-- Vercel Authentication is **disabled** for the project; `https://assay-uhhh2.vercel.app` is public (`200`), and `/dashboard` redirects to the app’s own `/login`. No Vercel login is required.
+- Vercel Authentication is **disabled** for the project; `https://assay-uhhh2.vercel.app` is public (`200`), and `/dashboard` redirects to the app’s own `/login`. No Vercel login is required. After repeated automation, Vercel’s automatic bot mitigation challenged this datacenter IP (`x-vercel-mitigated: challenge`); an independent external fetch and a headed browser still received the Assay pages and signed in. This is not deployment authentication.
 - User-facing preview/demo/staging copy was removed from the landing, login, authenticated shell, footer, settings, borrower, audit, document and facility views. Synthetic aliases and the organization name were renamed to remove “Demo”.
 - A 24-route headed-browser check verified the logo on every actual route, no banned branding and no Vercel toolbar. Screenshots and the route map are in `docs/evidence/`.
 - `/favicon.ico` and `/opengraph-image` return `200`; `/opengraph-image` serves `image/png`.
