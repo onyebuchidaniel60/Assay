@@ -69,7 +69,7 @@ export function registerIntegrationRoutes(app: FastifyInstance) {
           session: kiteSession(),
           paymentPath: "provider-blocked",
           providerBlocked: true,
-          note: "The last approved testnet x402 request was blocked upstream. No payment is retried automatically.",
+          note: "Both documented testnet endpoints are provider-blocked. 16 Nov 2026 01:23 UTC: x402.dev.gokite.ai returned DNS ENOTFOUND; the earlier passport.dev endpoint returned an upstream internal error. No payment was attempted or retried.",
         },
       },
       meta: meta(request),

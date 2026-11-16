@@ -169,9 +169,9 @@ export default async function IntegrationsPage() {
         <section className="rounded-3xl border border-line bg-paper p-5">
           <SectionLabel>Deployment</SectionLabel>
           <div className="mt-3 space-y-2 text-sm">
-            <p className="flex items-center justify-between"><span className="text-muted">Vercel</span><span className="font-semibold">Authenticated preview</span></p>
+            <p className="flex items-center justify-between"><span className="text-muted">Vercel</span><span className="font-semibold">Authenticated production</span></p>
             <p className="flex items-center justify-between"><span className="text-muted">Render</span><span className="font-semibold">API + Presidio live</span></p>
-            <p className="flex items-center justify-between"><span className="text-muted">Production</span><span className="font-semibold">Gated on final checks</span></p>
+            <p className="flex items-center justify-between"><span className="text-muted">Production</span><span className="font-semibold">Live · smoke tested</span></p>
           </div>
           <Link href="/settings" className="mt-4 inline-flex items-center gap-1 text-xs font-semibold underline decoration-line underline-offset-4 hover:text-ink">
             Workspace settings <ArrowUpRight className="size-3.5" />
