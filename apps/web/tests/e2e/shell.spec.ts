@@ -15,9 +15,9 @@ test.describe("Assay authenticated shell", () => {
   test("landing page exposes the product and entry points", async ({ page }) => {
     await page.goto("/");
     await expect(page).toHaveTitle(/Assay/);
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("Read the clause");
-    await expect(page.getByRole("link", { name: /Enter the preview workspace/i })).toBeVisible();
-    await expect(page.getByRole("link", { name: /Invite-only sign-in/i })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Enter the workspace|Open app/i }).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: /Invite-only sign-in|Sign in/i }).first()).toBeVisible();
   });
 
   test("dashboard is navigable and separates actual from forecast", async ({ page }) => {

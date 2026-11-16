@@ -184,16 +184,21 @@ export default async function AnalysisRunPage({
   const { id } = await params;
   const query = await searchParams;
   try {
-    const me = await getMe();
+    const [me, reportEnvelope] = await Promise.all([
+      getMe(),
+      apiFetch<ApiEnvelope<AnalystReport | ManagerReport | AuditorReport>>(`/v1/analysis-runs/${id}/report`),
+    ]);
     const role = me.user.role;
-    const reportEnvelope = await apiFetch<ApiEnvelope<AnalystReport | ManagerReport | AuditorReport>>(`/v1/analysis-runs/${id}/report`);
     const report = reportEnvelope.data;
     const analyst = role === "ANALYST" || role === "ADMIN";
     const analystReport = analyst ? (report as AnalystReport) : null;
     const managerReport = role === "MANAGER" ? (report as ManagerReport) : null;
     const auditorReport = role === "AUDITOR" ? (report as AuditorReport) : null;
     const status = analystReport?.run.status ?? managerReport?.status ?? auditorReport?.status ?? "UNKNOWN";
-    const detailEnvelope = analyst ? await apiFetch<ApiEnvelope<{ redaction: Array<{ revision: number }> }>>(`/v1/analysis-runs/${id}`) : null;
+    const detailEnvelope =
+      analyst && status === "REDACTION_REVIEW"
+        ? await apiFetch<ApiEnvelope<{ redaction: Array<{ revision: number }> }>>(`/v1/analysis-runs/${id}`)
+        : null;
     const latestRevision = detailEnvelope?.data.redaction[0]?.revision;
     const redaction =
       analyst && status === "REDACTION_REVIEW" && latestRevision

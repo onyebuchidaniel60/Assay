@@ -73,6 +73,9 @@ export async function uploadDocumentAction(formData: FormData): Promise<void> {
   if (!(file instanceof File) || file.size === 0) {
     redirect(withQuery(`/facilities/${facilityId}`, { error: "FILE_REQUIRED", message: "Choose a PDF or text agreement." }));
   }
+  if (file.size > 10 * 1024 * 1024) {
+    redirect(withQuery(`/facilities/${facilityId}`, { error: "TOO_LARGE", message: "The file exceeds the 10 MiB limit." }));
+  }
   const upload = new FormData();
   upload.append("file", file, file.name);
   const result = await perform<ApiEnvelope<{ id: string }>>(`/v1/facilities/${facilityId}/documents`, {

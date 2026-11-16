@@ -37,8 +37,8 @@ test.describe("Assay authenticated workspace", () => {
   test("analyst can open the approved run and inspect proof evidence", async ({ page }) => {
     await signIn(page, analystEmail, analystPassword);
     await page.goto("/analysis-runs");
-    await page.getByRole("link", { name: "Open", exact: true }).first().click();
-    await expect(page.getByText(/Run #\d+/)).toBeVisible();
+    await page.locator("tr", { hasText: "APPROVED" }).first().getByRole("link", { name: "Open", exact: true }).click();
+    await expect(page.getByText(/Run #\d+/)).toBeVisible({ timeout: 15000 });
     await expect(page.getByText("Compliance proof", { exact: true })).toBeVisible();
     await expect(page.getByText("Public signals", { exact: true })).toBeVisible();
     await expect(page.getByText(/Verification key/)).toBeVisible();

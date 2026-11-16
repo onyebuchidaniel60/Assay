@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { cookies } from "next/headers";
 
 export type ApiEnvelope<T> = { data: T; meta?: { requestId?: string; replayed?: boolean } };
@@ -65,9 +66,9 @@ export type MeResponse = ApiEnvelope<{
   capabilities: { writeCovenant: boolean; approve: boolean; verifyAudit: boolean; administrate: boolean };
 }>;
 
-export async function getMe(): Promise<MeResponse["data"]> {
+export const getMe = cache(async (): Promise<MeResponse["data"]> => {
   return (await apiFetch<MeResponse>("/v1/me")).data;
-}
+});
 
 export type Borrower = {
   id: string;

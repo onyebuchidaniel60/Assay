@@ -11,6 +11,11 @@ try {
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "12mb",
+    },
+  },
   async rewrites() {
     return [{ source: "/opengraph-image", destination: "/opengraph-image.png" }];
   },

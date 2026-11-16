@@ -58,6 +58,8 @@ async function handleAnalysisParse(job: ClaimedJob): Promise<void> {
 
   const failPermanently = async (code: string) => {
     await db.transaction(async (tx) => {
+      const [current] = await tx.select().from(analysisRuns).where(eq(analysisRuns.id, run.id)).for("update");
+      if (!current || !["FILE_UPLOADED", "PARSING"].includes(current.status)) return;
       await tx
         .update(documents)
         .set({ status: "FAILED", failureCode: code, updatedAt: new Date() })
@@ -117,11 +119,11 @@ async function handleAnalysisParse(job: ClaimedJob): Promise<void> {
       }
       await tx
         .update(analysisRuns)
-        .set({ status: "REDACTION_REVIEW", updatedAt: new Date() })
+        .set({ status: "REDACTION_REVIEW", failureCode: null, completedAt: null, updatedAt: new Date() })
         .where(eq(analysisRuns.id, run.id));
       await tx
         .update(documents)
-        .set({ status: "REDACTION_REVIEW", pageCount: parsed.pageCount, updatedAt: new Date() })
+        .set({ status: "REDACTION_REVIEW", failureCode: null, pageCount: parsed.pageCount, updatedAt: new Date() })
         .where(eq(documents.id, document.id));
       await appendBorrowerAuditEventInTx(tx, {
         organizationId: job.organizationId,
@@ -141,14 +143,7 @@ async function handleAnalysisParse(job: ClaimedJob): Promise<void> {
     }
     if (error instanceof PresidioUnavailableError) {
       process.stderr.write(`analysis.parse redaction unavailable: ${error.message}\n`);
-      await db
-        .update(documents)
-        .set({ status: "FAILED", failureCode: "REDACTION_SERVICE_UNAVAILABLE", updatedAt: new Date() })
-        .where(eq(documents.id, document.id));
-      await db
-        .update(analysisRuns)
-        .set({ status: "FAILED", failureCode: "REDACTION_SERVICE_UNAVAILABLE", completedAt: new Date(), updatedAt: new Date() })
-        .where(eq(analysisRuns.id, run.id));
+      await failPermanently("REDACTION_SERVICE_UNAVAILABLE");
       return;
     }
     throw error;
