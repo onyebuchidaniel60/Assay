@@ -1,6 +1,6 @@
 # <img src="apps/web/public/brand/assay-logo.png" alt="Assay logo" width="72" align="left" /> Assay
 
-# Assay
+
 
 **AI-assisted covenant monitoring for credit teams.** The model interprets, deterministic code calculates, ZK proofs verify compliance without exposing figures, and a human approves.
 
