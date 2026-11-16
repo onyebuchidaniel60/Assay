@@ -41,7 +41,10 @@ await page.screenshot({ path: path.join(outDir, "evaluation-detail.png"), fullPa
 console.log("captured evaluation-detail");
 await shot("audit", "/audit?borrower=d0031e48-7486-435f-915a-e1aed6037a8c");
 await shot("settings", "/settings");
-await shot("integrations", "/integrations");
+await shot("integrations", "/integrations", async () => {
+  await page.mouse.wheel(0, 900);
+  await page.waitForTimeout(1400);
+});
 
 await context.close();
 await browser.close();
