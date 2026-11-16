@@ -1248,6 +1248,60 @@ Return strict JSON only: {"agreement":"CONFIRMED|DISAGREES|UNCERTAIN","rationale
     return { data: serializeProof(proof), meta: meta(request) };
   });
 
+  app.post("/v1/analysis-runs/:id/proof/verify", async (request, reply) => {
+    const user = await requireAuth(request, reply);
+    requireRole(user, ["ANALYST", "MANAGER", "AUDITOR", "ADMIN"]);
+    const { id } = request.params as { id: string };
+    const context = await loadRun(user.organizationId, id);
+    const proof = await proofFor(id);
+    if (!proof) throw notFound("Proof artifact");
+    let verified: { verified: boolean; publicSignals: string[] };
+    try {
+      verified = await verifyStoredProof(proof.proofStorageKey);
+    } catch {
+      verified = { verified: false, publicSignals: [] };
+    }
+    if (!verified.verified) {
+      await db.transaction(async (tx) => {
+        await tx
+          .update(proofArtifacts)
+          .set({ status: "FAILED", verified: false, errorCode: "PROOF_MUTATION_DETECTED" })
+          .where(eq(proofArtifacts.id, proof.id));
+        if (["PROOF_PENDING", "PROOF_VERIFIED", "READY_FOR_MANAGER"].includes(context.run.status)) {
+          const [locked] = await tx.select().from(analysisRuns).where(eq(analysisRuns.id, id)).for("update");
+          if (locked) {
+            await tx
+              .update(analysisRuns)
+              .set({ status: "PROOF_FAILED", failureCode: "PROOF_MUTATION_DETECTED", version: locked.version + 1, updatedAt: new Date() })
+              .where(eq(analysisRuns.id, id));
+          }
+        }
+        const { appendBorrowerAuditEventInTx } = await import("@assay/db");
+        await appendBorrowerAuditEventInTx(tx, {
+          organizationId: user.organizationId,
+          borrowerId: context.borrower.id,
+          actorType: "USER",
+          actorId: user.userId,
+          eventType: "PROOF_VERIFICATION_FAILED",
+          entityType: "proof_artifact",
+          entityId: proof.id,
+          metadata: { errorCode: "PROOF_MUTATION_DETECTED", signalCount: verified.publicSignals.length },
+          payload: { errorCode: "PROOF_MUTATION_DETECTED" },
+        });
+      });
+      reply.code(422);
+      return {
+        error: {
+          code: "PROOF_FAILED",
+          message: "The stored proof no longer verifies against the fixed verification key. Approval is blocked.",
+          requestId: String(request.id),
+          details: { publicSignals: verified.publicSignals },
+        },
+      };
+    }
+    return { data: { result: "PROOF_VERIFIED", publicSignals: verified.publicSignals }, meta: meta(request) };
+  });
+
   app.get("/v1/analysis-runs/:id/report", async (request, reply) => {
     const user = await requireAuth(request, reply);
     requireRole(user, ["ANALYST", "MANAGER", "AUDITOR", "ADMIN"]);
@@ -1373,6 +1427,41 @@ Return strict JSON only: {"agreement":"CONFIRMED|DISAGREES|UNCERTAIN","rationale
     if (!terms || !financial || !proof) throw conflict("APPROVAL_PRECONDITION", "Terms, financial inputs and proof are required.");
     if (body.analysisVersion !== context.run.version) {
       throw conflict("VERSION_CONFLICT", "The analysis changed since you loaded it.");
+    }
+
+    let storedProof: { verified: boolean; publicSignals: string[] };
+    try {
+      storedProof = await verifyStoredProof(proof.proofStorageKey);
+    } catch {
+      storedProof = { verified: false, publicSignals: [] };
+    }
+    if (!storedProof.verified || storedProof.publicSignals[0] !== "1" || storedProof.publicSignals[1] !== String(terms.thresholdBps)) {
+      await db.transaction(async (tx) => {
+        await tx
+          .update(proofArtifacts)
+          .set({ status: "FAILED", verified: false, errorCode: "PROOF_MUTATION_DETECTED" })
+          .where(eq(proofArtifacts.id, proof.id));
+        const [locked] = await tx.select().from(analysisRuns).where(eq(analysisRuns.id, id)).for("update");
+        if (locked && ["PROOF_VERIFIED", "READY_FOR_MANAGER"].includes(locked.status)) {
+          await tx
+            .update(analysisRuns)
+            .set({ status: "PROOF_FAILED", failureCode: "PROOF_MUTATION_DETECTED", version: locked.version + 1, updatedAt: new Date() })
+            .where(eq(analysisRuns.id, id));
+        }
+        const { appendBorrowerAuditEventInTx } = await import("@assay/db");
+        await appendBorrowerAuditEventInTx(tx, {
+          organizationId: user.organizationId,
+          borrowerId: context.borrower.id,
+          actorType: "USER",
+          actorId: user.userId,
+          eventType: "PROOF_VERIFICATION_FAILED",
+          entityType: "proof_artifact",
+          entityId: proof.id,
+          metadata: { errorCode: "PROOF_MUTATION_DETECTED" },
+          payload: { errorCode: "PROOF_MUTATION_DETECTED" },
+        });
+      });
+      throw conflict("PROOF_FAILED", "The stored proof no longer verifies. Approval is blocked.");
     }
 
     const approval = await db.transaction(async (tx) => {
@@ -1642,3 +1731,42 @@ function serializeRunAnalyst(run: RunRow) {
   };
 }
 
+
+
+async function verifyStoredProof(proofStorageKey: string): Promise<{ verified: boolean; publicSignals: string[] }> {
+  if (!proofStorageKey) return { verified: false, publicSignals: [] };
+  let payload: string;
+  try {
+    const bytes = await storage.get(proofStorageKey);
+    payload = new TextDecoder().decode(bytes);
+  } catch {
+    return { verified: false, publicSignals: [] };
+  }
+  return new Promise((resolve, reject) => {
+    const script = fileURLToPath(new URL("../../../../packages/proof/scripts/verify-once.mjs", import.meta.url));
+    const child = spawn(process.execPath, [script], { stdio: ["pipe", "pipe", "pipe"], env: process.env });
+    let stdout = "";
+    let stderr = "";
+    const timer = setTimeout(() => {
+      child.kill("SIGKILL");
+      reject(new Error("Stored proof verification timed out."));
+    }, 45_000);
+    child.stdout.on("data", (chunk) => { stdout += String(chunk); });
+    child.stderr.on("data", (chunk) => { stderr += String(chunk); });
+    child.on("error", (error) => { clearTimeout(timer); reject(error); });
+    child.on("close", (code) => {
+      clearTimeout(timer);
+      if (code !== 0) {
+        reject(new Error(stderr || "Stored proof verification failed."));
+        return;
+      }
+      try {
+        const parsed = JSON.parse(stdout) as { verified: boolean; publicSignals: string[] };
+        resolve({ verified: Boolean(parsed.verified), publicSignals: Array.isArray(parsed.publicSignals) ? parsed.publicSignals : [] });
+      } catch {
+        reject(new Error("Stored proof verifier returned invalid JSON."));
+      }
+    });
+    child.stdin.end(payload);
+  });
+}
