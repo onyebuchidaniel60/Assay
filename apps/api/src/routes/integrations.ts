@@ -69,7 +69,7 @@ export function registerIntegrationRoutes(app: FastifyInstance) {
           session: kiteSession(),
           paymentPath: "provider-blocked",
           providerBlocked: true,
-          note: "Both documented testnet endpoints are provider-blocked. 16 Nov 2026 01:23 UTC: x402.dev.gokite.ai returned DNS ENOTFOUND; the earlier passport.dev endpoint returned an upstream internal error. No payment was attempted or retried.",
+          note: "Policy engine verified; payment rail provider-blocked with evidence. 16 Nov 2026: passport.dev.gokite.ai/x402/test returned an upstream internal error; x402.dev.gokite.ai/api/weather returned authoritative DNS NODATA (07:54:29Z); kite-live-dns.sakurasoga7.workers.dev returned 402 but kpass rejected it with payment_target_forbidden / sandbox_merchant_not_allowlisted (07:55:19Z). Spent total remains 0.",
         },
       },
       meta: meta(request),

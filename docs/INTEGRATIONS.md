@@ -72,9 +72,12 @@ Kite documentation describes passkey-approved spending sessions with a per-payme
 - Active session: `agent_session_01a1dfc3-794e-70cb-bde8-90c6315736cf`.
 - Delegation: `5 PIEUSD` per transaction, `20 PIEUSD` total, `24h` TTL, asset `PIEUSD`; expires `2026-11-16T15:11:32.17177Z`.
 - The Phase 3 adapter must use this approved session (or a newly approved successor) and enforce the same caps in the deterministic policy engine before any payment call. It must never auto-approve a session or bypass the caps.
-- The x402 smoke payment is **provider-blocked**: the approved call returned an upstream provider internal error; no activity event, receipt or spend exists. The API performs the deterministic local session/asset/cap/expiry check and then returns `503 PROVIDER_BLOCKED` without calling x402.
-- The over-cap policy test succeeded: a temporary `0.05 PIEUSD` session rejected a `0.1 PIEUSD` request with `session_rule_exceeded` (exit 6) and no payment event.
-- Do not represent the provider-blocked smoke payment as successful. Do not retry again without a provider change or new operator instruction.
+- The x402 smoke payment is **provider-blocked** (**policy engine verified; payment rail provider-blocked with evidence**):
+  1. `https://passport.dev.gokite.ai/x402/test` (`2026-11-15T15:29:37Z`, idempotency key `assay-kite-smoke-1457e791-3c4f-45f9-ade5-16e0749b117c`) — **upstream internal error** (`exit 1`, `status: error`, `"internal error"`).
+  2. `https://x402.dev.gokite.ai/api/weather` (`2026-11-16T07:54:29Z`) — **authoritative DNS NODATA**: verified across local `systemd-resolved` (`dig` / `nslookup`), Google Public DNS (`dns.google`), and Cloudflare (`cloudflare-dns.com`), all returning `NOERROR` with `ANSWER: 0` and only the `dev.gokite.ai` SOA record from Route53 (`ns-1130.awsdns-13.org.`).
+  3. `https://kite-live-dns.sakurasoga7.workers.dev/v1/dns?name=example.com&type=A` (`2026-11-16T07:55:19Z`, idempotency key `assay-kite-dns-fbe236f8-c046-48a6-a978-9219e9306023`) — direct `GET` returned `HTTP/2 402` with `payment-required` (`eip155:2368`), but `kpass session execute` against `https://passport.dev.gokite.ai` failed with **sandbox merchant allowlist rejection** (`exit 6`, `error_code: "payment_target_forbidden"`, `reason: "sandbox_merchant_not_allowlisted"`). Inspecting `ksearch service list` (48 catalog services) confirmed all allowlisted catalog endpoints require mainnet USDC/Tempo rather than testnet `PIEUSD`.
+- The over-cap policy test succeeded: a temporary `0.05 PIEUSD` session rejected a `0.1 PIEUSD` request with `session_rule_exceeded` (exit 6) and no payment event (`spent_total: 0`).
+- Do not represent the provider-blocked smoke payment as successful. Do not fabricate a receipt.
 
 ## Presidio — mandatory reduced mode on Render free tier
 
