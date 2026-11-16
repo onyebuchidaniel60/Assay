@@ -6,12 +6,12 @@
   --color-canvas: #f2eee4;
   --color-paper: #fbf8f0;
   --color-line: #d9d3c4;
-  --color-muted: #6f6b60;
+  --color-muted: #57534a;
   --color-acid: #f2d313;
   --color-acid-soft: #f8ea8c;
-  --color-positive: #067647;
-  --color-warning: #b54708;
-  --color-danger: #b42318;
+  --color-positive: #05603a;
+  --color-warning: #93370d;
+  --color-danger: #912018;
   --font-sans: "Inter", "Helvetica Neue", Arial, sans-serif;
   --font-display: "Inter", "Helvetica Neue", Arial, sans-serif;
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;

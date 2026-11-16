@@ -4,12 +4,12 @@ import { cn } from "@/lib/cn";
 export type BadgeTone = "positive" | "warning" | "danger" | "neutral" | "proof" | "info";
 
 const tones: Record<BadgeTone, string> = {
-  positive: "border-positive/25 bg-positive/10 text-positive",
-  warning: "border-warning/25 bg-warning/10 text-warning",
-  danger: "border-danger/25 bg-danger/10 text-danger",
-  neutral: "border-line bg-ink/[0.03] text-muted",
-  proof: "border-ink/15 bg-acid-soft/60 text-ink",
-  info: "border-ink/15 bg-paper text-ink",
+  positive: "border-positive/30 bg-[#e6f4ed] text-positive",
+  warning: "border-warning/30 bg-[#fef0c7] text-warning",
+  danger: "border-danger/30 bg-[#fee4e2] text-danger",
+  neutral: "border-line bg-paper text-muted",
+  proof: "border-ink/20 bg-acid-soft text-ink",
+  info: "border-ink/20 bg-paper text-ink",
 };
 
 const statusTone: Record<string, BadgeTone> = {
