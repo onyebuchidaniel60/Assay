@@ -70,6 +70,10 @@ flowchart LR
 - Reppo receives only field-level de-identified correction traces; no agreement text, borrower identity, token map or raw amounts.
 - No `zero retention guaranteed`, `TEE protected` without `attested`, `GDPR compliant` or differential-privacy claims.
 
+## Design references
+
+Design reference images are used as licensed inspiration only and are not redistributed in the repository. The operator-supplied Assay logo is committed as a product asset at `apps/web/public/brand/assay-logo.png`.
+
 ## Links
 
 - **Repository:** https://github.com/onyebuchidaniel60/Assay
