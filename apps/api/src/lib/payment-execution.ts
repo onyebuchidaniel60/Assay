@@ -150,6 +150,16 @@ export async function executePaymentJob(config: PaymentRuntimeConfig, intentId: 
   }
 
   const authorized = intent.authorizedAmountMinor ?? intent.amountMinor;
+  const quoteExpiresAt = json(intent.quote).expiresAt;
+  if (typeof quoteExpiresAt === "string" && new Date(quoteExpiresAt).getTime() <= Date.now()) {
+    await markPaymentFailed({
+      intent,
+      code: "QUOTE_EXPIRED",
+      message: "The provider quote expired before execution. No payment was submitted.",
+      release: true,
+    });
+    return;
+  }
   const reservedWithoutThis = (() => {
     const next = BigInt(session.reservedTotalMinor) - BigInt(authorized);
     return (next < 0n ? 0n : next).toString();

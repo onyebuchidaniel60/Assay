@@ -183,6 +183,7 @@ export async function getExternalEvidenceById(input: {
   db: AssayDb;
   organizationId: string;
   borrowerId: string;
+  analysisRunId: string;
   evidenceId: string;
   includePayload: boolean;
 }): Promise<ExternalEvidenceView | null> {
@@ -193,6 +194,7 @@ export async function getExternalEvidenceById(input: {
       and(
         eq(externalEvidence.id, input.evidenceId),
         eq(externalEvidence.organizationId, input.organizationId),
+        eq(externalEvidence.analysisRunId, input.analysisRunId),
       ),
     )
     .limit(1);

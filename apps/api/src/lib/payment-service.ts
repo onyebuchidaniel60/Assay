@@ -83,6 +83,16 @@ function asJson(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
 }
 
+function sameResource(left: string, right: string): boolean {
+  try {
+    const a = new URL(left);
+    const b = new URL(right);
+    return a.protocol === b.protocol && a.host === b.host && a.pathname === b.pathname;
+  } catch {
+    return false;
+  }
+}
+
 export function serializePaymentIntent(row: PaymentIntentRow): PaymentIntentView {
   const quote = asJson(row.quote);
   return {
@@ -233,6 +243,13 @@ export async function createPaymentIntentFromQuote(input: {
     throw new PaymentServiceError("PAYMENT_NOT_REQUIRED", "This provider request is free and does not create a payment intent.", 400);
   }
   const terms = input.providerQuote.terms;
+  if (!sameResource(terms.resourceUrl, input.providerQuote.endpoint)) {
+    throw new PaymentServiceError(
+      "PAYMENT_RESOURCE_MISMATCH",
+      "The provider's paid resource does not match the approved endpoint.",
+      422,
+    );
+  }
   const requirement: PaymentRequirement = {
     scheme: terms.scheme,
     network: terms.network,
@@ -263,7 +280,17 @@ export async function createPaymentIntentFromQuote(input: {
       maxTimeoutSeconds: requirement.maxTimeoutSeconds,
       ...(requirement.extra ? { extra: requirement.extra } : {}),
     },
-    accepts: [],
+    accepts: [
+      {
+        scheme: requirement.scheme,
+        network: requirement.network,
+        asset: requirement.asset,
+        amount: requirement.amountMinor,
+        payTo: requirement.payTo,
+        maxTimeoutSeconds: requirement.maxTimeoutSeconds,
+        ...(requirement.extra ? { extra: requirement.extra } : {}),
+      },
+    ],
     fetchedAt: now.toISOString(),
     expiresAt: quoteExpiresAt,
     quoteSha256: fingerprint,
@@ -273,118 +300,130 @@ export async function createPaymentIntentFromQuote(input: {
     },
   };
 
-  return input.db.transaction(async (tx) => {
-    const [existing] = await tx
-      .select()
-      .from(paymentIntents)
-      .where(
-        and(
-          eq(paymentIntents.organizationId, input.actor.organizationId),
-          eq(paymentIntents.idempotencyKey, input.idempotencyKey),
-        ),
-      )
-      .for("update")
-      .limit(1);
-    if (existing) {
-      if (existing.actorId !== input.actor.userId) {
-        throw new PaymentServiceError(
-          "IDEMPOTENCY_CONFLICT",
-          "This idempotency key belongs to a different analyst. Use a new key.",
-          409,
-        );
+  try {
+    return await input.db.transaction(async (tx) => {
+      const [existing] = await tx
+        .select()
+        .from(paymentIntents)
+        .where(
+          and(
+            eq(paymentIntents.organizationId, input.actor.organizationId),
+            eq(paymentIntents.idempotencyKey, input.idempotencyKey),
+          ),
+        )
+        .for("update")
+        .limit(1);
+      if (existing) {
+        if (existing.actorId !== input.actor.userId) {
+          throw new PaymentServiceError(
+            "IDEMPOTENCY_CONFLICT",
+            "This idempotency key belongs to a different analyst. Use a new key.",
+            409,
+          );
+        }
+        if (existing.requestFingerprint !== fingerprint) {
+          throw new PaymentServiceError(
+            "IDEMPOTENCY_CONFLICT",
+            "This idempotency key was already used with different payment requirements.",
+            409,
+          );
+        }
+        return { intent: serializePaymentIntent(existing), replayed: true };
       }
-      if (existing.requestFingerprint !== fingerprint) {
-        throw new PaymentServiceError(
-          "IDEMPOTENCY_CONFLICT",
-          "This idempotency key was already used with different payment requirements.",
-          409,
-        );
-      }
-      return { intent: serializePaymentIntent(existing), replayed: true };
-    }
 
-    const session = await ensureSession(tx, input.config, input.actor.organizationId, input.actor.userId);
-    const decision = evaluatePaymentPolicy(
-      policyFor({
-        session,
-        config: input.config,
-        idempotencyKey: input.idempotencyKey,
-        requestFingerprint: fingerprint,
-        now,
-      }),
-      {
-        providerId: input.providerQuote.providerId,
-        endpoint: input.providerQuote.endpoint,
-        requirement,
-      },
-    );
-    const configured = Boolean(input.config.session.expiresAt) && !input.config.configError;
-    const effectiveDecision: PaymentPolicyDecision = configured
-      ? decision
-      : {
-          allowed: false,
-          code: "payment_not_configured",
-          message:
-            input.config.configError ??
-            "Arc payments are not configured. Set the session expiry, allowlists, caps and enable the integration.",
-          policyVersion: PAYMENT_POLICY_VERSION,
-        };
-    const status = effectiveDecision.allowed ? "PROPOSED" : "POLICY_REJECTED";
-    const [row] = await tx
-      .insert(paymentIntents)
-      .values({
+      const session = await ensureSession(tx, input.config, input.actor.organizationId, input.actor.userId);
+      const decision = evaluatePaymentPolicy(
+        policyFor({
+          session,
+          config: input.config,
+          idempotencyKey: input.idempotencyKey,
+          requestFingerprint: fingerprint,
+          now,
+        }),
+        {
+          providerId: input.providerQuote.providerId,
+          endpoint: input.providerQuote.endpoint,
+          requirement,
+        },
+      );
+      const configured = Boolean(input.config.session.expiresAt) && !input.config.configError;
+      const effectiveDecision: PaymentPolicyDecision = configured
+        ? decision
+        : {
+            allowed: false,
+            code: "payment_not_configured",
+            message:
+              input.config.configError ??
+              "Arc payments are not configured. Set the session expiry, allowlists, caps and enable the integration.",
+            policyVersion: PAYMENT_POLICY_VERSION,
+          };
+      const status = effectiveDecision.allowed ? "PROPOSED" : "POLICY_REJECTED";
+      const [row] = await tx
+        .insert(paymentIntents)
+        .values({
+          organizationId: input.actor.organizationId,
+          borrowerId: input.run.borrowerId,
+          analysisRunId: input.run.id,
+          paymentSessionId: session.id,
+          actorId: input.actor.userId,
+          providerId: input.providerQuote.providerId,
+          providerName: input.providerQuote.displayName,
+          serviceId: input.serviceId,
+          requestContext: input.requestContext,
+          endpoint: input.providerQuote.endpoint,
+          method: input.providerQuote.method,
+          idempotencyKey: input.idempotencyKey,
+          requestFingerprint: fingerprint,
+          quoteSha256: fingerprint,
+          network: requirement.network,
+          asset: requirement.asset,
+          payTo: requirement.payTo,
+          amountMinor: requirement.amountMinor,
+          status,
+          policyDecision: effectiveDecision as unknown as Record<string, unknown>,
+          ...(effectiveDecision.allowed
+            ? {}
+            : {
+                rejectionCode: effectiveDecision.code,
+                rejectionReason: effectiveDecision.message,
+              }),
+          quote: quotePayload,
+        })
+        .returning();
+      if (!row) throw new Error("Payment intent insert did not return a row.");
+      await appendPaymentAudit(tx, {
         organizationId: input.actor.organizationId,
         borrowerId: input.run.borrowerId,
-        analysisRunId: input.run.id,
-        paymentSessionId: session.id,
+        eventType: effectiveDecision.allowed ? "PAYMENT_PROPOSED" : "PAYMENT_POLICY_REJECTED",
+        intentId: row.id,
+        actorType: "USER",
         actorId: input.actor.userId,
-        providerId: input.providerQuote.providerId,
-        providerName: input.providerQuote.displayName,
-        serviceId: input.serviceId,
-        requestContext: input.requestContext,
-        endpoint: input.providerQuote.endpoint,
-        method: input.providerQuote.method,
-        idempotencyKey: input.idempotencyKey,
-        requestFingerprint: fingerprint,
-        quoteSha256: fingerprint,
-        network: requirement.network,
-        asset: requirement.asset,
-        payTo: requirement.payTo,
-        amountMinor: requirement.amountMinor,
-        status,
-        policyDecision: effectiveDecision as unknown as Record<string, unknown>,
-        ...(effectiveDecision.allowed
-          ? {}
-          : {
-              rejectionCode: effectiveDecision.code,
-              rejectionReason: effectiveDecision.message,
-            }),
-        quote: quotePayload,
-      })
-      .returning();
-    if (!row) throw new Error("Payment intent insert did not return a row.");
-    await appendPaymentAudit(tx, {
-      organizationId: input.actor.organizationId,
-      borrowerId: input.run.borrowerId,
-      eventType: effectiveDecision.allowed ? "PAYMENT_PROPOSED" : "PAYMENT_POLICY_REJECTED",
-      intentId: row.id,
-      actorType: "USER",
-      actorId: input.actor.userId,
-      metadata: {
-        providerId: row.providerId,
-        network: row.network,
-        amountMinor: row.amountMinor,
-        quoteSha256: row.quoteSha256,
-        policyVersion: PAYMENT_POLICY_VERSION,
-      },
-      payload: {
-        endpoint: row.endpoint,
-        policyDecision: effectiveDecision,
-        requestContext: input.requestContext,
-      },
+        metadata: {
+          providerId: row.providerId,
+          network: row.network,
+          amountMinor: row.amountMinor,
+          quoteSha256: row.quoteSha256,
+          policyVersion: PAYMENT_POLICY_VERSION,
+        },
+        payload: {
+          endpoint: row.endpoint,
+          policyDecision: effectiveDecision,
+          requestContext: input.requestContext,
+        },
+      });
+      return { intent: serializePaymentIntent(row), replayed: false };
     });
-    return { intent: serializePaymentIntent(row), replayed: false };
-  });
+  } catch (error) {
+    const code = typeof error === "object" && error !== null && "code" in error ? String(error.code) : "";
+    if (code === "23505") {
+      throw new PaymentServiceError(
+        "IDEMPOTENCY_CONFLICT",
+        "This idempotency key was used concurrently. Retry with the same key to read the existing intent.",
+        409,
+      );
+    }
+    throw error;
+  }
 }
 
 export async function authorizePaymentIntent(input: {

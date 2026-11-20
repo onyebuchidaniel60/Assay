@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { canonicalize } from "./audit.js";
 
 /**
  * Deterministic spending policy for Assay external-data payments.
@@ -163,7 +164,7 @@ export function isEndpointAllowed(endpoint: string, allowlist: string[]): boolea
  * idempotency key with a different fingerprint is an idempotency conflict.
  */
 export function paymentRequestFingerprint(intent: PaymentIntent): string {
-  const canonical = JSON.stringify({
+  const canonical = canonicalize({
     providerId: intent.providerId,
     endpoint: intent.endpoint,
     requirement: {

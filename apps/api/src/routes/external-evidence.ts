@@ -427,6 +427,7 @@ export function registerExternalEvidenceRoutes(app: FastifyInstance) {
       db,
       organizationId: user.organizationId,
       borrowerId: run.borrowerId,
+      analysisRunId: id,
       evidenceId,
       includePayload: user.role === "ANALYST" || user.role === "ADMIN",
     });
