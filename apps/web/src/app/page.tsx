@@ -278,9 +278,9 @@ const stackItems = [
   },
   {
     name: "SEC EDGAR",
-    badge: "LIVE · FREE PUBLIC DATA",
-    tone: "positive" as const,
-    role: "Independent public-company evidence — real XBRL company facts with source URL, period, retrieval time, content hash and explicit private-borrower limitations.",
+    badge: "IMPLEMENTED · HOST 403",
+    tone: "warning" as const,
+    role: "Free public XBRL provider — source-linked parsing, period validation, content hash and private-borrower limits are implemented; SEC returned HTTP 403 from both tested egresses, so no live result is claimed.",
   },
   {
     name: "Neon",
@@ -319,7 +319,7 @@ const faqs = [
   {
     question: "How does the Arc payment integration work?",
     answer:
-      "Assay uses Circle Gateway's official x402 batching SDK on Arc Testnet. The provider's actual 402 requirement is evaluated by a deterministic policy that checks the approved provider, exact endpoint, network (eip155:5042002), Arc USDC contract, recipient, per-payment cap, aggregate budget, expiry, idempotency and duplicate nonce. A rejection never reaches execution. A timeout becomes RECONCILIATION_REQUIRED and is looked up, not paid again. The code and mock-server tests are implemented; no live paid financial-data retrieval is claimed because no Arc-Testnet financial-data merchant was available and no testnet funds were supplied. Free SEC EDGAR evidence is live.",
+      "Assay uses Circle Gateway's official x402 batching SDK on Arc Testnet. The provider's actual 402 requirement is evaluated by a deterministic policy that checks the approved provider, exact endpoint, network (eip155:5042002), Arc USDC contract, recipient, per-payment cap, aggregate budget, expiry, idempotency and duplicate nonce. A rejection never reaches execution. A timeout becomes RECONCILIATION_REQUIRED and is looked up, not paid again. The code and mock-server tests are implemented; no live paid financial-data retrieval is claimed because no Arc-Testnet financial-data merchant was available and no testnet funds were supplied. SEC EDGAR is implemented but returned HTTP 403 from both tested egresses, so no live SEC result is claimed.",
   },
   {
     question: "Why is Presidio labeled REDUCED_PII_MODE?",
