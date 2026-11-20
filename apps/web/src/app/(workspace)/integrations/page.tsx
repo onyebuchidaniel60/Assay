@@ -31,9 +31,11 @@ type PaymentStatus = {
   assetSymbol: string;
   assetDecimals: number;
   chainId: number;
-  gatewayWallet: string;
-  gatewayDomain: number;
-  facilitatorUrl: string;
+  settlementModel: "CIRCLE_GATEWAY_BATCH" | "X402_EXACT_ONCHAIN";
+  chain: "arcTestnet" | "arc";
+  gatewayWallet: string | null;
+  gatewayDomain: number | null;
+  facilitatorUrl: string | null;
   payerAddress: string | null;
   signingKeyConfigured: boolean;
   providerError: string | null;
@@ -46,7 +48,7 @@ type PaymentStatus = {
   };
   balances: {
     wallet: { balance: string; formatted: string } | null;
-    gateway: { total: string; available: string; formattedTotal: string; formattedAvailable: string };
+    gateway: { total: string; available: string; formattedTotal: string; formattedAvailable: string } | null;
   } | null;
   session: {
     configured: boolean;
@@ -150,11 +152,11 @@ export default async function IntegrationsPage() {
           detail: "Live endpoint eval.reppo.xyz. Only field-level, de-identified correction traces are submitted after a 50 KB preflight; verdicts stay PENDING/COMPLETED/FAILED exactly as returned.",
         },
         {
-          name: "Arc Testnet · Circle Gateway",
+          name: status.payments.settlementModel === "X402_EXACT_ONCHAIN" ? "Arc Mainnet · x402 exact" : "Arc Testnet · Circle Gateway",
           role: "Agentic x402 payment rail",
           configured: status.payments.enabled,
           state: paymentState(status.payments).state,
-          detail: `${status.payments.network} · ${status.payments.assetSymbol} ${status.payments.asset} · Gateway domain ${status.payments.gatewayDomain}. ${status.payments.configError ?? status.payments.providerError ?? "Deterministic allowlists, caps and idempotency gate every payment."}`,
+          detail: `${status.payments.network} · ${status.payments.assetSymbol} ${status.payments.asset} · ${status.payments.settlementModel === "X402_EXACT_ONCHAIN" ? "standard onchain x402 exact (EIP-3009)" : `Gateway domain ${status.payments.gatewayDomain}`}. ${status.payments.configError ?? status.payments.providerError ?? "Deterministic allowlists, caps and idempotency gate every payment."}`,
         },
       ]
     : [];
@@ -222,7 +224,9 @@ export default async function IntegrationsPage() {
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
                 <SectionLabel>Arc payment rail</SectionLabel>
-                <h2 className="mt-2 text-2xl font-semibold tracking-tight">Circle Gateway · Arc Testnet</h2>
+                <h2 className="mt-2 text-2xl font-semibold tracking-tight">
+                  {status.payments.settlementModel === "X402_EXACT_ONCHAIN" ? "x402 exact · Arc Mainnet" : "Circle Gateway · Arc Testnet"}
+                </h2>
               </div>
               <StatusBadge tone={paymentState(status.payments).tone}>{paymentState(status.payments).state}</StatusBadge>
             </div>
@@ -231,11 +235,13 @@ export default async function IntegrationsPage() {
                 ["Network", status.payments.network],
                 ["Chain ID", String(status.payments.chainId)],
                 ["USDC", `${status.payments.assetSymbol} · ${status.payments.asset.slice(0, 10)}…`],
-                ["Gateway domain", String(status.payments.gatewayDomain)],
+                ["Settlement", status.payments.settlementModel === "X402_EXACT_ONCHAIN" ? "Onchain x402 exact" : "Circle Gateway batch"],
+                ["Gateway domain", status.payments.gatewayDomain === null ? "n/a" : String(status.payments.gatewayDomain)],
                 ["Facilitator", status.payments.facilitator.reachable ? (status.payments.facilitator.supportedNetwork ? "Reachable · network supported" : "Reachable · network missing") : "Unreachable"],
                 ["Payer wallet", status.payments.payerAddress ? `${status.payments.payerAddress.slice(0, 8)}…${status.payments.payerAddress.slice(-6)}` : "Not configured"],
                 ["Signing key", status.payments.signingKeyConfigured ? "Server-side only" : "Not configured"],
-                ["Gateway balance", status.payments.balances ? formatUsdcMinor(status.payments.balances.gateway.available) : "Unavailable"],
+                ["Gateway balance", status.payments.balances?.gateway ? formatUsdcMinor(status.payments.balances.gateway.available) : "n/a"],
+                ["Wallet USDC", status.payments.balances?.wallet ? formatUsdcMinor(status.payments.balances.wallet.balance) : "Unavailable"],
               ].map(([label, value]) => (
                 <div key={label} className="rounded-2xl border border-line bg-white/40 p-4">
                   <p className="text-[10px] uppercase tracking-[0.14em] text-muted">{label}</p>
@@ -244,7 +250,9 @@ export default async function IntegrationsPage() {
               ))}
             </div>
             <p className="mt-4 break-all font-mono text-[10px] text-muted">
-              Gateway Wallet {status.payments.gatewayWallet} · Facilitator {status.payments.facilitatorUrl}
+              {status.payments.settlementModel === "X402_EXACT_ONCHAIN"
+                ? `Standard x402 exact · wallet USDC ${status.payments.asset} · seller facilitator`
+                : `Gateway Wallet ${status.payments.gatewayWallet} · Facilitator ${status.payments.facilitatorUrl}`}
             </p>
             {status.payments.session ? (
               <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

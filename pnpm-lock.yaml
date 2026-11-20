@@ -276,10 +276,13 @@ importers:
         version: link:../domain
       '@circle-fin/x402-batching':
         specifier: 4.0.0
-        version: 4.0.0(@x402/core@2.31.0)(viem@2.58.2(typescript@5.9.3)(zod@4.6.7))
+        version: 4.0.0(@x402/core@2.31.0)(@x402/evm@2.31.0(typescript@5.9.3))(viem@2.58.2(typescript@5.9.3)(zod@4.6.7))
       '@x402/core':
         specifier: 2.31.0
         version: 2.31.0
+      '@x402/evm':
+        specifier: 2.31.0
+        version: 2.31.0(typescript@5.9.3)
       viem:
         specifier: 2.58.2
         version: 2.58.2(typescript@5.9.3)(zod@4.6.7)
@@ -1702,6 +1705,9 @@ packages:
 
   '@x402/core@2.31.0':
     resolution: {integrity: sha512-7ToCOwHfftfFEERW5Mp6Fc5U1+JrtCLTkbQnEVsBl13IutltP9lWIBYi/J+zy8vQWaLUmACq8A2qywzdt/RRIQ==}
+
+  '@x402/evm@2.31.0':
+    resolution: {integrity: sha512-CCOqou/7f0/5kKQXlcVvWbiVnFmk/CqaSCs8YkJ2GPzxDYoQD13iKAjo0Uv7y/dVlkkOH0p/eJVxgcrO6aagbw==}
 
   abitype@1.2.3:
     resolution: {integrity: sha512-Ofer5QUnuUdTFsBRwARMoWKOH1ND5ehwYhJ3OJ/BQO+StkwQjHw0XyVh4vDttzHB7QOFhPHa/o413PJ82gU/Tg==}
@@ -3131,10 +3137,12 @@ snapshots:
 
   '@better-fetch/fetch@1.3.3': {}
 
-  '@circle-fin/x402-batching@4.0.0(@x402/core@2.31.0)(viem@2.58.2(typescript@5.9.3)(zod@4.6.7))':
+  '@circle-fin/x402-batching@4.0.0(@x402/core@2.31.0)(@x402/evm@2.31.0(typescript@5.9.3))(viem@2.58.2(typescript@5.9.3)(zod@4.6.7))':
     dependencies:
       '@x402/core': 2.31.0
       viem: 2.58.2(typescript@5.9.3)(zod@4.6.7)
+    optionalDependencies:
+      '@x402/evm': 2.31.0(typescript@5.9.3)
 
   '@drizzle-team/brocli@0.10.2': {}
 
@@ -3966,6 +3974,17 @@ snapshots:
   '@x402/core@2.31.0':
     dependencies:
       zod: 4.6.7
+
+  '@x402/evm@2.31.0(typescript@5.9.3)':
+    dependencies:
+      '@x402/core': 2.31.0
+      viem: 2.58.2(typescript@5.9.3)(zod@4.6.7)
+      zod: 4.6.7
+    transitivePeerDependencies:
+      - bufferutil
+      - mppx
+      - typescript
+      - utf-8-validate
 
   abitype@1.2.3(typescript@5.9.3)(zod@4.6.7):
     optionalDependencies:

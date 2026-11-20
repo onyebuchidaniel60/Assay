@@ -23,7 +23,8 @@ describe.skipIf(!enabled)("live Arc Testnet payment", () => {
       ...(process.env.CIRCLE_GATEWAY_FACILITATOR_URL ? { facilitatorUrl: process.env.CIRCLE_GATEWAY_FACILITATOR_URL } : {}),
     });
     const balances = await provider.getBalances();
-    expect(BigInt(balances.gateway.available)).toBeGreaterThan(0n);
+    expect(balances.gateway).not.toBeNull();
+    expect(BigInt(balances.gateway!.available)).toBeGreaterThan(0n);
 
     const facilitator = await provider.getFacilitatorStatus();
     expect(facilitator.reachable).toBe(true);

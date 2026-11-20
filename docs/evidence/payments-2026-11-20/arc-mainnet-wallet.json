@@ -1,0 +1,10 @@
+{
+  "network": "eip155:5042",
+  "publicAddress": "0xDff5469Ee2DD3f600ED5e216AD89705A08a85491",
+  "configuredAddress": "0xDff5469Ee2DD3f600ED5e216AD89705A08a85491",
+  "verified": true,
+  "keyFile": "/root/assay-secrets/arc-mainnet-payer.env",
+  "keyFileMode": "600",
+  "privateKeyPrinted": false,
+  "capturedAt": "2026-11-20T16:36:15.049Z"
+}

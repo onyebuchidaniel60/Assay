@@ -110,6 +110,8 @@ export type GatewayTransfer = {
   [key: string]: unknown;
 };
 
+export type PaymentSettlementModel = "CIRCLE_GATEWAY_BATCH" | "X402_EXACT_ONCHAIN";
+
 export type PaymentBalances = {
   wallet: { balance: string; formatted: string } | null;
   gateway: {
@@ -119,7 +121,7 @@ export type PaymentBalances = {
     withdrawable: string;
     formattedTotal: string;
     formattedAvailable: string;
-  };
+  } | null;
 };
 
 export type FacilitatorStatus = {
@@ -133,13 +135,16 @@ export type FacilitatorStatus = {
 export type PaymentProvider = {
   readonly id: PaymentProviderId;
   readonly displayName: string;
+  readonly settlementModel: PaymentSettlementModel;
   readonly network: string;
   readonly chainId: number;
   readonly asset: string;
   readonly assetSymbol: string;
-  readonly gatewayWallet: string;
-  readonly gatewayDomain: number;
-  readonly facilitatorUrl: string;
+  readonly gatewayWallet: string | null;
+  readonly gatewayDomain: number | null;
+  readonly facilitatorUrl: string | null;
+  readonly payerAddress: string | null;
+  readonly signingKeyConfigured: boolean;
 
   fetchRequirements(input: PaymentRequestInput): Promise<PaymentRequirementsResult>;
   execute(input: PaymentExecuteInput): Promise<PaymentExecutionResult>;
@@ -154,6 +159,8 @@ export type PaymentProvider = {
   }): Promise<GatewayTransfer[]>;
   getBalances(address?: string): Promise<PaymentBalances>;
   getFacilitatorStatus(): Promise<FacilitatorStatus>;
+  /** EIP-3009 authorization state for standard onchain x402 reconciliation. */
+  getAuthorizationState?(input: { from: string; nonce: string }): Promise<boolean>;
   deposit(amount: string): Promise<{ depositTxHash: string; approvalTxHash?: string; formattedAmount: string }>;
   withdraw(amount: string): Promise<{ mintTxHash: string; formattedAmount: string }>;
 };

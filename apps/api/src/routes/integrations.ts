@@ -59,7 +59,9 @@ async function arcStatus(organizationId: string): Promise<Record<string, unknown
   ]);
 
   const value = {
-    rail: "arc-circle-gateway",
+    rail: config.settlementModel === "X402_EXACT_ONCHAIN" ? "arc-x402-exact" : "arc-circle-gateway",
+    settlementModel: config.settlementModel,
+    chain: config.chain,
     enabled: config.enabled,
     ready: paymentRuntimeReady(config),
     executionEnabled: config.executionEnabled && !config.dryRun,
@@ -69,9 +71,9 @@ async function arcStatus(organizationId: string): Promise<Record<string, unknown
     assetSymbol: "USDC",
     assetDecimals: 6,
     chainId: config.chainId,
-    gatewayWallet: config.gatewayWallet,
-    gatewayDomain: config.gatewayDomain,
-    facilitatorUrl: config.facilitatorUrl,
+    gatewayWallet: provider?.gatewayWallet ?? null,
+    gatewayDomain: provider?.gatewayDomain ?? null,
+    facilitatorUrl: provider?.facilitatorUrl ?? null,
     payerAddress: provider?.payerAddress ?? config.payerAddress ?? null,
     signingKeyConfigured: provider?.signingKeyConfigured ?? Boolean(config.privateKey),
     providerError,
@@ -84,7 +86,7 @@ async function arcStatus(organizationId: string): Promise<Record<string, unknown
       financialDatasets:
         "Documented x402 rail is Base mainnet USDC (eip155:8453). It is not Arc-compatible; Assay will not bridge or relabel a Base payment as Arc.",
       lonestarOracle:
-        "Real x402 financial-data provider with an Arc mainnet USDC option (eip155:5042). Assay's default testnet policy rejects it and no mainnet funds are authorized.",
+        "Real x402 financial-data provider with an Arc mainnet USDC option (eip155:5042). The current Assay configuration uses standard x402 exact on Arc Mainnet when the operator explicitly allows eip155:5042 and the merchant recipient.",
       secEdgar: "Free public SEC XBRL data. It needs no payment and is used for real independent evidence when an analyst links a public CIK/ticker.",
     },
   };

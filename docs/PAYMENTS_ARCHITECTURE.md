@@ -64,7 +64,7 @@ Analyst / bounded workflow
 
 ### Services and files
 
-- `packages/payments` — `PaymentProvider` interface and `ArcCircleGatewayProvider` using the official Circle SDK and viem.
+- `packages/payments` — `PaymentProvider` interface, `ArcCircleGatewayProvider` for Arc Testnet Gateway batching, and `ArcX402ExactProvider` for LoneStar Oracle’s Arc Mainnet standard EIP-3009 x402 option.
 - `packages/domain/src/payment-policy.ts` — pure deterministic policy, no I/O and no LLM input.
 - `apps/api/src/lib/payment-service.ts` — session lock, proposal, authorisation, budget reservation and replay.
 - `apps/api/src/lib/payment-execution.ts` — worker execution, receipt handling, evidence storage, reconciliation and no-blind-retry behaviour.
@@ -127,16 +127,17 @@ It does **not** offer Arc Testnet and does not support Circle Gateway batching o
 
 An API-key path exists in the adapter, but no `FINANCIAL_DATASETS_API_KEY` is configured in this environment, so no retrieval is claimed.
 
-### LoneStar Oracle EquityScope (Arc-compatible quote, mainnet only)
+### LoneStar Oracle EquityScope (Arc Mainnet standard x402 exact)
 
 Circle Discovery lists `https://equity.lonestaroracle.xyz/equity` with:
 
-- Base, Solana and **Arc mainnet** (`eip155:5042`) options,
-- Arc mainnet USDC `0x3600000000000000000000000000000000000000`,
+- Base, Solana, Arc Mainnet (`eip155:5042`) and another EVM option,
+- Arc Mainnet USDC `0x3600000000000000000000000000000000000000`,
 - 0.05 USDC per request,
-- `scheme: exact`.
+- `scheme: exact`,
+- `extra: { name: "USDC", version: "2", assetTransferMethod: "eip3009" }`.
 
-This is the closest real third-party financial-data provider with an Arc option. It is **Arc mainnet**, not testnet. Assay's default policy allows only `eip155:5042002`, and no production funds are authorised, so the quote is persisted as `POLICY_REJECTED` with `payment_network_forbidden`. No mainnet payment was made.
+This is **standard onchain x402 exact**, not Circle Gateway batching. Assay implements `ArcX402ExactProvider`, which signs EIP-3009 against the USDC token, sends the standard x402 payload, checks the seller receipt and reconciles via USDC `authorizationState(from, nonce)`. The default testnet configuration still rejects `eip155:5042`; mainnet is opt-in with `ARC_NETWORK=eip155:5042`, `ARC_SETTLEMENT_MODEL=x402-exact`, an explicit merchant recipient and execution left disabled until operator authorization. No mainnet payment was made.
 
 ### SEC EDGAR (free public verification)
 
@@ -179,7 +180,7 @@ The generated unfunded Arc Testnet payer address is `0x16CCd81145AF27fB3Aba157d9
 
 A synthetic run (`856a437a-0449-4d2e-8cab-024fc0fa8140`, BOR-004, `TERMS_CONFIRMED`) was used to exercise the real provider quote and policy path from the local UI.
 
-- The live LoneStar Oracle 402 returned `network: eip155:5042`, `asset: 0x3600…0000`, `amount: 50000` (0.05 USDC), `payTo: 0xeF2a…42ab`.
+- The live LoneStar Oracle 402 on Arc Mainnet returned `network: eip155:5042`, `asset: 0x3600…0000`, `amount: 50000` (0.05 USDC), `payTo: 0xeF2a…42ab`, `scheme: exact`, `extra.assetTransferMethod: eip3009` (standard onchain x402, not Gateway batching). The dedicated mainnet payer `0xDff5469Ee2DD3f600ED5e216AD89705A08a85491` has a 0 USDC wallet balance. Read-only quote evidence: `docs/evidence/payments-2026-11-20/lonestar-arc-mainnet-quote.json`.
 - Payment intent `86907190-500c-434d-ac4a-73f526aa7a38` was persisted as `POLICY_REJECTED` with `payment_network_forbidden`.
 - No `payment.execute` or `payment.reconcile` job was created. The rejected transaction never reached the execution layer.
 - Audit events `PAYMENT_POLICY_REJECTED`, `EXTERNAL_EVIDENCE_REQUESTED` and `EXTERNAL_EVIDENCE_FAILED` were appended to the existing signed chain. `POST /v1/borrowers/…/audit/verify` returned `VALID` with 22 events.

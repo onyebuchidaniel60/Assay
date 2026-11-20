@@ -524,6 +524,65 @@ async function markPaymentFailed(input: {
   });
 }
 
+async function markReconciledByAuthorizationState(intent: PaymentIntentRow): Promise<void> {
+  await db.transaction(async (tx) => {
+    const [locked] = await tx.select().from(paymentIntents).where(eq(paymentIntents.id, intent.id)).for("update").limit(1);
+    if (!locked || ["CONFIRMED", "RECONCILED", "FAILED"].includes(locked.status)) return;
+    const authorized = locked.authorizedAmountMinor ?? locked.amountMinor;
+    const dataRetrieved = locked.dataStatus === "RETRIEVED";
+    await tx
+      .update(paymentIntents)
+      .set({
+        status: "RECONCILED",
+        settledAmountMinor: authorized,
+        failureCode: null,
+        failureMessage: null,
+        reconciledAt: new Date(),
+        settledAt: locked.settledAt ?? new Date(),
+        dataStatus: dataRetrieved ? "RETRIEVED" : "FAILED",
+        dataFailureCode: dataRetrieved ? null : "DATA_RETRIEVAL_NOT_REPLAYABLE",
+        updatedAt: new Date(),
+      })
+      .where(eq(paymentIntents.id, locked.id));
+    if (!locked.settledAt) {
+      await settleReservation(tx, locked.paymentSessionId, authorized, authorized);
+    }
+    await appendPaymentAudit(tx, {
+      organizationId: locked.organizationId,
+      borrowerId: locked.borrowerId,
+      eventType: "PAYMENT_RECONCILED",
+      intentId: locked.id,
+      actorType: "SYSTEM",
+      metadata: {
+        providerId: locked.providerId,
+        settlementModel: "X402_EXACT_ONCHAIN",
+        reconciledBy: "eip3009_authorization_state",
+        nonce: locked.nonce,
+        settledAmountMinor: authorized,
+      },
+      payload: {
+        note: "The onchain EIP-3009 authorization state is used. No transaction hash is fabricated.",
+        dataRetrieved,
+      },
+    });
+    if (!dataRetrieved) {
+      await appendBorrowerAuditEventInTx(tx, {
+        organizationId: locked.organizationId,
+        borrowerId: locked.borrowerId,
+        actorType: "SYSTEM",
+        eventType: "EXTERNAL_EVIDENCE_FAILED",
+        entityType: "payment_intent",
+        entityId: locked.id,
+        metadata: { providerId: locked.providerId, code: "DATA_RETRIEVAL_NOT_REPLAYABLE" },
+        payload: {
+          message:
+            "The payment authorization was used, but the paid response data was not preserved. Assay will not pay again automatically.",
+        },
+      });
+    }
+  });
+}
+
 async function enqueueReconciliation(config: PaymentRuntimeConfig, intentId: string, organizationId: string): Promise<void> {
   const nextRunAt = new Date(Date.now() + config.reconcile.intervalSeconds * 1000);
   await db
@@ -571,6 +630,37 @@ export async function reconcilePaymentJob(
   }
   const provider = createArcProvider(config);
   const from = intent.payerAddress ?? provider.payerAddress;
+  if (provider.getAuthorizationState && intent.payerAddress && intent.nonce) {
+    let used: boolean;
+    try {
+      used = await provider.getAuthorizationState({ from: intent.payerAddress, nonce: intent.nonce });
+    } catch (error) {
+      if (attempts >= maxAttempts) {
+        await markPaymentFailed({
+          intent,
+          code: "SETTLEMENT_LOOKUP_FAILED",
+          message: "The onchain authorization lookup failed and the reconciliation attempts were exhausted. No retry payment was attempted.",
+          release: true,
+        });
+        return "DONE";
+      }
+      throw new RetryPaymentReconciliation(error instanceof Error ? error.message : undefined);
+    }
+    if (used) {
+      await markReconciledByAuthorizationState(intent);
+      return "DONE";
+    }
+    if (attempts >= maxAttempts) {
+      await markPaymentFailed({
+        intent,
+        code: "SETTLEMENT_NOT_FOUND",
+        message: "The EIP-3009 authorization was not used after the reconciliation window. No retry payment was attempted.",
+        release: true,
+      });
+      return "DONE";
+    }
+    return "RETRY";
+  }
   let transfers;
   try {
     transfers = await provider.searchTransfers({

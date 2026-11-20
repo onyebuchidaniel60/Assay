@@ -14,10 +14,10 @@ const hex = z.string().regex(/^0x[0-9a-fA-F]+$/, "Expected a hex value.");
 export const x402AcceptSchema = z
   .object({
     scheme: z.string().min(1),
-    network: z.string().regex(/^eip155:\d+$/, "Expected a CAIP-2 EVM network."),
-    asset: z.string().regex(/^0x[0-9a-fA-F]{40}$/, "Expected a token contract address."),
+    network: z.string().min(3, "Expected a CAIP-2 network identifier."),
+    asset: z.string().min(1, "Expected a token identifier."),
     amount: z.string().regex(/^\d+$/, "Expected an integer amount in minor units."),
-    payTo: evmAddress,
+    payTo: z.string().min(1, "Expected a recipient identifier."),
     maxTimeoutSeconds: z.number().int().positive(),
     extra: z.record(z.string(), z.unknown()).optional(),
   })
@@ -137,6 +137,29 @@ export function selectGatewayOption(
     const versionB = Number((b.extra ?? {}).version ?? 0);
     return versionB - versionA;
   })[0]!;
+}
+
+export function selectExactOption(
+  paymentRequired: z.infer<typeof paymentRequiredSchema>,
+  expected: { network: string; asset: string },
+): X402Accept {
+  const candidates = paymentRequired.accepts.filter((option) => {
+    const extra = option.extra ?? {};
+    return (
+      option.scheme === "exact" &&
+      option.network === expected.network &&
+      option.asset.toLowerCase() === expected.asset.toLowerCase() &&
+      extra.name !== GATEWAY_BATCHING_NAME
+    );
+  });
+  if (candidates.length === 0) {
+    throw new PaymentRequestError(
+      "X402_OPTION_UNAVAILABLE",
+      `The provider does not offer a standard x402 exact option on ${expected.network} with the expected USDC contract.`,
+    );
+  }
+  const eip3009 = candidates.filter((option) => option.extra?.assetTransferMethod === "eip3009");
+  return (eip3009[0] ?? candidates[0])!;
 }
 
 export function buildQuote(input: {

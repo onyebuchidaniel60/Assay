@@ -80,9 +80,9 @@ Implemented with a descriptive `SEC_EDGAR_USER_AGENT`, CIK/ticker resolution, XB
 
 The live 402 terms on 20 November 2026 offered **Base mainnet** (`eip155:8453`) USDC only, with a Non-Professional x402 licence. It does not accept Arc Testnet or Circle Gateway on Arc. Assay implements the adapter, marks it incompatible, rejects it at the network policy check and does not bridge or relabel the payment. No API key is configured, so no retrieval is claimed.
 
-### LoneStar Oracle EquityScope — Arc mainnet quote only
+### LoneStar Oracle EquityScope — Arc Mainnet standard x402 exact
 
-Circle Discovery lists a real financial-data endpoint with an **Arc mainnet** (`eip155:5042`) USDC option at 0.05 USDC per request. Assay parses the actual quote and persists a deterministic `payment_network_forbidden` rejection under the default testnet-only policy. No mainnet funds are authorised and no payment was made.
+Circle Discovery lists a real financial-data endpoint with an **Arc Mainnet** (`eip155:5042`) USDC option at 0.05 USDC per request. The live option is **standard onchain x402 exact** (`assetTransferMethod: eip3009`), not Circle Gateway batching. Assay implements `ArcX402ExactProvider` for this rail and verifies the live quote. The default testnet configuration rejects `eip155:5042`; mainnet is opt-in with an explicit merchant recipient and execution disabled. No mainnet payment was made.
 
 ## Archived Kite evidence
 
@@ -114,5 +114,5 @@ Google Gemini TTS was not used: no Google AI/TTS credential or free-tier activat
 - Arc Testnet / Circle Gateway: **IMPLEMENTED, NOT LIVE-PAID** — verified SDK/config/facilitator, deterministic policy and mock-x402 tests; no live settlement or paid evidence retrieval claimed.
 - SEC EDGAR: **IMPLEMENTED, LIVE RETRIEVAL BLOCKED FROM THIS HOST** — HTTP 403 from SEC/Akamai on 20 November 2026; fixtures and validation pass. Re-probe Render before claiming live data.
 - Financial Datasets: **ADAPTER ONLY, NOT ARC-COMPATIBLE** — Base mainnet x402; no key; no payment or retrieval claimed.
-- LoneStar Oracle: **QUOTE-ONLY, POLICY-RESTRICTED** — Arc mainnet; default policy rejects `eip155:5042`; no payment claimed.
+- LoneStar Oracle: **ARC MAINNET X402 EXACT IMPLEMENTED; UNFUNDED/EXECUTION DISABLED** — live 0.05 USDC quote verified; mainnet policy is opt-in; no payment claimed.
 - Kite: **REMOVED** — historical provider-blocked evidence is archived at [archive/KITE_REMOVAL.md](archive/KITE_REMOVAL.md); no active dependency remains.

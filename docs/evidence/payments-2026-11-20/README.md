@@ -15,6 +15,20 @@ All values below were captured from this environment on 20 November 2026. No sec
 | `deployed-policy-rejection.png` | Deployed run page showing `POLICY_REJECTED` / `payment_network_forbidden`. |
 | `deployed-sec-attempt.png` | Deployed run page showing the Render-side SEC HTTP 403 and no fabricated evidence. |
 | `provider-compatibility.json` | Read-only re-check: 0 Arc-Testnet financial-analysis services, 193 Arc-mainnet listings, Financial Datasets Base-mainnet only, LoneStar Oracle Arc-mainnet option. |
+| `lonestar-arc-mainnet-quote.json` | Live LoneStar Oracle Arc Mainnet standard x402 exact quote, dedicated payer balance and deterministic policy decision. |
+
+## Dedicated Arc Mainnet payer
+
+- Public address: `0xDff5469Ee2DD3f600ED5e216AD89705A08a85491`
+- Private key: stored only at `/root/assay-secrets/arc-mainnet-payer.env` (mode 600, outside Git); never printed or committed.
+- Verified locally by re-reading the key file and re-deriving the address.
+- Current wallet USDC balance: `0` (unfunded).
+- Network: `eip155:5042` (Arc Mainnet).
+- Token: USDC `0x3600000000000000000000000000000000000000` (6 decimals).
+- Settlement model: standard onchain x402 exact (`assetTransferMethod: eip3009`).
+- Merchant: `0xeF2a4B6756895aAf1374640dcFCD4947959442ab`.
+- Current quoted price: `50000` atomic USDC = `0.05 USDC`.
+- Execution: disabled (`PAYMENT_EXECUTION_ENABLED=false`, `PAYMENT_DRY_RUN=true`).
 
 ## Reproduce
 

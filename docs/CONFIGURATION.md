@@ -11,7 +11,7 @@ Use `.env.example` as the canonical environment variable list. The complete vari
 
 ## Server-only secrets
 
-`DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `NEON_AUTH_BASE_URL`, `NEON_AUTH_API_KEY`, `NEON_AUTH_COOKIE_SECRET`, `NEON_STORAGE_BUCKET`, `AWS_ENDPOINT_URL_S3`, `AWS_REGION`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `SERV_REASONING_API_KEY`, `NEARAI_API_KEY`, `OPENROUTER_API_KEY`, `REPPO_API_KEY`, `REPPO_BASE_URL`, `PRESIDIO_SERVICE_TOKEN`, `DATA_KEK_BASE64`, `AUDIT_SIGNING_PRIVATE_KEY_BASE64`, `AUDIT_SIGNING_PUBLIC_KEY_BASE64`, `ARC_TESTNET_PRIVATE_KEY`, `ARC_TESTNET_PAYER_ADDRESS`, `CIRCLE_GATEWAY_FACILITATOR_URL`, payment allowlists/caps, `SEC_EDGAR_USER_AGENT` and optional `FINANCIAL_DATASETS_API_KEY`. Never prefix them with `NEXT_PUBLIC_`.
+`DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `NEON_AUTH_BASE_URL`, `NEON_AUTH_API_KEY`, `NEON_AUTH_COOKIE_SECRET`, `NEON_STORAGE_BUCKET`, `AWS_ENDPOINT_URL_S3`, `AWS_REGION`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `SERV_REASONING_API_KEY`, `NEARAI_API_KEY`, `OPENROUTER_API_KEY`, `REPPO_API_KEY`, `REPPO_BASE_URL`, `PRESIDIO_SERVICE_TOKEN`, `DATA_KEK_BASE64`, `AUDIT_SIGNING_PRIVATE_KEY_BASE64`, `AUDIT_SIGNING_PUBLIC_KEY_BASE64`, `ARC_TESTNET_PRIVATE_KEY`, `ARC_MAINNET_PRIVATE_KEY`, `ARC_TESTNET_PAYER_ADDRESS`, `ARC_MAINNET_PAYER_ADDRESS`, `CIRCLE_GATEWAY_FACILITATOR_URL`, `CIRCLE_GATEWAY_MAINNET_FACILITATOR_URL`, payment allowlists/caps, `SEC_EDGAR_USER_AGENT` and optional `FINANCIAL_DATASETS_API_KEY`. Never prefix them with `NEXT_PUBLIC_`.
 
 ## Model and provider configuration
 
@@ -82,12 +82,32 @@ node scripts/check-provider-compatibility.mjs
 ARC_TESTNET_PRIVATE_KEY=... node scripts/arc-gateway-deposit.mjs --amount 0.50 --confirm
 ```
 
+### Arc Mainnet / LoneStar Oracle (standard x402 exact)
+
+Use this only after explicit operator authorization and funding.
+
+- `ARC_NETWORK=eip155:5042`
+- `ARC_SETTLEMENT_MODEL=x402-exact` — selects `ArcX402ExactProvider`, not the Arc Testnet Circle Gateway provider.
+- `ARC_MAINNET_RPC_URL=https://rpc.mainnet.arc.io`
+- `ARC_MAINNET_PRIVATE_KEY=` — server-side only; never commit, log or send to the frontend.
+- `ARC_MAINNET_PAYER_ADDRESS=` — public address; must match the key.
+- `CIRCLE_GATEWAY_MAINNET_FACILITATOR_URL=https://gateway-api.circle.com` — used only if a seller offers Circle Gateway batching on Arc Mainnet.
+- `PAYMENT_SESSION_ID=assay-arc-mainnet-session-1`
+- `PAYMENT_ALLOWED_PROVIDERS=lonestar-oracle`
+- `PAYMENT_ALLOWED_ENDPOINTS=https://equity.lonestaroracle.xyz/equity`
+- `PAYMENT_ALLOWED_RECIPIENTS=0xeF2a4B6756895aAf1374640dcFCD4947959442ab`
+- `PAYMENT_ALLOWED_NETWORKS=eip155:5042`
+- `PAYMENT_ALLOWED_ASSETS=0x3600000000000000000000000000000000000000`
+- `PAYMENT_EXECUTION_ENABLED=false` and `PAYMENT_DRY_RUN=true` until the operator explicitly authorizes signing.
+
+LoneStar’s Arc option is **standard onchain x402 exact** (`extra.name: "USDC"`, `version: "2"`, `assetTransferMethod: "eip3009"`), not Circle Gateway batching. It spends wallet USDC and does not use a Gateway deposit. The mainnet provider signs the EIP-3009 authorization against the USDC token and verifies the seller’s `PAYMENT-RESPONSE` receipt. Reconciliation reads the USDC `authorizationState(from, nonce)` view; it does not fabricate a transaction hash.
+
 ### Financial-data configuration
 
 - `SEC_EDGAR_USER_AGENT=` — descriptive operator contact. SEC fair-access rules require it. The app refuses live SEC retrieval without it. The current development host receives HTTP 403 from SEC/Akamai; probe the deployed egress before claiming live SEC evidence.
 - `FINANCIAL_DATASETS_API_KEY=` — optional; licensed API-key path only. The documented x402 path is Base mainnet and is not Arc-compatible.
 - `FINANCIAL_DATASETS_BASE_URL=https://api.financialdatasets.ai`
-- `LONESTAR_ORACLE_BASE_URL=https://equity.lonestaroracle.xyz` — real Circle Discovery financial-data provider with an Arc mainnet option; default policy rejects mainnet.
+- `LONESTAR_ORACLE_BASE_URL=https://equity.lonestaroracle.xyz` — real Circle Discovery financial-data provider with a standard x402 exact Arc Mainnet option. Mainnet policy is opt-in via `PAYMENT_ALLOWED_NETWORKS=eip155:5042` and an explicit merchant recipient.
 
 ### Kite removal
 

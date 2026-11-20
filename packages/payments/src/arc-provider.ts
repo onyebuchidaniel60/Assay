@@ -7,9 +7,9 @@ import {
 import { createPublicClient, erc20Abi, formatUnits, http, type Address, type Hex } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import {
-  ARC_TESTNET,
-  isArcTestnetAsset,
-  isArcTestnetNetwork,
+  ARC_CHAINS,
+  type ArcChainName,
+  isArcAsset,
   verifyArcSdkConfig,
 } from "./arc-config.js";
 import { PaymentProviderError, PaymentRequestError } from "./errors.js";
@@ -39,6 +39,7 @@ import type {
 } from "./types.js";
 
 export type ArcCircleGatewayConfig = {
+  chain?: ArcChainName;
   privateKey?: string;
   payerAddress?: string;
   rpcUrl?: string;
@@ -75,7 +76,8 @@ function safeJson(text: string): unknown {
 
 export class ArcCircleGatewayProvider implements PaymentProvider {
   readonly id = "arc-circle-gateway";
-  readonly displayName = "Arc Testnet · Circle Gateway";
+  readonly displayName: string;
+  readonly settlementModel = "CIRCLE_GATEWAY_BATCH" as const;
   readonly network: string;
   readonly chainId: number;
   readonly asset: string;
@@ -83,6 +85,7 @@ export class ArcCircleGatewayProvider implements PaymentProvider {
   readonly gatewayWallet: string;
   readonly gatewayDomain: number;
   readonly facilitatorUrl: string;
+  readonly chainName: ArcChainName;
 
   readonly #configuredPayerAddress: string | undefined;
   readonly #privateKey: Hex | undefined;
@@ -94,28 +97,32 @@ export class ArcCircleGatewayProvider implements PaymentProvider {
   private readonly apiBase: string;
 
   constructor(config: ArcCircleGatewayConfig = {}) {
-    const sdk = verifyArcSdkConfig();
+    const chainName = config.chain ?? "arcTestnet";
+    const expected = ARC_CHAINS[chainName];
+    const sdk = verifyArcSdkConfig(chainName);
+    this.chainName = chainName;
+    this.displayName = `${expected.name} · Circle Gateway`;
     this.#configuredPayerAddress = config.payerAddress;
-    this.network = config.network ?? ARC_TESTNET.network;
-    this.asset = config.asset ?? ARC_TESTNET.usdc;
-    this.gatewayWallet = config.gatewayWallet ?? ARC_TESTNET.gatewayWallet;
+    this.network = config.network ?? expected.network;
+    this.asset = config.asset ?? expected.usdc;
+    this.gatewayWallet = config.gatewayWallet ?? expected.gatewayWallet;
     this.chainId = sdk.chainId;
     this.gatewayDomain = sdk.gatewayDomain;
-    this.facilitatorUrl = (config.facilitatorUrl ?? ARC_TESTNET.facilitatorUrl).replace(/\/$/, "");
+    this.facilitatorUrl = (config.facilitatorUrl ?? expected.facilitatorUrl).replace(/\/$/, "");
     this.requestTimeoutMs = config.requestTimeoutMs ?? 20_000;
-    this.rpcUrl = config.rpcUrl ?? ARC_TESTNET.rpcUrl;
+    this.rpcUrl = config.rpcUrl ?? expected.rpcUrl;
 
-    if (!isArcTestnetNetwork(this.network)) {
-      throw new Error(`ArcCircleGatewayProvider only supports ${ARC_TESTNET.network}; received ${this.network}.`);
+    if (this.network !== expected.network) {
+      throw new Error(`ArcCircleGatewayProvider only supports ${expected.network}; received ${this.network}.`);
     }
-    if (!isArcTestnetAsset(this.asset)) {
-      throw new Error(`ArcCircleGatewayProvider only supports Arc Testnet USDC ${ARC_TESTNET.usdc}.`);
+    if (!isArcAsset(this.asset, chainName)) {
+      throw new Error(`ArcCircleGatewayProvider only supports ${expected.name} USDC ${expected.usdc}.`);
     }
-    if (this.gatewayWallet.toLowerCase() !== ARC_TESTNET.gatewayWallet.toLowerCase()) {
+    if (this.gatewayWallet.toLowerCase() !== expected.gatewayWallet.toLowerCase()) {
       throw new Error(`Refusing an unexpected Gateway Wallet address: ${this.gatewayWallet}.`);
     }
     const parsedFacilitator = new URL(this.facilitatorUrl);
-    const defaultHost = new URL(ARC_TESTNET.facilitatorUrl).host;
+    const defaultHost = new URL(expected.facilitatorUrl).host;
     if (
       !config.allowCustomFacilitator &&
       (parsedFacilitator.protocol !== "https:" || parsedFacilitator.host !== defaultHost)
@@ -128,22 +135,22 @@ export class ArcCircleGatewayProvider implements PaymentProvider {
 
     if (config.privateKey) {
       if (!/^0x[0-9a-fA-F]{64}$/.test(config.privateKey)) {
-        throw new Error("ARC_TESTNET_PRIVATE_KEY must be a 32-byte 0x-prefixed hex value.");
+        throw new Error("The Arc signing key must be a 32-byte 0x-prefixed hex value.");
       }
       this.#privateKey = config.privateKey as Hex;
       this.#account = privateKeyToAccount(this.#privateKey);
       if (config.payerAddress && config.payerAddress.toLowerCase() !== this.#account.address.toLowerCase()) {
-        throw new Error("ARC_TESTNET_PAYER_ADDRESS does not match the configured signing key.");
+        throw new Error("The configured payer address does not match the signing key.");
       }
       this.#scheme = new BatchEvmScheme(this.#account);
       this.#gatewayClient = new GatewayClient({
-        chain: "arcTestnet",
+        chain: this.chainName,
         privateKey: this.#privateKey,
         ...(config.rpcUrl ? { rpcUrl: config.rpcUrl } : {}),
       });
     } else {
       if (config.payerAddress && !/^0x[0-9a-fA-F]{40}$/.test(config.payerAddress)) {
-        throw new Error("ARC_TESTNET_PAYER_ADDRESS must be a 20-byte EVM address.");
+        throw new Error("The configured payer address must be a 20-byte EVM address.");
       }
       this.#privateKey = undefined;
       this.#account = undefined;
@@ -164,6 +171,8 @@ export class ArcCircleGatewayProvider implements PaymentProvider {
     return {
       id: this.id,
       displayName: this.displayName,
+      settlementModel: this.settlementModel,
+      chain: this.chainName,
       network: this.network,
       chainId: this.chainId,
       asset: this.asset,
@@ -493,7 +502,7 @@ export class ArcCircleGatewayProvider implements PaymentProvider {
     let wallet: PaymentBalances["wallet"] = null;
     try {
       const publicClient = createPublicClient({
-        chain: CHAIN_CONFIGS.arcTestnet.chain,
+        chain: CHAIN_CONFIGS[this.chainName].chain,
         transport: http(this.rpcUrl),
       });
       const balance = await publicClient.readContract({
@@ -502,7 +511,7 @@ export class ArcCircleGatewayProvider implements PaymentProvider {
         functionName: "balanceOf",
         args: [target as Address],
       });
-      wallet = { balance: balance.toString(), formatted: formatUnits(balance, ARC_TESTNET.usdcDecimals) };
+      wallet = { balance: balance.toString(), formatted: formatUnits(balance, ARC_CHAINS[this.chainName].usdcDecimals) };
     } catch {
       wallet = null;
     }

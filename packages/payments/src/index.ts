@@ -1,4 +1,5 @@
 export * from "./arc-config.js";
+export * from "./arc-mainnet-provider.js";
 export * from "./arc-provider.js";
 export * from "./errors.js";
 export * from "./types.js";

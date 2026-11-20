@@ -52,4 +52,27 @@ describe("payment runtime configuration", () => {
     expect(config.privateKey).toBeUndefined();
     expect(config.payerAddress).toBeUndefined();
   });
+
+  it("selects Arc Mainnet and the standard x402 exact rail when configured", () => {
+    const config = loadPaymentRuntimeConfig({
+      ARC_PAYMENTS_ENABLED: "true",
+      ARC_NETWORK: "eip155:5042",
+      ARC_SETTLEMENT_MODEL: "x402-exact",
+      ARC_MAINNET_PAYER_ADDRESS: "0xDff5469Ee2DD3f600ED5e216AD89705A08a85491",
+      PAYMENT_SESSION_EXPIRES_AT: "2099-12-01T00:00:00Z",
+      PAYMENT_ALLOWED_PROVIDERS: "lonestar-oracle",
+      PAYMENT_ALLOWED_ENDPOINTS: "https://equity.lonestaroracle.xyz/equity",
+      PAYMENT_ALLOWED_RECIPIENTS: "0xeF2a4B6756895aAf1374640dcFCD4947959442ab",
+      PAYMENT_ALLOWED_NETWORKS: "eip155:5042",
+      PAYMENT_ALLOWED_ASSETS: "0x3600000000000000000000000000000000000000",
+    });
+    expect(config.configError).toBeNull();
+    expect(config.chain).toBe("arc");
+    expect(config.settlementModel).toBe("X402_EXACT_ONCHAIN");
+    expect(config.network).toBe("eip155:5042");
+    expect(config.gatewayWallet).toBe("0x77777777Dcc4d5A8B6E418Fd04D8997ef11000eE");
+    expect(config.payerAddress).toBe("0xDff5469Ee2DD3f600ED5e216AD89705A08a85491");
+    expect(paymentRuntimeReady(config)).toBe(true);
+    expect(JSON.stringify(config)).not.toContain("ARC_MAINNET_PRIVATE_KEY");
+  });
 });

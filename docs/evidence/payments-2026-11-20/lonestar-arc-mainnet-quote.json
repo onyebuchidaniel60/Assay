@@ -1,0 +1,32 @@
+{
+  "capturedAt": "2026-11-20T16:32:31.288Z",
+  "payerAddress": "0xDff5469Ee2DD3f600ED5e216AD89705A08a85491",
+  "settlementModel": "X402_EXACT_ONCHAIN",
+  "network": "eip155:5042",
+  "asset": "0x3600000000000000000000000000000000000000",
+  "amountMinor": "50000",
+  "formattedAmount": "0.05 USDC",
+  "payTo": "0xeF2a4B6756895aAf1374640dcFCD4947959442ab",
+  "scheme": "exact",
+  "maxTimeoutSeconds": 300,
+  "extra": {
+    "name": "USDC",
+    "version": "2",
+    "assetTransferMethod": "eip3009"
+  },
+  "quoteSha256": "c62e5fe2a0e7c4477653c6e470f5d5e83d2c7db6f594059210d1c28ea828047c",
+  "quoteExpiresAt": "2026-11-20T16:37:31.160Z",
+  "resourceUrl": "https://equity.lonestaroracle.xyz/equity?ticker=AAPL",
+  "policyDecision": {
+    "allowed": true,
+    "remainingTotalMinor": "450000",
+    "policyVersion": "arc-payment-policy-v1"
+  },
+  "balances": {
+    "wallet": {
+      "balance": "0",
+      "formatted": "0"
+    },
+    "gateway": null
+  }
+}

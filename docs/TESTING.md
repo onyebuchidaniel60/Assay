@@ -6,7 +6,7 @@
 |---|---|---|
 | Lint | `pnpm lint` | Passed |
 | Root typecheck | `pnpm typecheck` | Passed (10 packages + apps) |
-| Root unit tests | `pnpm test` | 94 passed, 1 skipped: domain 28, crypto 4, contracts 6, document 8, proof 3, reppo 8, AI 10, financial-data 8, payments 11, API 8 |
+| Root unit tests | `pnpm test` | 100 passed, 1 skipped: domain 28, crypto 4, contracts 6, document 8, proof 3, reppo 8, AI 10, financial-data 8, payments 16, API 9 |
 | Root build | `pnpm build` | Passed (all 10 packages + API + web) |
 | Playwright shell + authenticated workspace | `pnpm test:e2e` | 20/20 desktop + mobile (previous release); Arc evidence flows exercised separately with the demo analyst |
 | Dependency audit | `pnpm audit` | 0 critical/high; 1 moderate dev-only esbuild; 1 low elliptic |
@@ -73,6 +73,6 @@ Recorded in `docs/BUILD_LOG.md`:
 
 ## Gate
 
-All unit/integration tests pass (94 passed, 1 skipped live-payment suite), the production build passes, the deployed payment-update smoke test passes, no unresolved critical/high security issue remains, and no secret or real data is exposed. The payment update `9e9f054` (web) / `7d80665` (API) is deployed with execution disabled and was verified with analyst sign-in, the Arc status page and a real policy rejection. Playwright 20/20 was the previous release gate; the local and deployed Arc evidence flows were exercised with the demo analyst. The live Arc payment and live SEC suites remain skipped/blocked as documented; they are not claimed passing.
+All unit/integration tests pass (100 passed, 1 skipped live-payment suite), the production build passes, the deployed payment-update smoke test passes, no unresolved critical/high security issue remains, and no secret or real data is exposed. The payment update is deployed with execution disabled and was verified with analyst sign-in, the Arc status page and a real policy rejection. Playwright 20/20 was the previous release gate; the local and deployed Arc evidence flows were exercised with the demo analyst. The live Arc payment and live SEC suites remain skipped/blocked as documented; they are not claimed passing.
 
 Do not document an unrun test as passing. Record exact commands and outcomes in this file and `docs/BUILD_LOG.md`.
