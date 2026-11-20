@@ -17,7 +17,6 @@ import {
   type PaymentRequirement,
   type SpendingPolicy,
 } from "@assay/domain";
-import { toPaymentRequirement, type X402Quote } from "@assay/payments";
 import type { ProviderQuote } from "@assay/financial-data";
 import type { PaymentRuntimeConfig } from "./payment-config.js";
 
@@ -287,6 +286,13 @@ export async function createPaymentIntentFromQuote(input: {
       .for("update")
       .limit(1);
     if (existing) {
+      if (existing.actorId !== input.actor.userId) {
+        throw new PaymentServiceError(
+          "IDEMPOTENCY_CONFLICT",
+          "This idempotency key belongs to a different analyst. Use a new key.",
+          409,
+        );
+      }
       if (existing.requestFingerprint !== fingerprint) {
         throw new PaymentServiceError(
           "IDEMPOTENCY_CONFLICT",

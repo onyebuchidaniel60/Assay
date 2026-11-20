@@ -7,6 +7,7 @@ import {
   paymentSessions,
 } from "@assay/db";
 import type { FinancialDataProviderId, FinancialDataRequest, FinancialDataResult, ProviderQuote } from "@assay/financial-data";
+import { evaluatePaymentPolicy } from "@assay/domain";
 import { sha256Json, type PaymentExecutionResult, type X402Quote } from "@assay/payments";
 import { createArcProvider } from "./arc-provider.js";
 import type { PaymentRuntimeConfig } from "./payment-config.js";
@@ -14,6 +15,7 @@ import { getFinancialProvider } from "./financial-providers.js";
 import { storeExternalEvidence } from "./evidence-service.js";
 import {
   appendPaymentAudit,
+  policyFor,
   releaseReservation,
   serializePaymentIntent,
   settleReservation,
@@ -142,6 +144,42 @@ export async function executePaymentJob(config: PaymentRuntimeConfig, intentId: 
       intent,
       code: "SESSION_EXPIRED",
       message: "The spending session expired before execution. No payment was submitted.",
+      release: true,
+    });
+    return;
+  }
+
+  const authorized = intent.authorizedAmountMinor ?? intent.amountMinor;
+  const reservedWithoutThis = (() => {
+    const next = BigInt(session.reservedTotalMinor) - BigInt(authorized);
+    return (next < 0n ? 0n : next).toString();
+  })();
+  const recheck = evaluatePaymentPolicy(
+    policyFor({
+      session: { ...session, reservedTotalMinor: reservedWithoutThis },
+      config,
+      idempotencyKey: intent.idempotencyKey,
+      requestFingerprint: intent.requestFingerprint,
+      now: new Date(),
+    }),
+    {
+      providerId: intent.providerId,
+      endpoint: intent.endpoint,
+      requirement: {
+        scheme: intent.scheme,
+        network: intent.network,
+        asset: intent.asset,
+        amountMinor: intent.amountMinor,
+        payTo: intent.payTo,
+        maxTimeoutSeconds: Number((json(intent.quote).accepted as Record<string, unknown> | undefined)?.maxTimeoutSeconds ?? 300),
+      },
+    },
+  );
+  if (!recheck.allowed) {
+    await markPaymentFailed({
+      intent,
+      code: `POLICY_RECHECK_${recheck.code.toUpperCase()}`,
+      message: `The spending policy no longer permits this payment at execution time: ${recheck.message}`,
       release: true,
     });
     return;
