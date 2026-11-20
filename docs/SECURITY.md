@@ -27,7 +27,7 @@ See `MASTER_BLUEPRINT.md` §13 for the risk/mitigation matrix. This file records
 - Payment execution is disabled by default. Live signing requires `PAYMENT_EXECUTION_ENABLED=true` and `PAYMENT_DRY_RUN=false`.
 - The provider validates the Arc Testnet chain ID, USDC contract, Gateway Wallet and hosted facilitator against the official Circle SDK values. A mismatch fails closed.
 - The deterministic policy checks provider, exact endpoint origin/path, network, USDC asset, recipient, per-payment cap, aggregate budget, session expiry, idempotency and duplicate nonce. No LLM supplies any of these values.
-- A policy rejection is persisted and audited and never reaches the execution service. An authorisation locks the session row and reserves budget in the same transaction that queues execution.
+- A policy rejection is persisted and audited and never reaches the execution service. An authorisation locks the session row and reserves budget in the same transaction that queues execution. The worker re-evaluates the full policy against the current session and allowlists immediately before signing; a changed session/cap/allowlist releases the reservation and aborts.
 - A timeout or unknown provider result becomes `RECONCILIATION_REQUIRED`. The worker looks up the original nonce/transfer; it never submits a second payment.
 - `CONFIRMED` requires a verifiable provider receipt (`PAYMENT-RESPONSE.success === true`) or a reconciled Gateway transfer. A transaction hash is stored only when it is a 32-byte `0x` hash; a settlement UUID is stored separately.
 - External evidence is sealed under the borrower DEK, content-hashed, tenant-scoped and role-shaped in API responses. Public-company limitations are stored with the evidence.

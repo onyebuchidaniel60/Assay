@@ -51,6 +51,8 @@ Analyst / bounded workflow
        -> lock payment session row; reserve budget
        -> persist AUTHORIZED + payment_authorizations
        -> enqueue payment.execute on the Postgres jobs table
+  -> worker re-evaluates the full policy at execution time
+       -> if the session, caps or allowlists changed, release and fail; do not sign
   -> worker executes the signed x402 authorisation
        -> CONFIRMED only with a verifiable provider receipt
        -> RECONCILIATION_REQUIRED on timeout/unknown; lookup by nonce, never repay
