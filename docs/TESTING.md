@@ -73,6 +73,6 @@ Recorded in `docs/BUILD_LOG.md`:
 
 ## Gate
 
-All unit/integration tests pass (94 passed, 1 skipped live-payment suite), the production build passes, the deployed payment-update smoke test passes, no unresolved critical/high security issue remains, and no secret or real data is exposed. The payment update `9e9f054`/`91d9c63` is deployed to Render/Vercel with execution disabled and was verified with analyst sign-in, the Arc status page and a real policy rejection. Playwright 20/20 was the previous release gate; the local and deployed Arc evidence flows were exercised with the demo analyst. The live Arc payment and live SEC suites remain skipped/blocked as documented; they are not claimed passing.
+All unit/integration tests pass (94 passed, 1 skipped live-payment suite), the production build passes, the deployed payment-update smoke test passes, no unresolved critical/high security issue remains, and no secret or real data is exposed. The payment update `9e9f054` (web) / `7d80665` (API) is deployed with execution disabled and was verified with analyst sign-in, the Arc status page and a real policy rejection. Playwright 20/20 was the previous release gate; the local and deployed Arc evidence flows were exercised with the demo analyst. The live Arc payment and live SEC suites remain skipped/blocked as documented; they are not claimed passing.
 
 Do not document an unrun test as passing. Record exact commands and outcomes in this file and `docs/BUILD_LOG.md`.
