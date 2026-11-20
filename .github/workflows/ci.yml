@@ -19,6 +19,11 @@ jobs:
       DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/assay
       NEON_AUTH_BASE_URL: https://example.invalid/api/auth
       NEON_AUTH_COOKIE_SECRET: ci-build-placeholder-secret-at-least-32-chars
+      AWS_ENDPOINT_URL_S3: http://127.0.0.1:9000
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: ci-placeholder
+      AWS_SECRET_ACCESS_KEY: ci-placeholder
+      NEON_STORAGE_BUCKET: ci-placeholder-bucket
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
