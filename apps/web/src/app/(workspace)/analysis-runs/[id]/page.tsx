@@ -5,6 +5,7 @@ import { PageHeader, SectionLabel } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
 import { FeedbackBanner } from "@/components/feedback-banner";
 import { AutoRefresh } from "@/components/auto-refresh";
+import { ExternalEvidencePanel, type ExternalEvidenceData } from "@/components/external-evidence-panel";
 import { apiFetch, errorCode, errorMessage, getMe, type ApiEnvelope } from "@/lib/api-server";
 import {
   calculateAction,
@@ -195,6 +196,18 @@ export default async function AnalysisRunPage({
     const managerReport = role === "MANAGER" ? (report as ManagerReport) : null;
     const auditorReport = role === "AUDITOR" ? (report as AuditorReport) : null;
     const status = analystReport?.run.status ?? managerReport?.status ?? auditorReport?.status ?? "UNKNOWN";
+    const evidenceEditable = [
+      "TERMS_CONFIRMED",
+      "FINANCIALS_PENDING",
+      "FINANCIALS_CONFIRMED",
+      "CALCULATION_PENDING",
+      "CALCULATED",
+      "CALCULATED_SERV_PENDING",
+      "BREACH_REVIEW",
+      "PROOF_PENDING",
+      "PROOF_VERIFIED",
+      "READY_FOR_MANAGER",
+    ].includes(status);
     const detailEnvelope =
       analyst && status === "REDACTION_REVIEW"
         ? await apiFetch<ApiEnvelope<{ redaction: Array<{ revision: number }> }>>(`/v1/analysis-runs/${id}`)
@@ -205,6 +218,13 @@ export default async function AnalysisRunPage({
         ? (await apiFetch<ApiEnvelope<RedactionView>>(`/v1/analysis-runs/${id}/redaction?revision=${latestRevision}`)).data
         : null;
     const inProgress = ["PARSING", "EXTRACTION_PENDING"].includes(status);
+    let externalEvidence: ExternalEvidenceData | null = null;
+    let externalEvidenceError: string | null = null;
+    try {
+      externalEvidence = (await apiFetch<ApiEnvelope<ExternalEvidenceData>>(`/v1/analysis-runs/${id}/external-evidence`)).data;
+    } catch (error) {
+      externalEvidenceError = errorMessage(error);
+    }
 
     return (
       <div className="space-y-8">
@@ -517,6 +537,14 @@ export default async function AnalysisRunPage({
               </section>
             ) : null}
 
+            {externalEvidence ? (
+              <ExternalEvidencePanel runId={analystReport.run.id} role={role} editable={evidenceEditable} data={externalEvidence} />
+            ) : externalEvidenceError ? (
+              <p className="rounded-2xl border border-warning/30 bg-[#fef0c7] px-4 py-3 text-xs text-warning">
+                External evidence is temporarily unavailable: {externalEvidenceError}
+              </p>
+            ) : null}
+
             {analystReport.scenarios.length > 0 ? (
               <section className="rounded-3xl border border-line bg-paper p-5 sm:p-7">
                 <div className="flex flex-wrap items-end justify-between gap-4">
@@ -721,6 +749,10 @@ export default async function AnalysisRunPage({
               </div>
             </section>
 
+            {externalEvidence ? (
+              <ExternalEvidencePanel runId={managerReport.id} role={role} editable={evidenceEditable} data={externalEvidence} />
+            ) : null}
+
             {managerReport.status === "READY_FOR_MANAGER" && managerReport.proof ? (
               <section className="rounded-3xl border border-line bg-paper p-5 sm:p-7">
                 <SectionLabel>Decision</SectionLabel>
@@ -822,6 +854,9 @@ export default async function AnalysisRunPage({
                 ))}
               </ul>
             </section>
+            {externalEvidence ? (
+              <ExternalEvidencePanel runId={auditorReport.id} role={role} editable={evidenceEditable} data={externalEvidence} />
+            ) : null}
           </>
         ) : null}
       </div>

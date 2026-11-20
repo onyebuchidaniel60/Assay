@@ -1,5 +1,8 @@
 # Assay — Consolidated Operator Intake / Readiness Check
 
+> **ARCHIVED KITE NOTE — 20 November 2026.** Kite Passport/x402 was removed from the active application. Kite references in this historical intake are retained as development history only. The active rail is Arc Testnet / Circle Gateway; see `docs/PAYMENTS_ARCHITECTURE.md`.
+
+
 **Phase:** 0 — readiness  
 **Intake completed:** 2026-11-15 (UTC)  
 **Repository:** `https://github.com/onyebuchidaniel60/Assay`  

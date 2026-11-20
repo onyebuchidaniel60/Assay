@@ -1,0 +1,14 @@
+{
+  "capturedAt": "2026-11-20",
+  "query": "network=eip155:5042002",
+  "total": 134,
+  "providers": {
+    "BotPay": 2,
+    "Quicknode": 132
+  },
+  "categories": {
+    "INFRASTRUCTURE": 134
+  },
+  "financialAnalysisCount": 0,
+  "note": "Only Quicknode JSON-RPC and BotPay infrastructure were listed; no financial-data merchant."
+}

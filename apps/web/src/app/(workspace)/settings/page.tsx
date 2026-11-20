@@ -95,7 +95,7 @@ export default async function SettingsPage({
           <div className="mt-5 rounded-2xl border border-white/15 p-4 text-xs leading-5 text-white/75">
             Provider credentials are configured through the deployment secret store, not through this UI.
           </div>
-          <p className="mt-5 flex items-center gap-2 text-xs text-white/70"><ShieldCheck className="size-3.5" /> Manager approval is separate from any Kite payment authorization.</p>
+          <p className="mt-5 flex items-center gap-2 text-xs text-white/70"><ShieldCheck className="size-3.5" /> Manager approval is separate from any Arc / Circle Gateway payment authorization.</p>
         </section>
       </div>
 

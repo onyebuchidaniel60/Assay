@@ -13,6 +13,7 @@ import { registerBorrowerRoutes } from "./routes/borrowers.js";
 import { registerAnalysisRoutes } from "./routes/analysis.js";
 import { registerAuditRoutes } from "./routes/audit.js";
 import { registerIntegrationRoutes } from "./routes/integrations.js";
+import { registerExternalEvidenceRoutes } from "./routes/external-evidence.js";
 import { registerDemoRoutes } from "./routes/demo.js";
 
 const db = createDb();
@@ -131,6 +132,7 @@ export function buildServer(options: { env?: NodeJS.ProcessEnv } = {}): FastifyI
   registerAnalysisRoutes(app);
   registerAuditRoutes(app);
   registerIntegrationRoutes(app);
+  registerExternalEvidenceRoutes(app);
   registerDemoRoutes(app);
 
   app.setNotFoundHandler(async (request, reply) => {

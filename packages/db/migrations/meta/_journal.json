@@ -15,6 +15,13 @@
       "when": 1794790749299,
       "tag": "0001_violet_siren",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795183663097,
+      "tag": "0002_noisy_paibok",
+      "breakpoints": true
     }
   ]
 }

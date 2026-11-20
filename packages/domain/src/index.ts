@@ -4,5 +4,5 @@ export * from "./calculation.js";
 export * from "./verification.js";
 export * from "./audit.js";
 export * from "./approval.js";
-export * from "./kite-policy.js";
+export * from "./payment-policy.js";
 export * from "./states.js";

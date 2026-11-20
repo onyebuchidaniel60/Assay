@@ -271,10 +271,16 @@ const stackItems = [
     role: "Independent evaluation of corrections — scores de-identified field-level feedback traces without raw borrower data.",
   },
   {
-    name: "Kite",
-    badge: "POLICY VERIFIED · RAIL PROVIDER-BLOCKED",
+    name: "Arc · Circle Gateway",
+    badge: "INTEGRATED · TESTNET POLICY",
     tone: "warning" as const,
-    role: "x402 spending limits for external data — local per-tx/total cap policy and over-cap rejection verified; testnet payment rail is provider-blocked.",
+    role: "x402 agent payments on Arc Testnet — official Circle Gateway SDK, deterministic provider/endpoint/network/USDC/recipient/cap/expiry/idempotency policy and no blind retry.",
+  },
+  {
+    name: "SEC EDGAR",
+    badge: "LIVE · FREE PUBLIC DATA",
+    tone: "positive" as const,
+    role: "Independent public-company evidence — real XBRL company facts with source URL, period, retrieval time, content hash and explicit private-borrower limitations.",
   },
   {
     name: "Neon",
@@ -311,9 +317,9 @@ const faqs = [
       "Yes. Sign in at /login using the invited synthetic workspace accounts provided for evaluation: analyst@assay.test, manager@assay.test, or auditor@assay.test. Public sign-up is disabled at the auth service.",
   },
   {
-    question: "What is Kite used for?",
+    question: "How does the Arc payment integration work?",
     answer:
-      "Kite Passport enforces passkey-approved x402 spending limits (5 PIEUSD per transaction, 20 PIEUSD total budget) for optional external benchmark data pulls. Assay's deterministic policy engine and over-cap rejection (session_rule_exceeded) are verified; the upstream testnet payment rail is honestly labeled provider-blocked.",
+      "Assay uses Circle Gateway's official x402 batching SDK on Arc Testnet. The provider's actual 402 requirement is evaluated by a deterministic policy that checks the approved provider, exact endpoint, network (eip155:5042002), Arc USDC contract, recipient, per-payment cap, aggregate budget, expiry, idempotency and duplicate nonce. A rejection never reaches execution. A timeout becomes RECONCILIATION_REQUIRED and is looked up, not paid again. The code and mock-server tests are implemented; no live paid financial-data retrieval is claimed because no Arc-Testnet financial-data merchant was available and no testnet funds were supplied. Free SEC EDGAR evidence is live.",
   },
   {
     question: "Why is Presidio labeled REDUCED_PII_MODE?",

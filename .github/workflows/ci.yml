@@ -41,7 +41,7 @@ jobs:
         run: bash scripts/check-secrets.sh
 
       - name: Build workspace packages
-        run: pnpm --filter @assay/domain --filter @assay/crypto --filter @assay/contracts --filter @assay/storage --filter @assay/proof --filter @assay/db --filter @assay/ai build
+        run: pnpm --filter @assay/domain --filter @assay/crypto --filter @assay/contracts --filter @assay/storage --filter @assay/proof --filter @assay/db --filter @assay/ai --filter @assay/payments --filter @assay/financial-data build
 
       - name: Typecheck
         run: pnpm typecheck

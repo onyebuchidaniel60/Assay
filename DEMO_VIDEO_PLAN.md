@@ -21,7 +21,7 @@ Audience: hackathon judges and technically informed product reviewers. Explain t
 | 1:48–2:05 | Audit | Verify chain; demo-only shred if authorized; verify chain again | Explain tamper-evident chain and key deletion without overstating legal erasure. |
 | 2:05–2:10 | Close | Brand/summary end card | “Assay: structured covenant analysis, verifiable controls, human authority.” |
 
-If optional Reppo/Kite integrations are genuinely live and provide clear value, replace a short segment or extend within 180 seconds; do not squeeze essential screens or invent live responses. The video may omit an unavailable optional integration.
+If optional Reppo or Arc/Circle Gateway integrations are genuinely live and provide clear value, replace a short segment or extend within 180 seconds; do not squeeze essential screens or invent live responses. The video may omit an unavailable optional integration. The existing demo video predates the Arc change; a new recording must be produced if the submission requires current visuals.
 
 ## Capture rules
 

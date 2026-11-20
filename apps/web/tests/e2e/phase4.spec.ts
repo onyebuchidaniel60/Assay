@@ -31,7 +31,7 @@ test.describe("Assay authenticated workspace", () => {
 
     await page.goto("/integrations");
     await expect(page.getByText("NEAR AI Cloud", { exact: true })).toBeVisible();
-    await expect(page.getByText("Kite Passport")).toBeVisible();
+    await expect(page.getByText("Arc Testnet · Circle Gateway")).toBeVisible();
   });
 
   test("analyst can open the approved run and inspect proof evidence", async ({ page }) => {

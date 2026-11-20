@@ -1,5 +1,7 @@
 # Assay — Complete Implementation-Ready Project Blueprint
 
+> **ARCHIVED INTEGRATION NOTE — 20 November 2026.** The optional Kite Passport / `PIEUSD` / `gokite.ai` integration described in this historical blueprint was **removed**. It is not an active dependency, route, credential or instruction. The active payment integration is **Arc Testnet + Circle Gateway (`eip155:5042002`)**, documented in [ARCHITECTURE.md](ARCHITECTURE.md) and [docs/PAYMENTS_ARCHITECTURE.md](docs/PAYMENTS_ARCHITECTURE.md). Kite references below are retained only as product-development history; do not implement them.
+
 **Project:** Assay  
 **Purpose:** Authoritative product, architecture, requirements, security, UX and implementation specification for the coding agent.  
 **Status:** Pre-implementation blueprint; no application code has been created by this package.  

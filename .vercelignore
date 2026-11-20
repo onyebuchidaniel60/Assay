@@ -1,6 +1,5 @@
 .env
 .env.*
-.kite-passport
 design
 docs
 apps/api

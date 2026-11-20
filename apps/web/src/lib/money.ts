@@ -21,6 +21,14 @@ export function formatUsdMinor(value: string | null | undefined): string {
   return `$${whole.toLocaleString("en-US")}.${fraction}`;
 }
 
+export function formatUsdcMinor(value: string | null | undefined): string {
+  if (value === null || value === undefined || value === "") return "—";
+  const minor = BigInt(value);
+  const whole = minor / 1_000_000n;
+  const fraction = (minor % 1_000_000n).toString().padStart(6, "0").replace(/0+$/, "");
+  return `${whole.toLocaleString("en-US")}${fraction ? `.${fraction}` : ""} USDC`;
+}
+
 export function formatDateTime(value: string | null | undefined): string {
   if (!value) return "—";
   return new Intl.DateTimeFormat("en-GB", {

@@ -18,6 +18,8 @@
     "@assay/db": "workspace:*",
     "@assay/document": "workspace:*",
     "@assay/domain": "workspace:*",
+    "@assay/financial-data": "workspace:*",
+    "@assay/payments": "workspace:*",
     "@assay/proof": "workspace:*",
     "@assay/reppo": "workspace:*",
     "@assay/storage": "workspace:*",

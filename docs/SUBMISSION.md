@@ -38,7 +38,9 @@ SERV never does arithmetic, approves a run, changes policy or writes the databas
 
 - **PRIMARY: Open Track**
 - **SECONDARY: Reppo** — LIVE. A real synthetic evaluation completed: provider eval `cmwikqtsn000f08l4y73d9a8m`, score 98/100, decision `accept`, confidence `low`, route `review`, 440 credits, 409-byte safe trace. The legacy Reppo endpoints were removed by the provider; Assay uses the live `/agents/evals` endpoints and records the deviation.
-- **SECONDARY: Kite** — **policy engine verified; payment rail provider-blocked with evidence.** Deterministic session/cap/asset/expiry policy and over-cap rejection (`session_rule_exceeded`, exit 6) are verified. All three payment endpoints are provider-blocked: `passport.dev.gokite.ai/x402/test` returned an upstream internal error (`2026-11-15T15:29:37Z`); `x402.dev.gokite.ai/api/weather` returned authoritative Route53 DNS NODATA across local, Google and Cloudflare resolvers (`2026-11-16T07:54:29Z`); and `kite-live-dns.sakurasoga7.workers.dev/v1/dns` returned HTTP 402 but was rejected by `kpass session execute` with `payment_target_forbidden` / `sandbox_merchant_not_allowlisted` (`2026-11-16T07:55:19Z`). No successful payment is claimed (`spent_total: 0`).
+- **SECONDARY: Arc Testnet / Circle Gateway** — **implemented, not live-paid.** The official `@circle-fin/x402-batching` SDK is integrated behind a provider interface. Verified: SDK/config matches Circle's published Arc Testnet values; facilitator reachable and supports Arc Testnet USDC; deterministic provider/endpoint/network/asset/recipient/cap/budget/expiry/idempotency/duplicate-nonce policy; local mock-x402 tests for signing, receipt confirmation, missing receipt, timeout and duplicate/insufficient-balance handling. No live paid financial-data retrieval is claimed: Circle Discovery listed zero `FINANCIAL_ANALYSIS` services on Arc Testnet on 20 November 2026, Financial Datasets x402 is Base mainnet only, and no testnet funds were supplied. See [PAYMENTS_ARCHITECTURE.md](PAYMENTS_ARCHITECTURE.md).
+- **SECONDARY: SEC EDGAR** — free public-company XBRL evidence is implemented with provenance, period validation, content hash and explicit limitations. This development host received HTTP 403 from SEC/Akamai; live retrieval must be re-probed from the deployed Render egress. No live SEC result is claimed here.
+- **REMOVED: Kite** — Kite Passport is no longer an active dependency, credential, route or setup requirement. Historical provider-blocked evidence is archived at [archive/KITE_REMOVAL.md](archive/KITE_REMOVAL.md).
 - **NOT CLAIMED: Dolphin** — evaluated and rejected. Its confidentiality mechanism is unverified: no TEE, no MPC, zero-retention unverified. No Dolphin adapter, endpoint, key or flag exists in the repository.
 
 ## Architecture
@@ -54,9 +56,11 @@ flowchart LR
   API --> S[SERV Reasoning]
   S --> O[OpenRouter]
   API --> R[Reppo Eval Router]
-  API --> K[Kite policy]
+  API --> FD[Financial data\nSEC EDGAR · paid providers]
+  API --> A[Arc Testnet / Circle Gateway]
   API --> Z[Circom / SnarkJS]
   DB --> WK[Postgres worker]
+  WK --> A
 ```
 
 ## Privacy and security summary
@@ -86,7 +90,7 @@ Design reference images are used as licensed inspiration only and are not redist
 
 > Credit teams still reconcile covenants across PDFs, spreadsheets and email. Assay turns one maximum Debt/Adjusted EBITDA covenant into an evidence-linked, deterministic and proof-backed decision a manager can defend.
 >
-> Redacted extraction via NEAR AI Cloud with fresh TDX/NRAS attestation, SERV Reasoning as a core gate, a fixed Groth16 compliance proof, maker-checker approval and a signed audit trail. Synthetic feedback evaluation via Reppo. Kite x402 policy is live; payment is provider-blocked.
+> Redacted extraction via NEAR AI Cloud with fresh TDX/NRAS attestation, SERV Reasoning as a core gate, a fixed Groth16 compliance proof, maker-checker approval and a signed audit trail. Synthetic feedback evaluation via Reppo. Arc Testnet / Circle Gateway x402 policy and evidence linkage are implemented; no live paid retrieval is claimed because no Arc-Testnet financial-data merchant and no testnet funds were available.
 >
 > Built for @OpenServAI #SERVHackathon.
 >
@@ -105,5 +109,6 @@ Design reference images are used as licensed inspiration only and are not redist
 - [ ] Data collection enabled in OpenServ org settings — operator to verify
 - [ ] SERV API key active and credit balance adequate — operator to verify
 - [x] Reppo real evaluation completed
-- [x] Kite status recorded honestly (provider-blocked)
+- [x] Arc/Circle Gateway integration and limitations recorded honestly
+- [x] SEC EDGAR host-level 403 recorded; no live result fabricated
 - [x] No Dolphin claim

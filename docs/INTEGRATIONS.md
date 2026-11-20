@@ -1,6 +1,6 @@
 # Third-party Integrations
 
-**Provider revision:** 15 November 2026. This file supersedes the historical Dolphin integration description in the blueprint and `docs/`.
+**Provider revision:** 20 November 2026. This file supersedes the historical Dolphin and Kite integration descriptions in the blueprint and `docs/`. Kite is archived only.
 
 ## OpenServ SERV Reasoning — mandatory orchestration
 
@@ -61,23 +61,32 @@ Dolphin was evaluated and rejected because its confidentiality mechanism is unve
 
 Returned verdict summary: the submission scored 98 and was accepted, but low confidence routed it to `review` for additional validation. Rubric: scope 100, safety 100, correctness 100, reversibility 88. Three evaluators were weighted (economic 98 vs equal-weight 86; score spread 16.9); the route decision was `review`. No sensitive data was sent or returned.
 
-## Kite Passport / x402 — optional
+## Arc Testnet / Circle Gateway — implemented payment rail
 
-Kite documentation describes passkey-approved spending sessions with a per-payment cap, total budget and expiry, and payment for x402 services. Confirm current CLI/SDK commands, testnet, supported assets and catalog services. The deterministic Assay policy engine must check service allowlist, asset, per-payment cap, total remaining budget, session expiry and idempotency. No wallet funding or testnet spend without explicit operator authorization.
+- **Provider:** Circle Gateway nanopayments via the official `@circle-fin/x402-batching@4.0.0` SDK and viem.
+- **Network:** Arc Testnet `eip155:5042002`; chain ID `5042002`; USDC `0x3600000000000000000000000000000000000000`; Gateway Wallet `0x0077777d7EBA4688BDeF3E311b846F25870A19B9`; Gateway domain `26`; facilitator `https://gateway-api-testnet.circle.com`.
+- **Flow:** real 402 requirement -> deterministic policy -> explicit analyst authorisation -> Postgres `payment.execute` job -> signed EIP-3009 authorization -> receipt/transfer verification. A timeout becomes `RECONCILIATION_REQUIRED`; the worker looks up the original nonce and never blindly repays.
+- **Security:** server-side key only; no key in the browser or database; network/asset/recipient/allowlist/cap checks; execution off by default.
+- **Verified:** SDK config matches the official Circle values; facilitator reachable and supports Arc Testnet USDC; local mock x402 server tests cover signing, receipt confirmation, missing receipt, timeout, duplicate-payment and insufficient-balance handling.
+- **Not claimed:** no live paid financial-data retrieval. Circle Discovery returned zero `FINANCIAL_ANALYSIS` services on Arc Testnet on 20 November 2026, and no testnet funds were supplied. See [PAYMENTS_ARCHITECTURE.md](PAYMENTS_ARCHITECTURE.md).
 
-### Testnet integration state — 15 November 2026
+## Financial data providers
 
-- Testnet user: `user_01a1dfab-06b7-7b42-b03c-111a2805c175`.
-- Testnet wallet funded with `100 PIEUSD` from the faucet.
-- Active session: `agent_session_01a1dfc3-794e-70cb-bde8-90c6315736cf`.
-- Delegation: `5 PIEUSD` per transaction, `20 PIEUSD` total, `24h` TTL, asset `PIEUSD`; expires `2026-11-16T15:11:32.17177Z`.
-- The Phase 3 adapter must use this approved session (or a newly approved successor) and enforce the same caps in the deterministic policy engine before any payment call. It must never auto-approve a session or bypass the caps.
-- The x402 smoke payment is **provider-blocked** (**policy engine verified; payment rail provider-blocked with evidence**):
-  1. `https://passport.dev.gokite.ai/x402/test` (`2026-11-15T15:29:37Z`, idempotency key `assay-kite-smoke-1457e791-3c4f-45f9-ade5-16e0749b117c`) — **upstream internal error** (`exit 1`, `status: error`, `"internal error"`).
-  2. `https://x402.dev.gokite.ai/api/weather` (`2026-11-16T07:54:29Z`) — **authoritative DNS NODATA**: verified across local `systemd-resolved` (`dig` / `nslookup`), Google Public DNS (`dns.google`), and Cloudflare (`cloudflare-dns.com`), all returning `NOERROR` with `ANSWER: 0` and only the `dev.gokite.ai` SOA record from Route53 (`ns-1130.awsdns-13.org.`).
-  3. `https://kite-live-dns.sakurasoga7.workers.dev/v1/dns?name=example.com&type=A` (`2026-11-16T07:55:19Z`, idempotency key `assay-kite-dns-fbe236f8-c046-48a6-a978-9219e9306023`) — direct `GET` returned `HTTP/2 402` with `payment-required` (`eip155:2368`), but `kpass session execute` against `https://passport.dev.gokite.ai` failed with **sandbox merchant allowlist rejection** (`exit 6`, `error_code: "payment_target_forbidden"`, `reason: "sandbox_merchant_not_allowlisted"`). Inspecting `ksearch service list` (48 catalog services) confirmed all allowlisted catalog endpoints require mainnet USDC/Tempo rather than testnet `PIEUSD`.
-- The over-cap policy test succeeded: a temporary `0.05 PIEUSD` session rejected a `0.1 PIEUSD` request with `session_rule_exceeded` (exit 6) and no payment event (`spent_total: 0`).
-- Do not represent the provider-blocked smoke payment as successful. Do not fabricate a receipt.
+### SEC EDGAR — free public evidence
+
+Implemented with a descriptive `SEC_EDGAR_USER_AGENT`, CIK/ticker resolution, XBRL `companyfacts` parsing, annual-period selection, provenance, content hash and explicit public-company limitations. On 20 November 2026 this development host received **HTTP 403 from AkamaiGHost** for SEC endpoints; the adapter surfaces `PROVIDER_UNAVAILABLE` and does not fabricate a result. Re-probe the deployed Render egress before claiming live SEC evidence. Evidence fixtures and validation tests pass.
+
+### Financial Datasets — preferred candidate, not Arc-compatible
+
+The live 402 terms on 20 November 2026 offered **Base mainnet** (`eip155:8453`) USDC only, with a Non-Professional x402 licence. It does not accept Arc Testnet or Circle Gateway on Arc. Assay implements the adapter, marks it incompatible, rejects it at the network policy check and does not bridge or relabel the payment. No API key is configured, so no retrieval is claimed.
+
+### LoneStar Oracle EquityScope — Arc mainnet quote only
+
+Circle Discovery lists a real financial-data endpoint with an **Arc mainnet** (`eip155:5042`) USDC option at 0.05 USDC per request. Assay parses the actual quote and persists a deterministic `payment_network_forbidden` rejection under the default testnet-only policy. No mainnet funds are authorised and no payment was made.
+
+## Archived Kite evidence
+
+The failed Kite Passport integration is preserved for development history in [archive/KITE_REMOVAL.md](archive/KITE_REMOVAL.md). It is not an active dependency, route or setup instruction.
 
 ## Presidio — mandatory reduced mode on Render free tier
 
@@ -102,4 +111,8 @@ Google Gemini TTS was not used: no Google AI/TTS credential or free-tier activat
 ## Integration state
 
 - Reppo: **LIVE** — one real synthetic evaluation completed; score 98, decision `accept`, confidence `low`, route `review`, 440 credits.
-- Kite: testnet session enabled; both documented testnet endpoints are provider-blocked. `passport.dev.gokite.ai/x402/test` previously returned an upstream internal error; the second endpoint `x402.dev.gokite.ai/api/weather` did not resolve (DNS `ENOTFOUND`) on 16 November 2026. No payment was attempted through it, and the earlier endpoint was not retried a third time.
+- Arc Testnet / Circle Gateway: **IMPLEMENTED, NOT LIVE-PAID** — verified SDK/config/facilitator, deterministic policy and mock-x402 tests; no live settlement or paid evidence retrieval claimed.
+- SEC EDGAR: **IMPLEMENTED, LIVE RETRIEVAL BLOCKED FROM THIS HOST** — HTTP 403 from SEC/Akamai on 20 November 2026; fixtures and validation pass. Re-probe Render before claiming live data.
+- Financial Datasets: **ADAPTER ONLY, NOT ARC-COMPATIBLE** — Base mainnet x402; no key; no payment or retrieval claimed.
+- LoneStar Oracle: **QUOTE-ONLY, POLICY-RESTRICTED** — Arc mainnet; default policy rejects `eip155:5042`; no payment claimed.
+- Kite: **REMOVED** — historical provider-blocked evidence is archived at [archive/KITE_REMOVAL.md](archive/KITE_REMOVAL.md); no active dependency remains.

@@ -35,6 +35,12 @@ importers:
       '@assay/domain':
         specifier: workspace:*
         version: link:../../packages/domain
+      '@assay/financial-data':
+        specifier: workspace:*
+        version: link:../../packages/financial-data
+      '@assay/payments':
+        specifier: workspace:*
+        version: link:../../packages/payments
       '@assay/proof':
         specifier: workspace:*
         version: link:../../packages/proof
@@ -233,6 +239,53 @@ importers:
       decimal.js:
         specifier: 10.6.0
         version: 10.6.0
+    devDependencies:
+      '@types/node':
+        specifier: ^24.10.0
+        version: 24.19.2
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 5.1.0
+        version: 5.1.0(@types/node@24.19.2)(vite@8.3.8(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15))
+
+  packages/financial-data:
+    dependencies:
+      '@assay/domain':
+        specifier: workspace:*
+        version: link:../domain
+      zod:
+        specifier: 4.6.7
+        version: 4.6.7
+    devDependencies:
+      '@types/node':
+        specifier: ^24.10.0
+        version: 24.19.2
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 5.1.0
+        version: 5.1.0(@types/node@24.19.2)(vite@8.3.8(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15))
+
+  packages/payments:
+    dependencies:
+      '@assay/domain':
+        specifier: workspace:*
+        version: link:../domain
+      '@circle-fin/x402-batching':
+        specifier: 4.0.0
+        version: 4.0.0(@x402/core@2.31.0)(viem@2.58.2(typescript@5.9.3)(zod@4.6.7))
+      '@x402/core':
+        specifier: 2.31.0
+        version: 2.31.0
+      viem:
+        specifier: 2.58.2
+        version: 2.58.2(typescript@5.9.3)(zod@4.6.7)
+      zod:
+        specifier: 4.6.7
+        version: 4.6.7
     devDependencies:
       '@types/node':
         specifier: ^24.10.0
@@ -473,6 +526,17 @@ packages:
 
   '@better-fetch/fetch@1.3.3':
     resolution: {integrity: sha512-U6SlDt/GUWtK2JAxS/NhdoYTEim+EL1G5byz2TUj83KjLZBUpYzb5SmX0aXaCnbGkAjFKnV/o/0+cyXMbEcqqg==}
+
+  '@circle-fin/x402-batching@4.0.0':
+    resolution: {integrity: sha512-KLdHz85NdF9uBf4muRLnUW84z+ro1oBD/YfNvwpqSQAc7Q5vuRRj2SMrm5B8fyiP3v+t1HkO5qbIrRb34yvkXA==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@x402/core': ^2.3.0
+      '@x402/evm': ^2.3.0
+      viem: ^2.0.0
+    peerDependenciesMeta:
+      '@x402/evm':
+        optional: true
 
   '@drizzle-team/brocli@0.10.2':
     resolution: {integrity: sha512-z33Il7l5dKjUgGULTqBsQBQwckHh5AbIuxhdsIxDDiZAzBOrZO6q9ogcWC65kU382AfynTfgNumVcNIjuIua6w==}
@@ -1636,6 +1700,9 @@ packages:
   '@wasmer/wasi@0.12.0':
     resolution: {integrity: sha512-FJhLZKAfLWm/yjQI7eCRHNbA8ezmb7LSpUYFkHruZXs2mXk2+DaQtSElEtOoNrVQ4vApTyVaAd5/b7uEu8w6wQ==}
 
+  '@x402/core@2.31.0':
+    resolution: {integrity: sha512-7ToCOwHfftfFEERW5Mp6Fc5U1+JrtCLTkbQnEVsBl13IutltP9lWIBYi/J+zy8vQWaLUmACq8A2qywzdt/RRIQ==}
+
   abitype@1.2.3:
     resolution: {integrity: sha512-Ofer5QUnuUdTFsBRwARMoWKOH1ND5ehwYhJ3OJ/BQO+StkwQjHw0XyVh4vDttzHB7QOFhPHa/o413PJ82gU/Tg==}
     peerDependencies:
@@ -2671,6 +2738,17 @@ packages:
       typescript:
         optional: true
 
+  viem@2.58.2:
+    resolution: {integrity: sha512-tOdKI6+6oQWbb0NirduHfILojP9uY8YamtYIwallzObzMhhSCxWb2zOVw7SwrkYWTt7JmB1/Of4L3hTokp9GJA==}
+    peerDependencies:
+      mppx: '>=0.17.0'
+      typescript: '>=5.0.4'
+    peerDependenciesMeta:
+      mppx:
+        optional: true
+      typescript:
+        optional: true
+
   vite@8.3.8:
     resolution: {integrity: sha512-LzOn3h9rG/0vhLdXrV4yJ4QFA9eEoqCl+Yx+kGJd7aB9w6nfNgVHKSYwLPZUHrz4ZGa+t+kXjV9itvcHDLQouA==}
     engines: {node: ^20.19.0 || >=22.12.0}
@@ -3052,6 +3130,11 @@ snapshots:
   '@better-fetch/fetch@1.3.2': {}
 
   '@better-fetch/fetch@1.3.3': {}
+
+  '@circle-fin/x402-batching@4.0.0(@x402/core@2.31.0)(viem@2.58.2(typescript@5.9.3)(zod@4.6.7))':
+    dependencies:
+      '@x402/core': 2.31.0
+      viem: 2.58.2(typescript@5.9.3)(zod@4.6.7)
 
   '@drizzle-team/brocli@0.10.2': {}
 
@@ -3879,6 +3962,10 @@ snapshots:
       buffer-es6: 4.9.3
       path-browserify: 1.0.1
       randomfill: 1.0.4
+
+  '@x402/core@2.31.0':
+    dependencies:
+      zod: 4.6.7
 
   abitype@1.2.3(typescript@5.9.3)(zod@4.6.7):
     optionalDependencies:
@@ -4832,6 +4919,23 @@ snapshots:
   undici-types@7.24.6: {}
 
   viem@2.57.20(typescript@5.9.3)(zod@4.6.7):
+    dependencies:
+      '@noble/curves': 1.9.1
+      '@noble/hashes': 1.8.0
+      '@scure/bip32': 1.7.0
+      '@scure/bip39': 1.6.0
+      abitype: 1.2.3(typescript@5.9.3)(zod@4.6.7)
+      isows: 1.0.7(ws@8.21.0)
+      ox: 0.14.67(typescript@5.9.3)(zod@4.6.7)
+      ws: 8.21.0
+    optionalDependencies:
+      typescript: 5.9.3
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+      - zod
+
+  viem@2.58.2(typescript@5.9.3)(zod@4.6.7):
     dependencies:
       '@noble/curves': 1.9.1
       '@noble/hashes': 1.8.0

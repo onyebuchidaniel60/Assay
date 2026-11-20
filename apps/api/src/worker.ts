@@ -24,6 +24,8 @@ import { buildRedaction } from "./lib/redaction.js";
 import { runExtraction } from "./lib/extraction.js";
 import { pollReppoJob } from "./lib/reppo.js";
 import { loadBorrowerDek } from "@assay/db";
+import { loadPaymentRuntimeConfig } from "./lib/payment-config.js";
+import { executePaymentJob, reconcilePaymentJob, RetryPaymentReconciliation } from "./lib/payment-execution.js";
 
 const db = createDb();
 const storage = new PrivateObjectStorage();
@@ -166,11 +168,30 @@ async function handleReppoPoll(job: ClaimedJob): Promise<void> {
   }
 }
 
+const paymentConfig = loadPaymentRuntimeConfig();
+
+async function handlePaymentExecute(job: ClaimedJob): Promise<void> {
+  const paymentIntentId = String(job.payload.paymentIntentId ?? "");
+  if (!paymentIntentId) return;
+  await executePaymentJob(paymentConfig, paymentIntentId);
+}
+
+async function handlePaymentReconcile(job: ClaimedJob): Promise<void> {
+  const paymentIntentId = String(job.payload.paymentIntentId ?? "");
+  if (!paymentIntentId) return;
+  const outcome = await reconcilePaymentJob(paymentConfig, paymentIntentId, job.attempts, job.maxAttempts);
+  if (outcome === "RETRY") {
+    throw new RetryPaymentReconciliation();
+  }
+}
+
 const handlers = new Map<string, (job: ClaimedJob) => Promise<void>>([
   ["healthcheck", async () => undefined],
   ["analysis.parse", handleAnalysisParse],
   ["analysis.extract", handleAnalysisExtract],
   ["reppo.poll", handleReppoPoll],
+  ["payment.execute", handlePaymentExecute],
+  ["payment.reconcile", handlePaymentReconcile],
 ]);
 
 let running = false;

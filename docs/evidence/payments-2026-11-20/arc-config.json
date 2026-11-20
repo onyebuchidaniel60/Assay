@@ -1,0 +1,355 @@
+{
+  "verifiedConfig": {
+    "expected": {
+      "chainId": 5042002,
+      "network": "eip155:5042002",
+      "name": "Arc Testnet",
+      "usdc": "0x3600000000000000000000000000000000000000",
+      "usdcDecimals": 6,
+      "gatewayWallet": "0x0077777d7EBA4688BDeF3E311b846F25870A19B9",
+      "gatewayMinter": "0x0022222ABE238Cc2C7Bb1f21003F0a260052475B",
+      "gatewayDomain": 26,
+      "facilitatorUrl": "https://gateway-api-testnet.circle.com",
+      "rpcUrl": "https://rpc.testnet.arc.network",
+      "explorerUrl": "https://explorer.testnet.arc.io"
+    },
+    "sdk": {
+      "chainId": 5042002,
+      "usdc": "0x3600000000000000000000000000000000000000",
+      "usdcDecimals": 6,
+      "gatewayWallet": "0x0077777d7EBA4688BDeF3E311b846F25870A19B9",
+      "gatewayDomain": 26,
+      "rpcUrl": "https://rpc.testnet.arc.network"
+    }
+  },
+  "provider": {
+    "id": "arc-circle-gateway",
+    "displayName": "Arc Testnet · Circle Gateway",
+    "network": "eip155:5042002",
+    "chainId": 5042002,
+    "asset": "0x3600000000000000000000000000000000000000",
+    "assetSymbol": "USDC",
+    "gatewayWallet": "0x0077777d7EBA4688BDeF3E311b846F25870A19B9",
+    "gatewayDomain": 26,
+    "facilitatorUrl": "https://gateway-api-testnet.circle.com",
+    "payerAddress": null,
+    "signingKeyConfigured": false
+  },
+  "facilitator": {
+    "reachable": true,
+    "supportedNetwork": true,
+    "supportedAsset": true,
+    "supportedKinds": [
+      {
+        "scheme": "exact",
+        "network": "eip155:11155111",
+        "extra": {
+          "name": "GatewayWalletBatched",
+          "version": "1",
+          "verifyingContract": "0x0077777d7eba4688bdef3e311b846f25870a19b9",
+          "minValiditySeconds": 604800,
+          "assets": [
+            {
+              "symbol": "USDC",
+              "address": "0x1c7d4b196cb0c7b01d743fbc6116a902379c7238",
+              "decimals": 6,
+              "authorizationVersions": [
+                "1",
+                "2"
+              ]
+            },
+            {
+              "symbol": "cirBTC",
+              "address": "0x3a3fe695f684bf9b9e43cf43c2b895ea5e392bb3",
+              "decimals": 8,
+              "authorizationVersions": [
+                "2"
+              ]
+            },
+            {
+              "symbol": "EURC",
+              "address": "0x08210f9170f89ab7658f0b5e3ff39b0e03c594d4",
+              "decimals": 6,
+              "authorizationVersions": [
+                "2"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "scheme": "exact",
+        "network": "eip155:84532",
+        "extra": {
+          "name": "GatewayWalletBatched",
+          "version": "1",
+          "verifyingContract": "0x0077777d7eba4688bdef3e311b846f25870a19b9",
+          "minValiditySeconds": 604800,
+          "assets": [
+            {
+              "symbol": "USDC",
+              "address": "0x036cbd53842c5426634e7929541ec2318f3dcf7e",
+              "decimals": 6,
+              "authorizationVersions": [
+                "1",
+                "2"
+              ]
+            },
+            {
+              "symbol": "EURC",
+              "address": "0x808456652fdb597867f38412077a9182bf77359f",
+              "decimals": 6,
+              "authorizationVersions": [
+                "2"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "scheme": "exact",
+        "network": "eip155:43113",
+        "extra": {
+          "name": "GatewayWalletBatched",
+          "version": "1",
+          "verifyingContract": "0x0077777d7eba4688bdef3e311b846f25870a19b9",
+          "minValiditySeconds": 604800,
+          "assets": [
+            {
+              "symbol": "USDC",
+              "address": "0x5425890298aed601595a70ab815c96711a31bc65",
+              "decimals": 6,
+              "authorizationVersions": [
+                "1",
+                "2"
+              ]
+            },
+            {
+              "symbol": "EURC",
+              "address": "0x5e44db7996c682e92a960b65ac713a54ad815c6b",
+              "decimals": 6,
+              "authorizationVersions": [
+                "2"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "scheme": "exact",
+        "network": "eip155:421614",
+        "extra": {
+          "name": "GatewayWalletBatched",
+          "version": "1",
+          "verifyingContract": "0x0077777d7eba4688bdef3e311b846f25870a19b9",
+          "minValiditySeconds": 604800,
+          "assets": [
+            {
+              "symbol": "USDC",
+              "address": "0x75faf114eafb1bdbe2f0316df893fd58ce46aa4d",
+              "decimals": 6,
+              "authorizationVersions": [
+                "1",
+                "2"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "scheme": "exact",
+        "network": "eip155:14601",
+        "extra": {
+          "name": "GatewayWalletBatched",
+          "version": "1",
+          "verifyingContract": "0x0077777d7eba4688bdef3e311b846f25870a19b9",
+          "minValiditySeconds": 604800,
+          "assets": [
+            {
+              "symbol": "USDC",
+              "address": "0x0ba304580ee7c9a980cf72e55f5ed2e9fd30bc51",
+              "decimals": 6,
+              "authorizationVersions": [
+                "1",
+                "2"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "scheme": "exact",
+        "network": "eip155:4801",
+        "extra": {
+          "name": "GatewayWalletBatched",
+          "version": "1",
+          "verifyingContract": "0x0077777d7eba4688bdef3e311b846f25870a19b9",
+          "minValiditySeconds": 604800,
+          "assets": [
+            {
+              "symbol": "USDC",
+              "address": "0x66145f38cbac35ca6f1dfb4914df98f1614aea88",
+              "decimals": 6,
+              "authorizationVersions": [
+                "1",
+                "2"
+              ]
+            },
+            {
+              "symbol": "EURC",
+              "address": "0xe479eca5740ac65d6e1823bea2f1c08bc14e954f",
+              "decimals": 6,
+              "authorizationVersions": [
+                "2"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "scheme": "exact",
+        "network": "eip155:1328",
+        "extra": {
+          "name": "GatewayWalletBatched",
+          "version": "1",
+          "verifyingContract": "0x0077777d7eba4688bdef3e311b846f25870a19b9",
+          "minValiditySeconds": 604800,
+          "assets": [
+            {
+              "symbol": "USDC",
+              "address": "0x4fcf1784b31630811181f670aea7a7bef803eaed",
+              "decimals": 6,
+              "authorizationVersions": [
+                "1",
+                "2"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "scheme": "exact",
+        "network": "eip155:998",
+        "extra": {
+          "name": "GatewayWalletBatched",
+          "version": "1",
+          "verifyingContract": "0x0077777d7eba4688bdef3e311b846f25870a19b9",
+          "minValiditySeconds": 604800,
+          "assets": [
+            {
+              "symbol": "USDC",
+              "address": "0x2b3370ee501b4a559b57d449569354196457d8ab",
+              "decimals": 6,
+              "authorizationVersions": [
+                "1",
+                "2"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "scheme": "exact",
+        "network": "eip155:5042002",
+        "extra": {
+          "name": "GatewayWalletBatched",
+          "version": "1",
+          "verifyingContract": "0x0077777d7eba4688bdef3e311b846f25870a19b9",
+          "minValiditySeconds": 604800,
+          "assets": [
+            {
+              "symbol": "USDC",
+              "address": "0x3600000000000000000000000000000000000000",
+              "decimals": 6,
+              "authorizationVersions": [
+                "1",
+                "2"
+              ]
+            },
+            {
+              "symbol": "cirBTC",
+              "address": "0xf0c4a4ce82a5746abaad9425360ab04fbba432bf",
+              "decimals": 8,
+              "authorizationVersions": [
+                "2"
+              ]
+            },
+            {
+              "symbol": "EURC",
+              "address": "0x89b50855aa3be2f677cd6303cec089b5f319d72a",
+              "decimals": 6,
+              "authorizationVersions": [
+                "2"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "scheme": "exact",
+        "network": "eip155:11155420",
+        "extra": {
+          "name": "GatewayWalletBatched",
+          "version": "1",
+          "verifyingContract": "0x0077777d7eba4688bdef3e311b846f25870a19b9",
+          "minValiditySeconds": 604800,
+          "assets": [
+            {
+              "symbol": "USDC",
+              "address": "0x5fd84259d66cd46123540766be93dfe6d43130d7",
+              "decimals": 6,
+              "authorizationVersions": [
+                "1",
+                "2"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "scheme": "exact",
+        "network": "eip155:80002",
+        "extra": {
+          "name": "GatewayWalletBatched",
+          "version": "1",
+          "verifyingContract": "0x0077777d7eba4688bdef3e311b846f25870a19b9",
+          "minValiditySeconds": 604800,
+          "assets": [
+            {
+              "symbol": "USDC",
+              "address": "0x41e94eb019c0762f9bfcf9fb1e58725bfb0e7582",
+              "decimals": 6,
+              "authorizationVersions": [
+                "1",
+                "2"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "scheme": "exact",
+        "network": "eip155:1301",
+        "extra": {
+          "name": "GatewayWalletBatched",
+          "version": "1",
+          "verifyingContract": "0x0077777d7eba4688bdef3e311b846f25870a19b9",
+          "minValiditySeconds": 604800,
+          "assets": [
+            {
+              "symbol": "USDC",
+              "address": "0x31d0220469e10c4e71834a79b1f276d740d3768f",
+              "decimals": 6,
+              "authorizationVersions": [
+                "1",
+                "2"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "error": null
+  },
+  "balances": null
+}

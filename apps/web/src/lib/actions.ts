@@ -279,6 +279,74 @@ export async function submitFeedbackAction(formData: FormData): Promise<void> {
   redirect(withQuery(runPath(runId), { ok: "Correction recorded; Reppo submission not requested" }));
 }
 
+export async function requestSecEvidenceAction(formData: FormData): Promise<void> {
+  const runId = field(formData, "runId");
+  const result = await perform(`/v1/analysis-runs/${runId}/external-evidence/free`, {
+    method: "POST",
+    headers: { "idempotency-key": `evidence-sec-${runId}-${randomUUID()}` },
+    body: JSON.stringify({
+      kind: field(formData, "kind") || "REVENUE_VERIFICATION",
+      providerId: "sec-edgar",
+      ...(field(formData, "ticker") ? { ticker: field(formData, "ticker") } : {}),
+      ...(field(formData, "cik") ? { cik: field(formData, "cik") } : {}),
+      ...(field(formData, "fiscalYear") ? { fiscalYear: Number(field(formData, "fiscalYear")) } : {}),
+      linkedField: field(formData, "linkedField") || "reported revenue",
+      reason: field(formData, "reason") || "Independent verification of a public-company financial figure.",
+      publicReferenceConfirmed: formData.get("publicReferenceConfirmed") === "on",
+    }),
+  });
+  if (!result.ok) redirect(withQuery(runPath(runId), { error: result.code, message: result.message }));
+  revalidatePath(runPath(runId));
+  redirect(withQuery(runPath(runId), { ok: "External evidence retrieved and linked to this run" }));
+}
+
+export async function quotePaidEvidenceAction(formData: FormData): Promise<void> {
+  const runId = field(formData, "runId");
+  const result = await perform(`/v1/analysis-runs/${runId}/external-evidence/quote`, {
+    method: "POST",
+    headers: { "idempotency-key": `evidence-quote-${runId}-${randomUUID()}` },
+    body: JSON.stringify({
+      kind: field(formData, "kind") || "EQUITY_FUNDAMENTALS",
+      providerId: field(formData, "providerId") || "lonestar-oracle",
+      ticker: field(formData, "ticker"),
+      ...(field(formData, "fiscalYear") ? { fiscalYear: Number(field(formData, "fiscalYear")) } : {}),
+      linkedField: field(formData, "linkedField") || "public-company reference",
+      reason: field(formData, "reason") || "Optional market-context evidence for the linked public reference.",
+      publicReferenceConfirmed: formData.get("publicReferenceConfirmed") === "on",
+    }),
+  });
+  if (!result.ok) redirect(withQuery(runPath(runId), { error: result.code, message: result.message }));
+  revalidatePath(runPath(runId));
+  redirect(withQuery(runPath(runId), { ok: "Payment quote recorded — review the deterministic policy decision" }));
+}
+
+export async function authorizePaymentAction(formData: FormData): Promise<void> {
+  const runId = field(formData, "runId");
+  const result = await perform(`/v1/analysis-runs/${runId}/external-evidence/authorize`, {
+    method: "POST",
+    body: JSON.stringify({
+      paymentIntentId: field(formData, "paymentIntentId"),
+      expectedQuoteSha256: field(formData, "expectedQuoteSha256"),
+      confirm: true,
+    }),
+  });
+  if (!result.ok) redirect(withQuery(runPath(runId), { error: result.code, message: result.message }));
+  revalidatePath(runPath(runId));
+  redirect(withQuery(runPath(runId), { ok: "Payment authorized and queued for execution" }));
+}
+
+export async function reconcilePaymentAction(formData: FormData): Promise<void> {
+  const runId = field(formData, "runId");
+  const paymentIntentId = field(formData, "paymentIntentId");
+  const result = await perform(`/v1/analysis-runs/${runId}/external-evidence/payments/${paymentIntentId}/reconcile`, {
+    method: "POST",
+    body: JSON.stringify({}),
+  });
+  if (!result.ok) redirect(withQuery(runPath(runId), { error: result.code, message: result.message }));
+  revalidatePath(runPath(runId));
+  redirect(withQuery(runPath(runId), { ok: "Payment reconciliation queued — no second payment will be created" }));
+}
+
 export async function verifyAuditAction(formData: FormData): Promise<void> {
   const borrowerId = field(formData, "borrowerId");
   const result = await perform<ApiEnvelope<{ result: string; checkedCount: number }>>(

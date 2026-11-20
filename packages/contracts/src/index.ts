@@ -207,27 +207,61 @@ export const reppoSubmitSchema = z
   })
   .strict();
 
-export const kiteSessionSchema = z
+export const financialDataProviderIdSchema = z.enum(["sec-edgar", "financial-datasets", "lonestar-oracle"]);
+export const financialEvidenceKindSchema = z.enum([
+  "COMPANY_FACTS",
+  "REVENUE_VERIFICATION",
+  "INCOME_STATEMENT",
+  "BALANCE_SHEET",
+  "CASH_FLOW_STATEMENT",
+  "EQUITY_FUNDAMENTALS",
+]);
+
+export const externalEvidenceRequestSchema = z
   .object({
-    sessionId: z.string().min(8),
-    status: z.enum(["active", "expired", "used_up", "revoked"]),
-    asset: z.string().min(1),
-    maxPerTransaction: minorUnitsSchema,
-    maxTotal: minorUnitsSchema,
-    spentTotal: minorUnitsSchema,
-    reservedTotal: minorUnitsSchema,
-    expiresAt: z.string().datetime(),
+    kind: financialEvidenceKindSchema,
+    providerId: financialDataProviderIdSchema,
+    ticker: z
+      .string()
+      .trim()
+      .toUpperCase()
+      .min(1)
+      .max(12)
+      .regex(/^[A-Z0-9.-]+$/, "Use a public ticker such as AAPL.")
+      .optional(),
+    cik: z.string().trim().regex(/^\d{1,10}$/, "Use a SEC CIK of 1–10 digits.").optional(),
+    fiscalYear: z.number().int().min(1990).max(2100).optional(),
+    reason: z.string().trim().min(10).max(1000),
+    linkedField: z.string().trim().max(200).optional(),
+    publicReferenceConfirmed: z.boolean().default(false),
+  })
+  .strict()
+  .superRefine((value, ctx) => {
+    if (!value.publicReferenceConfirmed) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["publicReferenceConfirmed"],
+        message: "Confirm that the public ticker or CIK refers to the entity you intend to check.",
+      });
+    }
+    if (value.providerId === "sec-edgar" && !value.ticker && !value.cik) {
+      ctx.addIssue({ code: "custom", path: ["ticker"], message: "Provide a ticker or CIK for SEC EDGAR." });
+    }
+    if (value.providerId !== "sec-edgar" && !value.ticker) {
+      ctx.addIssue({ code: "custom", path: ["ticker"], message: "This provider requires a public ticker." });
+    }
+  });
+
+export const paymentAuthorizationSchema = z
+  .object({
+    paymentIntentId: z.string().uuid(),
+    expectedQuoteSha256: z.string().regex(/^[0-9a-f]{64}$/, "Use the quote hash returned by the server."),
+    confirm: z.literal(true),
   })
   .strict();
 
-export const kitePaymentIntentSchema = z
-  .object({
-    amountMinor: minorUnitsSchema,
-    asset: z.string().min(1),
-    idempotencyKey: z.string().min(8).max(200),
-    serviceId: z.string().min(1).max(120),
-  })
-  .strict();
+export type ExternalEvidenceRequest = z.infer<typeof externalEvidenceRequestSchema>;
+export type PaymentAuthorizationRequest = z.infer<typeof paymentAuthorizationSchema>;
 
 export const safeErrorSchema = z.object({
   error: z.object({

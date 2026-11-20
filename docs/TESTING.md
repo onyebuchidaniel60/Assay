@@ -36,7 +36,10 @@ It signs in through Neon Auth and covers:
 - Deterministic Decimal engine: exact predicate, headroom, floor/ceil stress rules, ineligible add-back rejection, zero/negative EBITDA rejection, currency mismatch.
 - Independent BigInt verifier: rounded 8-dp ratio match, classification match, dependency/formula staleness.
 - Approval policy: role, maker-checker, payload/dependency invalidation, expiry and reason rules.
-- Kite policy: expiry, asset, per-tx cap, total cap, idempotency and invalid amount.
+- Arc spending policy: provider, endpoint, network, asset, recipient, per-tx cap, total budget, expiry, scheme, idempotency conflict, duplicate payment, duplicate nonce and invalid amount.
+- Arc provider: SDK/config verification, safe serialisation (no key), quote parsing, resource mismatch, signing/header shape against a local mock x402 server, receipt confirmation, missing receipt, timeout/no blind retry, duplicate-payment and insufficient-balance handling.
+- Financial data: SEC EDGAR annual fact selection, provenance/content hash, unknown ticker, missing fiscal period, malformed response, rate limit, unavailable provider; Financial Datasets Base-mainnet incompatibility; LoneStar Oracle Arc-mainnet policy restriction; deterministic private-company/public-company evidence planning.
+- Payment runtime config: default-disabled, complete bounded session, wrong network/token fail-closed, empty optional values.
 - Contracts: normative covenant-terms schema, minor-unit financial inputs, redaction spans, approval/terms review.
 - Crypto: DEK wrap/unwrap, AES-GCM tamper failure, Ed25519 sign/verify.
 - Document: magic bytes, 10 MiB cap, PDF text/page extraction, scanned/no-text rejection, tokenization stability, overlap priority.
@@ -65,7 +68,7 @@ Recorded in `docs/BUILD_LOG.md`:
 - Log redaction: forced `ATTESTATION_FAILED`; grep for marker/email/account/figure/reference/borrower name/token-map was clean.
 - Dependency/secret scans: `pnpm audit` 0 high/critical (1 moderate dev-only esbuild, 1 low elliptic); Gitleaks worktree/history clean of real secrets; `scripts/check-secrets.sh` passes.
 - XSS/SQL-injection probes, audit-tamper fixture, concurrent approval, CORS denial and demo-shred tests passed in earlier phases.
-- Kite duplicate-payment/reconciliation is code-reviewed only because both documented testnet endpoints are provider-blocked; no live-payment success is claimed.
+- Arc live payment and SEC live retrieval suites are **skipped** unless credentials/funding and a compatible merchant are supplied. The mock-x402 tests are explicitly mocks and do not claim settlement. No live-payment success or live SEC result is claimed from this host.
 - Deployed production smoke: `/`, `/login`, logo/favicon/OG/manifest, authenticated workspace routes, `/v1/me`, `/v1/integrations/status` and API health all pass at `https://assay-omega-gray.vercel.app` / `https://assay-api-7hy0.onrender.com`.
 
 ## Gate

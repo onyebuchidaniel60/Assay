@@ -2,8 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { randomUUID } from "node:crypto";
 import { and, desc, eq } from "@assay/db";
 import { analysisRuns, borrowers, createDb, reppoEvaluations } from "@assay/db";
-import { feedbackCreateSchema, kitePaymentIntentSchema, reppoSubmitSchema } from "@assay/contracts";
-import { evaluateKitePayment } from "@assay/domain";
+import { feedbackCreateSchema, reppoSubmitSchema } from "@assay/contracts";
 import { appendBorrowerAuditEventInTx } from "@assay/db";
 import { meta, parseBody, requireAuth, requireRole } from "../lib/http.js";
 import { ApiError, notFound } from "../lib/errors.js";
@@ -12,6 +11,10 @@ import {
   serializeEvaluation,
   submitFeedbackToReppo,
 } from "../lib/reppo.js";
+import { createArcProvider } from "../lib/arc-provider.js";
+import { getFinancialProviderStatuses } from "../lib/financial-providers.js";
+import { loadPaymentRuntimeConfig, paymentRuntimeReady } from "../lib/payment-config.js";
+import { getSessionSummary } from "../lib/payment-service.js";
 
 const db = createDb();
 
@@ -19,21 +22,74 @@ function booleanEnv(name: string): boolean {
   return (process.env[name] ?? "").toLowerCase() === "true";
 }
 
-function kiteSession() {
-  const remaining = Number(process.env.KITE_MAX_TOTAL_MINOR ?? "0");
-  return {
-    sessionId: process.env.KITE_SESSION_ID ?? "",
-    status: (process.env.KITE_SESSION_EXPIRY && new Date(process.env.KITE_SESSION_EXPIRY).getTime() > Date.now()
-      ? "active"
-      : "expired") as "active" | "expired",
-    asset: process.env.KITE_TESTNET_ASSET ?? "PIEUSD",
-    maxPerTransaction: process.env.KITE_MAX_PER_PAYMENT_MINOR ?? "0",
-    maxTotal: process.env.KITE_MAX_TOTAL_MINOR ?? "0",
-    spentTotal: process.env.KITE_SPENT_TOTAL_MINOR ?? "0",
-    reservedTotal: "0",
-    expiresAt: process.env.KITE_SESSION_EXPIRY ?? new Date(0).toISOString(),
-    remainingDisplayMinor: String(remaining),
+type ArcStatusCache = {
+  at: number;
+  value: Record<string, unknown>;
+};
+
+let arcStatusCache = new Map<string, ArcStatusCache>();
+
+async function arcStatus(organizationId: string): Promise<Record<string, unknown>> {
+  const cached = arcStatusCache.get(organizationId);
+  if (cached && Date.now() - cached.at < 60_000) return cached.value;
+  const config = loadPaymentRuntimeConfig();
+  let provider: ReturnType<typeof createArcProvider> | null = null;
+  let providerError: string | null = null;
+  try {
+    provider = createArcProvider(config);
+  } catch (error) {
+    providerError = error instanceof Error ? error.message : "The Arc provider could not be initialized.";
+  }
+
+  const [facilitator, balances, session, financialProviders] = await Promise.all([
+    provider
+      ? provider.getFacilitatorStatus().catch((error) => ({
+          reachable: false,
+          supportedNetwork: false,
+          supportedAsset: false,
+          supportedKinds: [],
+          error: error instanceof Error ? error.message : "Facilitator status is unavailable.",
+        }))
+      : Promise.resolve({ reachable: false, supportedNetwork: false, supportedAsset: false, supportedKinds: [], error: providerError }),
+    provider && (config.payerAddress || config.privateKey)
+      ? provider.getBalances().catch(() => null)
+      : Promise.resolve(null),
+    getSessionSummary({ db, organizationId, config }).catch(() => null),
+    getFinancialProviderStatuses(config),
+  ]);
+
+  const value = {
+    rail: "arc-circle-gateway",
+    enabled: config.enabled,
+    ready: paymentRuntimeReady(config),
+    executionEnabled: config.executionEnabled && !config.dryRun,
+    dryRun: config.dryRun,
+    network: config.network,
+    asset: config.asset,
+    assetSymbol: "USDC",
+    assetDecimals: 6,
+    chainId: config.chainId,
+    gatewayWallet: config.gatewayWallet,
+    gatewayDomain: config.gatewayDomain,
+    facilitatorUrl: config.facilitatorUrl,
+    payerAddress: provider?.payerAddress ?? config.payerAddress ?? null,
+    signingKeyConfigured: provider?.signingKeyConfigured ?? Boolean(config.privateKey),
+    providerError,
+    configError: config.configError,
+    facilitator,
+    balances,
+    session,
+    financialDataProviders: financialProviders,
+    compatibility: {
+      financialDatasets:
+        "Documented x402 rail is Base mainnet USDC (eip155:8453). It is not Arc-compatible; Assay will not bridge or relabel a Base payment as Arc.",
+      lonestarOracle:
+        "Real x402 financial-data provider with an Arc mainnet USDC option (eip155:5042). Assay's default testnet policy rejects it and no mainnet funds are authorized.",
+      secEdgar: "Free public SEC XBRL data. It needs no payment and is used for real independent evidence when an analyst links a public CIK/ticker.",
+    },
   };
+  arcStatusCache.set(organizationId, { at: Date.now(), value });
+  return value;
 }
 
 export function registerIntegrationRoutes(app: FastifyInstance) {
@@ -64,13 +120,7 @@ export function registerIntegrationRoutes(app: FastifyInstance) {
               : "missing-key"
             : "disabled",
         },
-        kite: {
-          enabled: booleanEnv("KITE_ENABLED"),
-          session: kiteSession(),
-          paymentPath: "provider-blocked",
-          providerBlocked: true,
-          note: "Policy engine verified; payment rail provider-blocked with evidence. 16 Nov 2026: passport.dev.gokite.ai/x402/test returned an upstream internal error; x402.dev.gokite.ai/api/weather returned authoritative DNS NODATA (07:54:29Z); kite-live-dns.sakurasoga7.workers.dev returned 402 but kpass rejected it with payment_target_forbidden / sandbox_merchant_not_allowlisted (07:55:19Z). Spent total remains 0.",
-        },
+        payments: await arcStatus(user.organizationId),
       },
       meta: meta(request),
     };
@@ -188,44 +238,5 @@ export function registerIntegrationRoutes(app: FastifyInstance) {
     const refresh = (request.query as { refresh?: string }).refresh === "1";
     const evaluation = await loadReppoEvaluation(user.organizationId, id, refresh);
     return { data: evaluation, meta: meta(request) };
-  });
-
-  app.post("/v1/integrations/kite/benchmark-requests", async (request, reply) => {
-    const user = await requireAuth(request, reply);
-    requireRole(user, ["ANALYST", "ADMIN"]);
-    const body = parseBody(kitePaymentIntentSchema, request.body);
-    const session = kiteSession();
-    const decision = evaluateKitePayment(
-      {
-        sessionId: session.sessionId,
-        status: session.status,
-        asset: session.asset,
-        maxPerTransaction: session.maxPerTransaction,
-        maxTotal: session.maxTotal,
-        spentTotal: session.spentTotal,
-        reservedTotal: session.reservedTotal,
-        expiresAt: session.expiresAt,
-      },
-      { amount: body.amountMinor, asset: body.asset, idempotencyKey: body.idempotencyKey },
-    );
-    if (!decision.allowed) {
-      reply.code(422);
-      return {
-        error: {
-          code: decision.code.toUpperCase(),
-          message: decision.message,
-          requestId: String(request.id),
-        },
-      };
-    }
-    reply.code(503);
-    return {
-      error: {
-        code: "PROVIDER_BLOCKED",
-        message: "Local policy allowed the request, but the Kite x402 provider is currently blocking payment. No payment was attempted.",
-        requestId: String(request.id),
-        details: { remainingTotal: decision.remainingTotal, idempotencyKey: body.idempotencyKey, providerBlocked: true },
-      },
-    };
   });
 }

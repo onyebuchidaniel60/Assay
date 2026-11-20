@@ -49,6 +49,20 @@ const statusTone: Record<string, BadgeTone> = {
   PROCESSING: "warning",
   READY: "positive",
   SHREDDED: "neutral",
+  PROPOSED: "info",
+  POLICY_REJECTED: "warning",
+  AUTHORIZED: "proof",
+  SUBMITTING: "warning",
+  SUBMITTED: "warning",
+  CONFIRMED: "positive",
+  RECONCILIATION_REQUIRED: "warning",
+  RECONCILED: "proof",
+  RETRIEVED: "positive",
+  NOT_REQUESTED: "neutral",
+  PENDING: "warning",
+  VALID: "positive",
+  INCOMPLETE: "warning",
+  INVALID: "danger",
 };
 
 export function StatusBadge({

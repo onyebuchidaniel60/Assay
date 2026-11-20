@@ -1,13 +1,16 @@
 # Assay — AI Handoff / Build State
 
-**Status:** Phases 1–9 complete. Public production deployed and smoke-tested after the full regression and security matrix passed; post-submission access and branding fixes applied.  
+> **PAYMENT UPDATE — 20 November 2026.** Kite Passport/x402 was removed and replaced by Arc Testnet / Circle Gateway plus external financial-evidence linkage. Historical Kite entries below are development history, not active instructions. See `docs/PAYMENTS_ARCHITECTURE.md` and the latest `docs/BUILD_LOG.md` entry.
+
+
+**Status:** Phases 1–9 complete. Public production deployed and smoke-tested after the full regression and security matrix passed; post-submission access and branding fixes applied. The 20 November 2026 payment update removes Kite, adds Arc Testnet / Circle Gateway and external financial-evidence linkage.
 **Repository:** `https://github.com/onyebuchidaniel60/Assay` — public, default branch `main`.  
-**Production URL:** `https://assay-uhhh2.vercel.app` — public (Vercel Authentication disabled). `https://assay-omega-gray.vercel.app` is the production domain and points to the same deployment `assay-o65mwq19k-uhhh2.vercel.app`.  
-**Production commit:** `c27a02a`. **Render API:** `https://assay-api-7hy0.onrender.com` (live at `60fac34`; post-submission UI change is Vercel-only). **Render Presidio:** `https://assay-presidio.onrender.com`.  
-**Public demo:** `https://github.com/onyebuchidaniel60/Assay/releases/download/demo-v1/assay-demo-final.mp4` — 131.97 s, 1080p/30 fps.  
-**Production release authority:** Exercised after the gate passed; no unresolved critical/high finding.  
+**Production URL:** `https://assay-uhhh2.vercel.app` — public (Vercel Authentication disabled). `https://assay-omega-gray.vercel.app` is the production domain.
+**Production commit:** previous release `c27a02a`; the 20 November 2026 payment update deployment is recorded in `docs/BUILD_LOG.md` after verification. **Render API:** `https://assay-api-7hy0.onrender.com`. **Render Presidio:** `https://assay-presidio.onrender.com`.
+**Public demo:** `https://github.com/onyebuchidaniel60/Assay/releases/download/demo-v1/assay-demo-final.mp4` — 131.97 s, 1080p/30 fps. It predates the Arc change and is a historical artifact.
+**Production release authority:** Exercised for the previous release; the Arc update was deployed with payment execution disabled.
 **Data boundary:** Synthetic data only; no real borrower, lender or production records.  
-**New spend authority:** `$0` beyond existing NEAR AI, SERV, Reppo and OpenRouter credits.
+**New spend authority:** `$0`; no Arc Testnet funds, no Arc mainnet funds, no paid Financial Datasets request.
 
 ## Phase 1 — complete
 
@@ -55,9 +58,10 @@
 | Full workflow BOR-004 | 3.0660x compliant → proof `VERIFIED` → manager `APPROVED` |
 | Stressed BOR-005 | baseline 3.475x; stress 3.861x/3.823x breached; no-ack 422; acknowledged approve 201 |
 | Root typecheck/build | Passed |
-| Unit tests | domain 18/18, crypto 4/4, contracts 6/6, document 8/8, proof 3/3, AI 10/10, API 4/4 |
-| Playwright | 18/18 desktop + mobile |
-| Kite | Testnet session active; payment path provider-blocked; no retry; no receipt claimed |
+| Unit tests | 94 passed, 1 skipped (live Arc payment suite requires funded testnet credentials); domain 28, crypto 4, contracts 6, document 8, proof 3, Reppo 8, AI 10, financial-data 8, payments 11, API 8 |
+| Playwright | 20/20 desktop + mobile on the previous release; local Arc evidence flow exercised with the demo analyst |
+| Arc | SDK/config verified; facilitator supports Arc Testnet USDC; real LoneStar quote persisted as `POLICY_REJECTED` with `payment_network_forbidden`; no execution job; no payment claimed |
+| SEC EDGAR | Adapter and fixtures pass; this host received HTTP 403 from AkamaiGHost; visible failure and audit; no data fabricated |
 | Public signup | Disabled at the auth service; direct probe returned `400 EMAIL_PASSWORD_SIGN_UP_DISABLED` |
 | Reppo | **LIVE** — real evaluation `cmwikqtsn000f08l4y73d9a8m`, score 98, `accept`, confidence `low`, route `review`, 440 credits, 409-byte safe trace |
 
@@ -66,6 +70,7 @@
 - Organizations: `Assay Demo Credit Partners` (`00000000-0000-4000-8000-000000000001`).
 - Demo staff: `analyst@assay.test` (Maya Chen, ANALYST), `manager@assay.test` (Jon Bell, MANAGER), `auditor@assay.test` (Priya Raman, AUDITOR). Credentials live only in `/root/assay-secrets/demo-users.env`.
 - Borrowers BOR-004, BOR-005, BOR-006, BOR-013 and BOR-018 exist, all manager-approved. BOR-004/006/013/018 are baseline compliant with two acknowledged stress breaches; BOR-005 is the stressed-breach fixture. One real Reppo evaluation (`cmwikqtsn000f08l4y73d9a8m`) remains. All security-test and IDOR records were deleted.
+- The 20 November 2026 payment update added synthetic run `856a437a-0449-4d2e-8cab-024fc0fa8140` (BOR-004, `TERMS_CONFIRMED`) solely for the external-evidence policy demonstration. It has no covenant terms or financial inputs and is not an approved analysis. Payment intent `86907190-500c-434d-ac4a-73f526aa7a38` is `POLICY_REJECTED`; SEC failure audit events are present. The audit chain verifies `VALID` with 22 events.
 - Old BOR-001/2/3 test runs were deleted before the final schema/workflow checks. No real data was involved.
 
 ## Phase 5 — deployed preview verified

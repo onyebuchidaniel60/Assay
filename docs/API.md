@@ -78,12 +78,17 @@ Stack traces, SQL messages, provider raw errors, prompts, raw documents and priv
 | `POST /v1/integrations/reppo/evaluations` | Analyst/Admin | Submits a feedback record to the live Reppo Eval Router; returns `202` or a visible provider/client error |
 | `GET /v1/integrations/reppo/evaluations` | All staff | Tenant-scoped evaluation register |
 | `GET /v1/integrations/reppo/evaluations/:id` | All staff | Real provider status/score/decision/confidence/route/result; `?refresh=1` polls the provider |
-| `POST /v1/integrations/kite/benchmark-requests` | Analyst/Admin | Deterministic local session/cap/asset/expiry check; both documented testnet endpoints are provider-blocked/DNS-unresolved and no payment is attempted |
+| `GET /v1/analysis-runs/:id/external-evidence` | All staff | Deterministic evidence plan, retrieved evidence, payment intents and provider status; payload only for analyst/admin |
+| `POST /v1/analysis-runs/:id/external-evidence/free` | Analyst/Admin | Free SEC EDGAR retrieval; requires an explicit public-reference confirmation and idempotency key |
+| `POST /v1/analysis-runs/:id/external-evidence/quote` | Analyst/Admin | Fetches the provider's real terms, runs the deterministic Arc policy and persists `PROPOSED` or `POLICY_REJECTED` |
+| `POST /v1/analysis-runs/:id/external-evidence/authorize` | Analyst/Admin | Re-evaluates policy, locks the session, reserves budget and queues `payment.execute`; a policy rejection never executes |
+| `POST /v1/analysis-runs/:id/external-evidence/payments/:intentId/reconcile` | Analyst/Admin | Queues a lookup of the original authorization; never creates a second payment |
+| `GET /v1/analysis-runs/:id/external-evidence/:evidenceId` | All staff | Source-linked evidence; payload is role-restricted |
 | `POST /v1/demo/borrowers/:id/shred` | Admin, demo-only | Requires `APP_ENV=demo`, `ENABLE_DEMO_SHRED=true`, synthetic `BOR-*` reference and typed confirmation |
 
 ## Idempotency and state
 
-`Idempotency-Key` is mandatory for run creation, proof generation and manager decisions. Other mutating endpoints accept it. Reuse with a different request hash returns `409 IDEMPOTENCY_CONFLICT`. State transitions use row locks and a version check; stale or concurrent actions return `409`.
+`Idempotency-Key` is mandatory for run creation, proof generation, manager decisions, free external-evidence retrieval and paid payment intents. Other mutating endpoints accept it. Reuse with a different request hash returns `409 IDEMPOTENCY_CONFLICT`. State transitions use row locks and a version check; stale or concurrent actions return `409`. Payment authorisation locks the payment-session row and reserves budget before queuing execution. A timeout becomes `RECONCILIATION_REQUIRED`; reconciliation looks up the original nonce and never creates a second payment.
 
 ## Security notes
 

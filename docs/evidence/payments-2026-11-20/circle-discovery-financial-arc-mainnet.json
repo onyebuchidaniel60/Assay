@@ -1,0 +1,114 @@
+{
+  "capturedAt": "2026-11-20",
+  "query": "category=FINANCIAL_ANALYSIS&network=eip155:5042",
+  "total": 193,
+  "providers": {
+    "LoneStarOracle": 63,
+    "AIsa API": 20,
+    "anchor-x402": 18,
+    "BlockRun.AI": 74,
+    "Orthogonal": 2,
+    "SqueezeOS": 16
+  },
+  "equityListing": {
+    "resource": "https://equity.lonestaroracle.xyz/equity",
+    "type": "http",
+    "x402Version": 2,
+    "lastUpdated": "2026-10-07T13:25:16.316Z",
+    "accepts": [
+      {
+        "scheme": "exact",
+        "network": "eip155:8453",
+        "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+        "payTo": "0x52Ab53912D37759B2ad364f22dD06B16714b6C06",
+        "amount": "50000",
+        "maxTimeoutSeconds": 300,
+        "extra": {
+          "name": "USD Coin",
+          "version": "2"
+        }
+      },
+      {
+        "scheme": "exact",
+        "network": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+        "asset": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "payTo": "3nmeVj5m9Uq2hSTfsVsn3tJMHRJQNMKR1AjzyUJbrSgw",
+        "amount": "50000",
+        "maxTimeoutSeconds": 300,
+        "extra": {
+          "feePayer": "BENrLoUbndxoNMUS5JXApGMtNykLjFXXixMtpDwDR9SP"
+        }
+      },
+      {
+        "scheme": "exact",
+        "network": "eip155:5042",
+        "asset": "0x3600000000000000000000000000000000000000",
+        "payTo": "0xeF2a4B6756895aAf1374640dcFCD4947959442ab",
+        "amount": "50000",
+        "maxTimeoutSeconds": 300,
+        "extra": {
+          "name": "USDC",
+          "version": "2",
+          "assetTransferMethod": "eip3009"
+        }
+      }
+    ],
+    "metadata": {
+      "provider": {
+        "name": "LoneStarOracle",
+        "website": "https://lonestaroracle.xyz",
+        "docsUrl": "https://docs.lonestaroracle.xyz",
+        "description": "Real-economy, market, and geopolitical risk data",
+        "category": "FINANCIAL_ANALYSIS",
+        "tags": [
+          "x402",
+          "financial-data",
+          "real-economy",
+          "lonestaroracle",
+          "macro",
+          "equities",
+          "crypto",
+          "compliance",
+          "risk",
+          "data"
+        ]
+      },
+      "path": "/equity",
+      "method": "GET",
+      "description": "US equity fundamentals, valuation and buy/sell signal",
+      "mimeType": "application/json",
+      "input": {
+        "type": "http",
+        "method": "GET",
+        "queryParams": {
+          "type": "object",
+          "properties": {
+            "symbol": {
+              "type": "string",
+              "title": "Symbol"
+            },
+            "ticker": {
+              "type": "string",
+              "title": "Ticker"
+            }
+          }
+        }
+      },
+      "output": {
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "example": {}
+        }
+      },
+      "siwx": false,
+      "supportsVanillax402": true,
+      "supportsCircleGateway": false
+    }
+  }
+}

@@ -12,8 +12,19 @@ Use synthetic borrower identities and synthetic agreement/financial fixtures onl
 4. Review every redaction and confirm before extraction.
 5. Review the extracted covenant threshold, definitions, permitted add-backs and source quotes. Correct any mistake.
 6. Enter total debt, EBITDA and permitted add-back amounts from the synthetic test fixture. Confirm currency and attest to input values.
-7. Run calculation and inspect baseline and two stress scenarios.
-8. Submit eligible compliant result to manager review.
+7. Optionally review the external-evidence plan. Link a public ticker/CIK only if it is genuinely the intended public reference; retrieve free SEC evidence or request a paid quote. A paid quote is not a payment; authorise only a policy-approved quote and only when execution is enabled.
+8. Run calculation and inspect baseline and two stress scenarios.
+9. Submit eligible compliant result to manager review.
+
+## External-evidence and payment operations
+
+- Free SEC evidence: requires `SEC_EDGAR_USER_AGENT`. The current host is blocked by SEC/Akamai (HTTP 403); do not scrape around it or fabricate data. Probe from the deployed egress.
+- Paid providers: provider terms are fetched live and evaluated by the deterministic policy. `POLICY_REJECTED` means no execution. `PROPOSED` means the policy approved the quote but no payment exists yet.
+- Authorisation is explicit and distinct from manager approval. It reserves budget and queues `payment.execute`.
+- `CONFIRMED` requires a verifiable provider receipt or a reconciled Gateway transfer. `RECONCILIATION_REQUIRED` means look up the original authorization; never press pay again.
+- Execution is disabled by default. Do not enable it without an isolated funded test wallet, a new session ID, allowlists, caps and an expiry.
+- Do not deploy `ARC_TESTNET_PRIVATE_KEY` to a shared environment without explicit operator key-management authority. The status page works with only a public payer address.
+- Deposit/withdraw are manual scripts under `scripts/` and require `--confirm`. The agent never deposits automatically.
 
 ## Manager workflow
 
@@ -34,7 +45,7 @@ Open the audit timeline, inspect event metadata and run chain verification. Audi
 - ZK proof verifies the defined inequality for a private witness; it does not prove agreement authenticity or input-source truth.
 - Hash chain is tamper-evident; it is not an immutable public ledger.
 - Demo crypto-shred removes the application-wrapped key for synthetic data; it is not a legal erasure certification.
-- Reppo is live for synthetic feedback evaluation; Kite policy is live but both documented payment endpoints remain provider-blocked/DNS-unresolved. Never present a blocked payment as successful.
+- Reppo is live for synthetic feedback evaluation. Arc Testnet / Circle Gateway is implemented with deterministic policy and mock-x402 tests; no live paid financial-data retrieval is claimed. SEC EDGAR is implemented but returned HTTP 403 from this host. Never present a policy approval, an HTTP 200 or a blocked provider as a settled payment.
 
 ## Support
 

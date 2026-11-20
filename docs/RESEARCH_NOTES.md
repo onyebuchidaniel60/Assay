@@ -47,9 +47,20 @@ Dolphin was evaluated and rejected because its confidentiality mechanism is unve
 
 - Reppo public Evaluation API page advertises `POST https://eval.reppo.xyz/api/v1/agents/eval-requests/submit`, bearer key, GET by evaluation ID, structured verdict fields and async settlement windows. It advertises 10 free evaluations then launch price $0.01/evaluation. Confirm current conditions on the actual account; use synthetic/de-identified payloads only.
 
-## Kite
+## Arc / Circle Gateway
 
-- Kite Passport docs describe passkey-approved spending sessions with per-payment and total limits plus expiry, and x402 service payments. A spending session controls agent payments, not business/credit approvals. Verify current CLI/SDK and testnet details before implementation.
+- Circle Gateway nanopayments use `@circle-fin/x402-batching` and EIP-3009 `TransferWithAuthorization` signatures against the Gateway Wallet, not the USDC token.
+- Arc Testnet: chain ID `5042002`, network `eip155:5042002`, USDC `0x3600000000000000000000000000000000000000`, Gateway Wallet `0x0077777d7EBA4688BDeF3E311b846F25870A19B9`, domain `26`, facilitator `https://gateway-api-testnet.circle.com`.
+- Gateway payments are gasless at payment time but require a prior on-chain deposit into the Gateway Wallet. A wallet balance alone is not spendable by x402.
+- Authorization validity must be at least three days; the SDK handles this. Assay still re-evaluates the actual 402 requirement before signing.
+- Circle Discovery had zero financial-analysis services on Arc Testnet on 20 November 2026. Financial Datasets x402 is Base mainnet; LoneStar Oracle offers Arc mainnet. Verify current listings before claiming compatibility.
+
+## Financial data
+
+- Financial Datasets: https://docs.financialdatasets.ai/x402 (Base mainnet; Non-Professional licence)
+- SEC EDGAR APIs: https://www.sec.gov/edgar/sec-api-documentation
+- Circle Discovery API: `GET https://api.circle.com/v2/x402/discovery/resources`
+- Circle Gateway docs: https://developers.circle.com/gateway
 
 ## Presidio and proofs
 
@@ -75,8 +86,13 @@ Dolphin was evaluated and rejected because its confidentiality mechanism is unve
 - NEAR AI Cloud: https://cloud-api.near.ai/v1
 - NEAR AI public deployment manifests: https://github.com/nearai/cvm-compose-files
 - OpenRouter: https://openrouter.ai/api/v1
-- Kite Passport: https://docs.gokite.ai/passport
-- Kite allowance and sessions: https://docs.gokite.ai/passport/payments/allowance
+- Kite Passport: removed; historical evidence only in `docs/archive/KITE_REMOVAL.md`.
+- Circle Gateway: https://developers.circle.com/gateway
+- Circle nanopayments SDK: https://developers.circle.com/sdks/gateway-nanopayments-sdk
+- Circle Discovery: https://developers.circle.com/agent-stack/agent-marketplace/discovery-api
+- Arc Testnet contract addresses: https://docs.arc.io/arc/references/contract-addresses
+- Financial Datasets x402: https://docs.financialdatasets.ai/x402
+- SEC EDGAR API: https://www.sec.gov/edgar/sec-api-documentation
 - Reppo Evaluation API: https://www.reppofoundation.org/evaluation-api
 - Presidio Analyzer: https://microsoft.github.io/presidio/analyzer/
 - Circom proof verification: https://docs.circom.io/getting-started/proving-circuits/

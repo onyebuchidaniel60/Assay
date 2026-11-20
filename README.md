@@ -53,6 +53,7 @@ Credit analysts, credit managers and auditors at a lender or credit fund who nee
 7. **Approve with maker-checker control.** The manager sees a restricted view with no raw amounts or named counterparties. The server re-locks the run and re-verifies the stored proof before one decision is written.
 8. **Verify the audit chain.** Per-borrower events are encrypted, hash-chained and Ed25519-signed. The chain remains verifiable after a demo crypto-shred.
 9. **Evaluate synthetic feedback.** An analyst correction can be submitted to Reppo as a de-identified field-level trace. The real verdict is displayed; Reppo never approves the covenant.
+10. **Retrieve external financial evidence.** A deterministic planner proposes a genuine evidence need. The analyst can retrieve free SEC EDGAR public-company facts or request a paid provider quote. Paid quotes are evaluated by the Arc/Circle Gateway spending policy before any signature; evidence is encrypted, source-linked, hashed and audited. Public-company data is never treated as proof of a private borrower's position.
 
 ## Architecture
 
@@ -67,22 +68,26 @@ flowchart LR
   API --> S[SERV Reasoning]
   S --> O[OpenRouter\nstructured judgement]
   API --> R[Reppo Eval Router]
-  API --> K[Kite x402 policy]
+  API --> F[Financial data\nSEC EDGAR · paid providers]
+  API --> A[Arc Testnet / Circle Gateway\nx402 payment rail]
   API --> Z[Circom / SnarkJS\nfixed leverage circuit]
   DB --> J[Postgres FOR UPDATE SKIP LOCKED worker]
   J --> API
+  J --> A
 ```
 
-- **Deterministic code owns** arithmetic, business rules, approval checks, audit verification and spending policy.
+- **Deterministic code owns** arithmetic, business rules, approval checks, audit verification, spending policy and payment-state transitions.
 - **No LLM can calculate authoritatively, approve a credit decision or pay.**
 - **Postgres is the queue.** No Redis, Kafka or Kubernetes.
-- **Provider failures are visible.** There is no fabricated verdict, receipt or proof.
+- **Provider failures are visible.** There is no fabricated verdict, receipt, transfer or proof.
+- **A policy approval is not a payment receipt.** Settlement requires a verifiable provider receipt or a reconciled Gateway transfer.
 
 ## Track declaration
 
 - **PRIMARY: Open Track**
 - **SECONDARY: Reppo** — feedback evaluation is live (one real synthetic evaluation completed: score 98, decision `accept`, confidence `low`, route `review`).
-- **SECONDARY: Kite** — deterministic x402 session/cap/asset/expiry policy is implemented and the over-cap rejection is verified. Payment remains **provider-blocked**: the first documented testnet endpoint returned an upstream internal error, and the second (`x402.dev.gokite.ai`) did not resolve (DNS `ENOTFOUND`) on 16 November 2026. No payment is claimed.
+- **SECONDARY: Arc Testnet / Circle Gateway** — the official `@circle-fin/x402-batching` SDK is integrated behind a `PaymentProvider` interface. Deterministic allowlists, caps, expiry, idempotency, duplicate-nonce and reconciliation controls are implemented and tested with a local mock x402 server. **No live paid financial-data retrieval is claimed**: Circle Discovery listed zero `FINANCIAL_ANALYSIS` services on Arc Testnet on 20 November 2026, Financial Datasets x402 is Base mainnet only, and no testnet funds were supplied. See [docs/PAYMENTS_ARCHITECTURE.md](docs/PAYMENTS_ARCHITECTURE.md).
+- **SECONDARY: SEC EDGAR** — free public XBRL company facts are implemented with provenance, validation and limitations. This development host received HTTP 403 from SEC/Akamai, so live retrieval must be verified from the deployed Render egress; no live SEC result is claimed here.
 - **NOT CLAIMED: Dolphin** — evaluated and rejected because its confidentiality mechanism is unverified: no TEE, no MPC and no verified zero-retention guarantee. No Dolphin adapter, key, endpoint or model is present.
 
 ## Security and privacy summary
@@ -97,6 +102,9 @@ flowchart LR
 - The proof proves the fixed compliance predicate over the submitted witness, not the truth of the source figures.
 - The audit chain is signed and tamper-evident; it is not claimed immutable against a fully compromised signing key.
 - Reppo receives only field-level, de-identified correction traces, never agreement text, borrower identity, token maps or raw financial figures.
+- The Arc payer private key is server-side only, held in non-serialisable private fields, never stored in the database, never sent to the frontend and never logged. Payment execution is disabled by default.
+- External evidence is encrypted with the borrower DEK, content-hashed and linked to the run. SEC/public-company limitations are shown explicitly.
+- Kite Passport, Kite SDKs, `PIEUSD`, `gokite.ai` and Kite credentials are removed from the active application.
 
 ## Quick start
 
@@ -117,7 +125,7 @@ pnpm --filter @assay/web dev
 - Presidio: see [docs/SETUP.md](docs/SETUP.md)
 - Proof artifacts: `packages/proof/artifacts/`
 
-See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for every variable and [docs/SETUP.md](docs/SETUP.md) for the exact verified setup.
+See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for every variable and [docs/SETUP.md](docs/SETUP.md) for the exact verified setup. Payment execution is off by default; see [docs/PAYMENTS_ARCHITECTURE.md](docs/PAYMENTS_ARCHITECTURE.md) before funding an Arc Testnet wallet.
 
 ## Verified deployment
 
@@ -137,6 +145,7 @@ The production deployment is public; the workspace itself requires an invited sy
 - [Data model](docs/DATA_MODEL.md)
 - [Security architecture](docs/SECURITY.md)
 - [Integrations](docs/INTEGRATIONS.md)
+- [Arc payments and external evidence](docs/PAYMENTS_ARCHITECTURE.md)
 - [Testing and evidence](docs/TESTING.md)
 - [Deployment](docs/DEPLOYMENT.md)
 - [Operator guide](docs/OPERATOR_GUIDE.md)
@@ -149,7 +158,7 @@ The production deployment is public; the workspace itself requires an invited sy
 
 ## Project status
 
-Phases 1–9 are complete and production is deployed at commit `60fac34`: full API and authenticated analyst/manager/auditor workspace, encrypted ingestion, reduced-PII review, attested extraction, deterministic calculation and SERV gate, fixed-circuit proof, maker-checker approval, signed audit chain, Postgres worker, a live Reppo feedback evaluation, Kite policy with a provider-blocked payment path, the logo, a real captured demo, and a passing final regression/security matrix. Evidence is recorded in [AI_HANDOFF.md](AI_HANDOFF.md) and [docs/BUILD_LOG.md](docs/BUILD_LOG.md).
+Phases 1–9 are complete and the original production deployment was verified at commit `60fac34`. The 20 November 2026 payment update replaces Kite with Arc Testnet / Circle Gateway, adds encrypted external-evidence linkage and the financial-data providers documented in [docs/PAYMENTS_ARCHITECTURE.md](docs/PAYMENTS_ARCHITECTURE.md). The live deployment, database migration and provider status are recorded in [AI_HANDOFF.md](AI_HANDOFF.md) and [docs/BUILD_LOG.md](docs/BUILD_LOG.md). The earlier demo video is a historical artifact and predates the Arc change.
 
 ## License and attribution
 

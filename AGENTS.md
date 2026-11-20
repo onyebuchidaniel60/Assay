@@ -10,11 +10,11 @@ Read `PROJECT_SPEC.md`, `ARCHITECTURE.md`, `IMPLEMENTATION_PLAN.md`, `OPERATOR_I
 
 ## One consolidated intake before coding
 
-Before modifying the repository, inspect repository/Git metadata and complete one consolidated Operator Intake/Readiness Check. Collect missing product inputs, user roles/workflows, business rules, reference image(s), assets and ownership, Vercel/Render/Neon access, domains, environment variables/secrets, OpenServ/NEAR AI/OpenRouter/Reppo/Kite credentials, account permissions, webhook/sandbox details, quotas, costs, budgets, data handling, permitted actions, production authorization, demo audience/pronunciation/redactions/output directory. Do not ask for information already in source or environment. Use safe defaults only for noncritical omissions. Mark blockers vs optional. Do not start implementation before critical input and reference image requirements pass.
+Before modifying the repository, inspect repository/Git metadata and complete one consolidated Operator Intake/Readiness Check. Collect missing product inputs, user roles/workflows, business rules, reference image(s), assets and ownership, Vercel/Render/Neon access, domains, environment variables/secrets, OpenServ/NEAR AI/OpenRouter/Reppo/Arc/Circle Gateway/Financial Datasets credentials, account permissions, webhook/sandbox details, quotas, costs, budgets, data handling, permitted actions, production authorization, demo audience/pronunciation/redactions/output directory. Do not ask for information already in source or environment. Use safe defaults only for noncritical omissions. Mark blockers vs optional. Do not start implementation before critical input and reference image requirements pass.
 
 ## Authorization boundaries
 
-Autonomy does not authorize bypassing access control, inventing credentials, exposing secrets, weakening security, accepting unexpected charges, using real borrower data, performing a live payment, destructive/key-deletion actions or production deployment without explicit exact authority. Default: synthetic data only, no new paid spend, no Kite wallet spend, preview deployment allowed only after access is verified, production release not authorized. Stop only for genuine blockers or actions outside authority. Never ask for routine phase approval.
+Autonomy does not authorize bypassing access control, inventing credentials, exposing secrets, weakening security, accepting unexpected charges, using real borrower data, performing a live payment, destructive/key-deletion actions or production deployment without explicit exact authority. Default: synthetic data only, no new paid spend, no Arc wallet spend, preview deployment allowed only after access is verified, production release not authorized. Stop only for genuine blockers or actions outside authority. Never ask for routine phase approval.
 
 ## Autonomous phase execution
 
@@ -30,9 +30,10 @@ Execute Phases 1–9 sequentially. At each checkpoint: implement → test → in
 - Dolphin is rejected and removed: its confidentiality mechanism is unverified (no TEE, no MPC, zero-retention unverified). Do not build an adapter or add Dolphin endpoints, models, keys or flags.
 - NEAR AI Cloud is the Layer 2 confidential inference provider; verify TEE-verifiable model metadata and fresh Intel TDX/NVIDIA NRAS attestation for every extraction request. OpenRouter is the general inference provider for SERV judgement/generation using structured, already-extracted data only.
 - Reppo receives synthetic/de-identified feedback only.
-- Kite Passport/x402 is optional; no payment without exact approved session/cap/asset/service.
+- Arc Testnet/Circle Gateway x402 is optional; no payment without exact approved session/cap/asset/service.
+- Kite Passport/x402 is removed; do not reintroduce Kite SDKs, PIEUSD, gokite.ai endpoints or Kite credentials.
 - No real borrower information, production deployment, public signup, arbitrary covenant support or baseline breach override.
-- Manager approval is distinct from Kite spending authorization.
+- Manager approval is distinct from Arc payment authorization.
 
 ## Preview and functionality sequencing
 

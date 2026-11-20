@@ -16,7 +16,11 @@
 | Audit chain fails verification | DB tampering, missing signature/key, serialization drift | Stop approvals for affected borrower; preserve evidence; do not rewrite history. |
 | Reppo evaluation pending | Provider queue or polling window | Keep `PENDING`; poll every 60 s within the chosen 10/15/30-minute cap. A timeout is not a verdict. |
 | Reppo submission failed | Client payload/key/credits or provider failure | Read `errorCode`/`errorMessage` and the side recorded; do not retry blindly. |
-| Kite payment timed out | Unknown settlement state | Set `RECONCILIATION_REQUIRED`; query provider receipt; never blindly retry. |
+| Arc payment timed out | Unknown settlement state | Set `RECONCILIATION_REQUIRED`; the worker looks up the original nonce/transfer. Never submit a second payment. |
+| Arc facilitator unreachable | Cannot verify supported network | Check `CIRCLE_GATEWAY_FACILITATOR_URL`, network and Circle status. Payment execution fails closed. |
+| Arc signing key missing | `PAYMENT_SIGNER_NOT_CONFIGURED` | Set `ARC_TESTNET_PRIVATE_KEY` server-side; keep execution disabled unless an isolated funded test wallet is intended. |
+| SEC EDGAR HTTP 403 | Akamai blocks the egress IP | Set a descriptive `SEC_EDGAR_USER_AGENT`; probe from the deployed host. Do not scrape around the block or fabricate data. |
+| Financial Datasets rejected | Base mainnet only | Do not bridge or relabel. Use an Arc-compatible provider or a licensed API key outside the Arc flow, with explicit disclosure. |
 | Demo capture slow | Render free-service sleep or cold Presidio service | Warm preview before capture, then reload from clean browser profile. |
 | TTS quota unavailable | Free-tier rate/availability changed | Use a permitted local TTS fallback; do not enable billing without approval. |
 

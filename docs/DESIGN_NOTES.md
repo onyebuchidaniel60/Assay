@@ -25,7 +25,7 @@ Reference-led UI implemented in Phases 1–5. The operator supplied four AVIF re
 - `/audit` — borrower selector, chain verification, sequence/hash/signature table.
 - `/covenants` — confirmed covenant snapshots with threshold and result.
 - `/cases` — exception list derived from breach/failed run state; detail redirects to the immutable run.
-- `/integrations` — honest provider status, including Reppo LIVE and Kite provider-blocked on both documented testnet endpoints.
+- `/integrations` — honest provider status, including Reppo LIVE, Arc Testnet / Circle Gateway readiness, financial-data provider compatibility and the absence of any fabricated settlement.
 - `/settings` — current membership, product identity block/logo, role matrix, sign-out and server-only secret boundary.
 - `/evaluations`, `/evaluations/[id]` — real Reppo status, score, decision, confidence, route, rubric/result and errors.
 

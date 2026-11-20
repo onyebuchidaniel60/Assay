@@ -8,8 +8,9 @@ import {
   decideApproval,
   dependencyHash,
   evaluateFormula,
-  evaluateKitePayment,
+  evaluatePaymentPolicy,
   isForecastStatus,
+  paymentRequestFingerprint,
   sha256,
   validateFormula,
   verifyAuditChain,
@@ -232,62 +233,185 @@ describe("approval and audit controls", () => {
   });
 });
 
-describe("Kite deterministic spending policy", () => {
-  const session = {
-    sessionId: "agent_session_test",
+describe("Arc deterministic spending policy", () => {
+  const policy = {
+    sessionId: "payment_session_test",
     status: "active" as const,
-    asset: "PIEUSD",
-    maxPerTransaction: "5",
-    maxTotal: "20",
-    spentTotal: "0",
-    reservedTotal: "0",
-    expiresAt: "2026-11-16T15:11:32.17177Z",
+    allowedProviders: ["lonestar-oracle"],
+    allowedEndpoints: ["https://equity.lonestaroracle.xyz/equity?ticker=AAPL"],
+    allowedNetworks: ["eip155:5042002"],
+    allowedAssets: ["0x3600000000000000000000000000000000000000"],
+    allowedRecipients: ["0xeF2a4B6756895aAf1374640dcFCD4947959442ab"],
+    maxPerTransactionMinor: "100000",
+    maxTotalMinor: "500000",
+    spentTotalMinor: "0",
+    reservedTotalMinor: "0",
+    expiresAt: "2026-11-21T15:11:32.17177Z",
+    idempotencyKey: "assay-arc-policy-test",
+    requestFingerprint: "a".repeat(64),
+    now: new Date("2026-11-20T15:00:00Z"),
+  };
+  const intent = {
+    providerId: "lonestar-oracle",
+    endpoint: "https://equity.lonestaroracle.xyz/equity?ticker=AAPL",
+    requirement: {
+      scheme: "exact",
+      network: "eip155:5042002",
+      asset: "0x3600000000000000000000000000000000000000",
+      amountMinor: "50000",
+      payTo: "0xeF2a4B6756895aAf1374640dcFCD4947959442ab",
+      maxTimeoutSeconds: 300,
+    },
   };
 
-  it("allows a payment inside the caps", () => {
-    const decision = evaluateKitePayment(session, {
-      amount: "0.1",
-      asset: "PIEUSD",
-      idempotencyKey: "assay-kite-smoke-test",
-      now: new Date("2026-11-15T15:00:00Z"),
-    });
-    expect(decision.allowed).toBe(true);
+  it("allows an approved provider, endpoint, network, asset and amount", () => {
+    const decision = evaluatePaymentPolicy(
+      { ...policy, requestFingerprint: paymentRequestFingerprint(intent) },
+      intent,
+    );
+    expect(decision).toMatchObject({ allowed: true, remainingTotalMinor: "450000" });
   });
 
-  it("rejects a per-transaction over-cap request", () => {
-    const decision = evaluateKitePayment(session, {
-      amount: "6",
-      asset: "PIEUSD",
-      idempotencyKey: "assay-kite-overcap-test",
-      now: new Date("2026-11-15T15:00:00Z"),
-    });
+  it("rejects an unauthorized provider", () => {
+    const decision = evaluatePaymentPolicy(
+      { ...policy, requestFingerprint: paymentRequestFingerprint({ ...intent, providerId: "unknown-provider" }) },
+      { ...intent, providerId: "unknown-provider" },
+    );
+    expect(decision).toMatchObject({ allowed: false, code: "payment_provider_forbidden" });
+  });
+
+  it("rejects an unauthorized endpoint", () => {
+    const modified = { ...intent, endpoint: "https://evil.example/collect" };
+    const decision = evaluatePaymentPolicy(
+      { ...policy, requestFingerprint: paymentRequestFingerprint(modified) },
+      modified,
+    );
+    expect(decision).toMatchObject({ allowed: false, code: "payment_endpoint_forbidden" });
+  });
+
+  it("rejects an amount above the per-payment limit with the preserved session code", () => {
+    const modified = { ...intent, requirement: { ...intent.requirement, amountMinor: "100001" } };
+    const decision = evaluatePaymentPolicy(
+      { ...policy, requestFingerprint: paymentRequestFingerprint(modified) },
+      modified,
+    );
     expect(decision).toMatchObject({ allowed: false, code: "session_rule_exceeded" });
   });
 
-  it("rejects total budget, asset and expiry violations", () => {
+  it("rejects an aggregate budget overrun including reserved spend", () => {
+    const decision = evaluatePaymentPolicy(
+      {
+        ...policy,
+        spentTotalMinor: "400001",
+        reservedTotalMinor: "50000",
+        requestFingerprint: paymentRequestFingerprint(intent),
+      },
+      intent,
+    );
+    expect(decision).toMatchObject({ allowed: false, code: "session_total_exceeded" });
+  });
+
+  it("rejects an expired authorization", () => {
+    const decision = evaluatePaymentPolicy(
+      {
+        ...policy,
+        expiresAt: "2026-11-19T15:00:00Z",
+        requestFingerprint: paymentRequestFingerprint(intent),
+      },
+      intent,
+    );
+    expect(decision).toMatchObject({ allowed: false, code: "session_expired" });
+  });
+
+  it("rejects the wrong network", () => {
+    const modified = { ...intent, requirement: { ...intent.requirement, network: "eip155:8453" } };
+    const decision = evaluatePaymentPolicy(
+      { ...policy, requestFingerprint: paymentRequestFingerprint(modified) },
+      modified,
+    );
+    expect(decision).toMatchObject({ allowed: false, code: "payment_network_forbidden" });
+  });
+
+  it("rejects the wrong token", () => {
+    const modified = {
+      ...intent,
+      requirement: { ...intent.requirement, asset: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" },
+    };
+    const decision = evaluatePaymentPolicy(
+      { ...policy, requestFingerprint: paymentRequestFingerprint(modified) },
+      modified,
+    );
+    expect(decision).toMatchObject({ allowed: false, code: "payment_asset_forbidden" });
+  });
+
+  it("rejects a modified recipient even when the amount is unchanged", () => {
+    const modified = { ...intent, requirement: { ...intent.requirement, payTo: "0x1111111111111111111111111111111111111111" } };
+    const decision = evaluatePaymentPolicy(
+      { ...policy, requestFingerprint: paymentRequestFingerprint(modified) },
+      modified,
+    );
+    expect(decision).toMatchObject({ allowed: false, code: "payment_recipient_forbidden" });
+  });
+
+  it("rejects a duplicate payment instead of paying twice", () => {
+    const fingerprint = paymentRequestFingerprint(intent);
+    const decision = evaluatePaymentPolicy(
+      {
+        ...policy,
+        requestFingerprint: fingerprint,
+        priorIntent: { fingerprint, status: "CONFIRMED" },
+      },
+      intent,
+    );
+    expect(decision).toMatchObject({ allowed: false, code: "duplicate_payment" });
+  });
+
+  it("rejects an idempotency-key conflict with different requirements", () => {
+    const decision = evaluatePaymentPolicy(
+      {
+        ...policy,
+        requestFingerprint: paymentRequestFingerprint(intent),
+        priorIntent: { fingerprint: "b".repeat(64), status: "FAILED" },
+      },
+      intent,
+    );
+    expect(decision).toMatchObject({ allowed: false, code: "idempotency_conflict" });
+  });
+
+  it("rejects a reused provider nonce", () => {
+    const decision = evaluatePaymentPolicy(
+      {
+        ...policy,
+        requestFingerprint: paymentRequestFingerprint(intent),
+        priorNonce: "0x" + "1".repeat(64),
+      },
+      intent,
+    );
+    expect(decision).toMatchObject({ allowed: false, code: "duplicate_payment" });
+  });
+
+  it("rejects invalid amounts, schemes and inactive sessions", () => {
+    const badAmount = { ...intent, requirement: { ...intent.requirement, amountMinor: "0" } };
     expect(
-      evaluateKitePayment({ ...session, spentTotal: "19.95" }, {
-        amount: "0.1",
-        asset: "PIEUSD",
-        idempotencyKey: "assay-kite-total-test",
-        now: new Date("2026-11-15T15:00:00Z"),
-      }),
-    ).toMatchObject({ allowed: false, code: "session_total_exceeded" });
+      evaluatePaymentPolicy(
+        { ...policy, requestFingerprint: paymentRequestFingerprint(badAmount) },
+        badAmount,
+      ),
+    ).toMatchObject({ allowed: false, code: "invalid_amount" });
+
+    const badScheme = { ...intent, requirement: { ...intent.requirement, scheme: "upto" } };
     expect(
-      evaluateKitePayment(session, {
-        amount: "0.1",
-        asset: "USDC",
-        idempotencyKey: "assay-kite-asset-test",
-        now: new Date("2026-11-15T15:00:00Z"),
-      }),
-    ).toMatchObject({ allowed: false, code: "session_asset_forbidden" });
+      evaluatePaymentPolicy(
+        { ...policy, requestFingerprint: paymentRequestFingerprint(badScheme) },
+        badScheme,
+      ),
+    ).toMatchObject({ allowed: false, code: "payment_scheme_forbidden" });
+
     expect(
-      evaluateKitePayment(session, {
-        amount: "0.1",
-        asset: "PIEUSD",
-        idempotencyKey: "assay-kite-expiry-test",
-        now: new Date("2026-11-17T15:00:00Z"),
-      }),
-    ).toMatchObject({ allowed: false, code: "session_expired" });
+      evaluatePaymentPolicy(
+        { ...policy, status: "revoked", requestFingerprint: paymentRequestFingerprint(intent) },
+        intent,
+      ),
+    ).toMatchObject({ allowed: false, code: "session_inactive" });
   });
 });

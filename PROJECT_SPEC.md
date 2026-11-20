@@ -33,7 +33,8 @@ Covenant reviews combine contract interpretation, manual spreadsheet arithmetic,
 - Manager approval gated on proof verification.
 - Encrypted hash-chained/signed audit log and demo-only crypto-shred.
 - Synthetic-only correction feedback and optional actual Reppo evaluation.
-- Optional Kite x402 spend adapter behind explicit authorization.
+- Optional Arc Testnet / Circle Gateway x402 payment rail behind deterministic authorization; optional paid financial-data provider when its network is compatible.
+- Free SEC EDGAR public-company evidence and encrypted evidence linkage to an analysis run.
 - Complete docs and <=180-second real demo video.
 
 ### Out of scope
@@ -59,7 +60,7 @@ Covenant reviews combine contract interpretation, manual spreadsheet arithmetic,
 10. If baseline meets the covenant, fixed circuit proof is generated and verified. If baseline breaches, there is no compliance proof and approval is blocked.
 11. Manager sees restricted summary, proof state and scenario risk indicators. Manager approves or rejects. Downside scenario breach requires explicit risk acknowledgement/rationale.
 12. Audit chain stores a signed, encrypted event. Auditor verifies chain.
-13. Optional synthetic correction is submitted to Reppo; optional Kite external-data purchase is allowed only within a passkey-authorized session and operator-approved spend cap.
+13. Optional synthetic correction is submitted to Reppo. Optional external evidence is proposed by the deterministic planner; free SEC EDGAR data or a paid provider quote is retrieved only after analyst action and, for a paid quote, deterministic Arc/Circle Gateway policy authorization. Evidence is encrypted, source-linked and audited.
 
 ## Normative calculation rules
 

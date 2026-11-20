@@ -74,6 +74,22 @@ export const actorType = pgEnum("actor_type", ["USER", "SYSTEM"]);
 export const extractionStatus = pgEnum("extraction_status", ["STARTED", "SUCCEEDED", "FAILED"]);
 export const jobStatus = pgEnum("job_status", ["QUEUED", "RUNNING", "RETRY", "SUCCEEDED", "FAILED", "CANCELLED"]);
 export const borrowerKeyStatus = pgEnum("borrower_key_status", ["ACTIVE", "SHREDDED"]);
+export const paymentSessionStatus = pgEnum("payment_session_status", ["ACTIVE", "EXPIRED", "REVOKED", "EXHAUSTED"]);
+export const paymentIntentStatus = pgEnum("payment_intent_status", [
+  "PROPOSED",
+  "POLICY_REJECTED",
+  "AUTHORIZED",
+  "SUBMITTING",
+  "SUBMITTED",
+  "CONFIRMED",
+  "RECONCILIATION_REQUIRED",
+  "RECONCILED",
+  "FAILED",
+  "CANCELLED",
+]);
+export const paymentDataStatus = pgEnum("payment_data_status", ["NOT_REQUESTED", "PENDING", "RETRIEVED", "FAILED"]);
+export const paymentAuthorizationDecision = pgEnum("payment_authorization_decision", ["APPROVED", "REJECTED"]);
+export const externalEvidenceValidation = pgEnum("external_evidence_validation", ["VALID", "INCOMPLETE", "INVALID"]);
 
 export const organizations = pgTable(
   "organizations",
@@ -613,6 +629,162 @@ export const jobs = pgTable(
   ],
 );
 
+export const paymentSessions = pgTable(
+  "payment_sessions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    organizationId: uuid("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "restrict" }),
+    sessionKey: text("session_key").notNull(),
+    network: text("network").notNull(),
+    asset: text("asset").notNull(),
+    maxPerPaymentMinor: numeric("max_per_payment_minor", { precision: 24, scale: 0 }).notNull(),
+    maxTotalMinor: numeric("max_total_minor", { precision: 24, scale: 0 }).notNull(),
+    spentTotalMinor: numeric("spent_total_minor", { precision: 24, scale: 0 }).default("0").notNull(),
+    reservedTotalMinor: numeric("reserved_total_minor", { precision: 24, scale: 0 }).default("0").notNull(),
+    status: paymentSessionStatus("status").default("ACTIVE").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    createdBy: text("created_by").notNull(),
+    version: integer("version").default(1).notNull(),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (table) => [
+    uniqueIndex("payment_sessions_org_key_uq").on(table.organizationId, table.sessionKey),
+    index("payment_sessions_org_status_idx").on(table.organizationId, table.status),
+  ],
+);
+
+export const paymentIntents = pgTable(
+  "payment_intents",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    organizationId: uuid("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "restrict" }),
+    borrowerId: uuid("borrower_id")
+      .notNull()
+      .references(() => borrowers.id, { onDelete: "restrict" }),
+    analysisRunId: uuid("analysis_run_id")
+      .notNull()
+      .references(() => analysisRuns.id, { onDelete: "restrict" }),
+    paymentSessionId: uuid("payment_session_id")
+      .notNull()
+      .references(() => paymentSessions.id, { onDelete: "restrict" }),
+    actorId: text("actor_id").notNull(),
+    rail: text("rail").default("arc-circle-gateway").notNull(),
+    providerId: text("provider_id").notNull(),
+    providerName: text("provider_name").notNull(),
+    serviceId: text("service_id").notNull(),
+    requestContext: jsonb("request_context").$type<Record<string, unknown>>().default({}).notNull(),
+    endpoint: text("endpoint").notNull(),
+    method: text("method").default("GET").notNull(),
+    idempotencyKey: text("idempotency_key").notNull(),
+    requestFingerprint: char("request_fingerprint", { length: 64 }).notNull(),
+    quoteSha256: char("quote_sha256", { length: 64 }).notNull(),
+    network: text("network").notNull(),
+    asset: text("asset").notNull(),
+    payTo: text("pay_to").notNull(),
+    amountMinor: numeric("amount_minor", { precision: 24, scale: 0 }).notNull(),
+    authorizedAmountMinor: numeric("authorized_amount_minor", { precision: 24, scale: 0 }),
+    settledAmountMinor: numeric("settled_amount_minor", { precision: 24, scale: 0 }),
+    scheme: text("scheme").default("exact").notNull(),
+    status: paymentIntentStatus("status").default("PROPOSED").notNull(),
+    policyDecision: jsonb("policy_decision").$type<Record<string, unknown>>().default({}).notNull(),
+    rejectionCode: text("rejection_code"),
+    rejectionReason: text("rejection_reason"),
+    payerAddress: text("payer_address"),
+    providerTransaction: text("provider_transaction"),
+    transactionHash: text("transaction_hash"),
+    transferId: text("transfer_id"),
+    nonce: text("nonce"),
+    validBefore: timestamp("valid_before", { withTimezone: true }),
+    quote: jsonb("quote").$type<Record<string, unknown>>().notNull(),
+    receipt: jsonb("receipt").$type<Record<string, unknown>>(),
+    failureCode: text("failure_code"),
+    failureMessage: text("failure_message"),
+    dataStatus: paymentDataStatus("data_status").default("NOT_REQUESTED").notNull(),
+    dataFailureCode: text("data_failure_code"),
+    authorizedAt: timestamp("authorized_at", { withTimezone: true }),
+    submittedAt: timestamp("submitted_at", { withTimezone: true }),
+    settledAt: timestamp("settled_at", { withTimezone: true }),
+    reconciledAt: timestamp("reconciled_at", { withTimezone: true }),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (table) => [
+    uniqueIndex("payment_intents_org_idempotency_uq").on(table.organizationId, table.idempotencyKey),
+    uniqueIndex("payment_intents_nonce_uq").on(table.nonce),
+    index("payment_intents_run_created_idx").on(table.analysisRunId, table.createdAt),
+    index("payment_intents_status_created_idx").on(table.status, table.createdAt),
+    index("payment_intents_session_status_idx").on(table.paymentSessionId, table.status),
+  ],
+);
+
+export const paymentAuthorizations = pgTable(
+  "payment_authorizations",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    organizationId: uuid("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "restrict" }),
+    paymentIntentId: uuid("payment_intent_id")
+      .notNull()
+      .references(() => paymentIntents.id, { onDelete: "restrict" }),
+    actorId: text("actor_id").notNull(),
+    decision: paymentAuthorizationDecision("decision").notNull(),
+    policyVersion: text("policy_version").notNull(),
+    policySnapshot: jsonb("policy_snapshot").$type<Record<string, unknown>>().notNull(),
+    authorizedAmountMinor: numeric("authorized_amount_minor", { precision: 24, scale: 0 }),
+    expiresAt: timestamp("expires_at", { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (table) => [
+    uniqueIndex("payment_authorizations_intent_uq").on(table.paymentIntentId),
+    index("payment_authorizations_org_created_idx").on(table.organizationId, table.createdAt),
+  ],
+);
+
+export const externalEvidence = pgTable(
+  "external_evidence",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    organizationId: uuid("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "restrict" }),
+    borrowerId: uuid("borrower_id")
+      .notNull()
+      .references(() => borrowers.id, { onDelete: "restrict" }),
+    analysisRunId: uuid("analysis_run_id")
+      .notNull()
+      .references(() => analysisRuns.id, { onDelete: "restrict" }),
+    paymentIntentId: uuid("payment_intent_id").references(() => paymentIntents.id, { onDelete: "restrict" }),
+    providerId: text("provider_id").notNull(),
+    providerName: text("provider_name").notNull(),
+    kind: text("kind").notNull(),
+    requestContext: jsonb("request_context").$type<Record<string, unknown>>().default({}).notNull(),
+    endpoint: text("endpoint").notNull(),
+    sourceUrl: text("source_url").notNull(),
+    publisher: text("publisher").notNull(),
+    reportingPeriod: text("reporting_period").notNull(),
+    linkedField: text("linked_field"),
+    retrievedAt: timestamp("retrieved_at", { withTimezone: true }).notNull(),
+    contentSha256: char("content_sha256", { length: 64 }).notNull(),
+    ...sealed("payload"),
+    limitations: jsonb("limitations").$type<string[]>().notNull(),
+    validationStatus: externalEvidenceValidation("validation_status").notNull(),
+    validationErrors: jsonb("validation_errors").$type<string[]>().default([]).notNull(),
+    createdBy: text("created_by").notNull(),
+    createdAt: createdAt(),
+  },
+  (table) => [
+    uniqueIndex("external_evidence_run_content_uq").on(table.analysisRunId, table.contentSha256),
+    uniqueIndex("external_evidence_payment_uq").on(table.paymentIntentId),
+    index("external_evidence_run_created_idx").on(table.analysisRunId, table.createdAt),
+  ],
+);
+
 export const schema = {
   organizations,
   profiles,
@@ -636,4 +808,8 @@ export const schema = {
   auditHeads,
   idempotencyRecords,
   jobs,
+  paymentSessions,
+  paymentIntents,
+  paymentAuthorizations,
+  externalEvidence,
 };

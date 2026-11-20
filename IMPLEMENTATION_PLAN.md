@@ -28,7 +28,7 @@ Create Drizzle schema/migrations, Neon Auth verification, profile roles, private
 
 ### Phase 3 — Core domain and APIs
 
-Implement borrower/facility, upload/parse/redaction, bounded SERV graph, NEAR AI extraction adapter with TEE attestation verification, OpenRouter judgement/generation routing, covenant term schema/review, financial inputs, deterministic engine/scenarios, Circom/SnarkJS proof, manager approval and audit APIs. Add Reppo/Kite only behind feature flags and only with authorized credentials.
+Implement borrower/facility, upload/parse/redaction, bounded SERV graph, NEAR AI extraction adapter with TEE attestation verification, OpenRouter judgement/generation routing, covenant term schema/review, financial inputs, deterministic engine/scenarios, Circom/SnarkJS proof, manager approval, audit APIs, Arc Testnet/Circle Gateway payment policy and external financial-evidence linkage. Add Reppo and paid data providers only behind feature flags and only with authorized credentials.
 
 **Acceptance:** API-level MUST HAVE requirements pass; no pretend integration state.  
 **Commit:** `feat: implement covenant analysis workflow`.
