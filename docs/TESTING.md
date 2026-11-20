@@ -2,13 +2,13 @@
 
 ## Current automated suites
 
-| Suite | Command | Result (16 Nov 2026) |
+| Suite | Command | Result (20 Nov 2026) |
 |---|---|---|
 | Lint | `pnpm lint` | Passed |
 | Root typecheck | `pnpm typecheck` | Passed (10 packages + apps) |
 | Root unit tests | `pnpm test` | 94 passed, 1 skipped: domain 28, crypto 4, contracts 6, document 8, proof 3, reppo 8, AI 10, financial-data 8, payments 11, API 8 |
-| Root build | `pnpm build` | Passed |
-| Playwright shell + authenticated workspace | `pnpm test:e2e` | 20/20 desktop + mobile |
+| Root build | `pnpm build` | Passed (all 10 packages + API + web) |
+| Playwright shell + authenticated workspace | `pnpm test:e2e` | 20/20 desktop + mobile (previous release); Arc evidence flows exercised separately with the demo analyst |
 | Dependency audit | `pnpm audit` | 0 critical/high; 1 moderate dev-only esbuild; 1 low elliptic |
 | Secret scan | Gitleaks + `scripts/check-secrets.sh` | Clean of real secrets |
 
