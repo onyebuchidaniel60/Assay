@@ -11,6 +11,9 @@ All values below were captured from this environment on 20 November 2026. No sec
 | `sec-companyfacts.status.txt` / `.headers.txt` / `.body.txt` | SEC EDGAR returned HTTP 403 from AkamaiGHost for `CIK0000320193` on this host. No SEC data was fabricated. |
 | `arc-policy-rejection.png` | Local UI showing the real LoneStar Oracle quote rejected by the deterministic Arc Testnet policy with `payment_network_forbidden`. |
 | `sec-provider-failure.png` | Local UI showing the visible SEC 403 provider failure. |
+| `deployed-integrations.png` | Deployed Vercel UI: Arc Testnet / Circle Gateway, DRY RUN, SEC EDGAR, Financial Datasets, LoneStar Oracle, no Kite. |
+| `deployed-policy-rejection.png` | Deployed run page showing `POLICY_REJECTED` / `payment_network_forbidden`. |
+| `deployed-sec-attempt.png` | Deployed run page showing the Render-side SEC HTTP 403 and no fabricated evidence. |
 
 ## Reproduce
 
@@ -39,4 +42,6 @@ curl -sS -D - \
 - Execution jobs: none
 - Audit chain: `VALID`, 22 events
 - SEC failure event: `EXTERNAL_EVIDENCE_FAILED` with `PROVIDER_UNAVAILABLE`
+- Render egress SEC probe: HTTP 403 as well; no live SEC evidence
+- Deployed build: `https://assay-uhhh2.vercel.app` at `9e9f054`; Render API `https://assay-api-7hy0.onrender.com`
 - Runnable testnet payer address (unfunded): `0x16CCd81145AF27fB3Aba157d907611863FDc28E1`

@@ -158,7 +158,7 @@ The production deployment is public; the workspace itself requires an invited sy
 
 ## Project status
 
-Phases 1–9 are complete and the original production deployment was verified at commit `60fac34`. The 20 November 2026 payment update replaces Kite with Arc Testnet / Circle Gateway, adds encrypted external-evidence linkage and the financial-data providers documented in [docs/PAYMENTS_ARCHITECTURE.md](docs/PAYMENTS_ARCHITECTURE.md). The live deployment, database migration and provider status are recorded in [AI_HANDOFF.md](AI_HANDOFF.md) and [docs/BUILD_LOG.md](docs/BUILD_LOG.md). The earlier demo video is a historical artifact and predates the Arc change.
+Phases 1–9 are complete and the original production deployment was verified at commit `60fac34`. The 20 November 2026 payment update (`9e9f054`) replaces Kite with Arc Testnet / Circle Gateway, adds encrypted external-evidence linkage and the financial-data providers documented in [docs/PAYMENTS_ARCHITECTURE.md](docs/PAYMENTS_ARCHITECTURE.md). The update is deployed to Render and Vercel with payment execution disabled; the deployed status and policy-rejection evidence are recorded in [AI_HANDOFF.md](AI_HANDOFF.md) and [docs/BUILD_LOG.md](docs/BUILD_LOG.md). No live paid retrieval is claimed. The earlier demo video is a historical artifact and predates the Arc change.
 
 ## License and attribution
 

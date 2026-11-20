@@ -5,8 +5,8 @@
 
 **Status:** Phases 1–9 complete. Public production deployed and smoke-tested after the full regression and security matrix passed; post-submission access and branding fixes applied. The 20 November 2026 payment update removes Kite, adds Arc Testnet / Circle Gateway and external financial-evidence linkage.
 **Repository:** `https://github.com/onyebuchidaniel60/Assay` — public, default branch `main`.  
-**Production URL:** `https://assay-uhhh2.vercel.app` — public (Vercel Authentication disabled). `https://assay-omega-gray.vercel.app` is the production domain.
-**Production commit:** previous release `c27a02a`; the 20 November 2026 payment update deployment is recorded in `docs/BUILD_LOG.md` after verification. **Render API:** `https://assay-api-7hy0.onrender.com`. **Render Presidio:** `https://assay-presidio.onrender.com`.
+**Production URL:** `https://assay-uhhh2.vercel.app` — public (Vercel Authentication disabled) and explicitly aliased to the 20 November 2026 build. `https://assay-omega-gray.vercel.app` is the production domain.
+**Production commit:** `9e9f054` (payment update). Vercel `dpl_AA3gRSVs1ggcZ5Gsku7MBbrrADCH` / `https://assay-px4d9i5ih-uhhh2.vercel.app`; Render deploy `dep-dc060l2fngtc73b3mcu0` live. **Render API:** `https://assay-api-7hy0.onrender.com`. **Render Presidio:** `https://assay-presidio.onrender.com`.
 **Public demo:** `https://github.com/onyebuchidaniel60/Assay/releases/download/demo-v1/assay-demo-final.mp4` — 131.97 s, 1080p/30 fps. It predates the Arc change and is a historical artifact.
 **Production release authority:** Exercised for the previous release; the Arc update was deployed with payment execution disabled.
 **Data boundary:** Synthetic data only; no real borrower, lender or production records.  

@@ -4,7 +4,7 @@
 
 - **Local:** Neon development branch/project, synthetic fixtures, live providers only through verified server-side adapters.
 - **Preview:** Vercel frontend, Render API/Presidio, Neon demo project. Synthetic fixtures only. Sandbox integrations. No production secrets/data/payments.
-- **Production:** Vercel frontend `https://assay-omega-gray.vercel.app`, Render API/Presidio, Neon demo project. Deployed at commit `c27a02a` after the full Phase 5/9 regression and security matrix and the post-submission public-access/branding fix. Synthetic data only; Vercel Authentication is disabled and the app keeps its own invite-only sign-in.
+- **Production:** Vercel frontend `https://assay-omega-gray.vercel.app`, Render API/Presidio, Neon demo project. Deployed at commit `9e9f054` for the 20 November 2026 payment update; the previous release was `c27a02a`. Synthetic data only; Vercel Authentication is disabled and the app keeps its own invite-only sign-in.
 
 ## Platform allocation
 
@@ -20,9 +20,9 @@
 ## Current production deployment
 
 - **Frontend:** `https://assay-uhhh2.vercel.app` (public; deployment `assay-o65mwq19k-uhhh2.vercel.app`; production domain `https://assay-omega-gray.vercel.app`).
-- **Commit:** `c27a02a`.
+- **Commit:** `9e9f054` for the 20 November 2026 payment update; previous release `c27a02a`.
 - **Protection:** Vercel Authentication disabled; the app enforces invite-only Neon Auth sign-in. Vercel Toolbar feedback is off for production and preview.
-- **API:** `https://assay-api-7hy0.onrender.com` (Render free web service, live at `60fac34` (API unchanged by the post-submission UI fix), health `/health/ready`; worker enabled, Reppo live).
+- **API:** `https://assay-api-7hy0.onrender.com` (Render free web service, live at `9e9f054`, health `/health/ready`; worker enabled, Reppo live, Arc execution disabled).
 - **Presidio:** `https://assay-presidio.onrender.com` (Render free Python service, `REDUCED_PII_MODE`).
 - **State:** production analyst/manager/auditor journeys backed by Neon and the live providers. Synthetic data only.
 - **Payment state (20 November 2026):** Arc Testnet / Circle Gateway configuration is present; live signing/execution is **disabled** (`PAYMENT_EXECUTION_ENABLED=false`, `PAYMENT_DRY_RUN=true`). No payer private key is deployed. Provider allowlists/caps and the SEC User-Agent are set. A real LoneStar Oracle quote was policy-rejected with `payment_network_forbidden`; no payment is claimed.
@@ -40,7 +40,7 @@
 5. Add only synthetic test data and sandbox secrets.
 6. Redeploy and smoke-test after verified checkpoints.
 
-A production build was auto-triggered by the GitHub connection during Phase 1; the Git integration was disconnected and production remained gated until the final Phase 9 matrix passed. Production has since been deployed manually from `c27a02a` and smoke-tested.
+A production build was auto-triggered by the GitHub connection during Phase 1; the Git integration was disconnected and production remained gated until the final Phase 9 matrix passed. Production has since been deployed manually from `9e9f054` and smoke-tested with execution disabled.
 
 ## Secrets
 

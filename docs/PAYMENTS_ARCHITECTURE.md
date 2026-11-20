@@ -140,7 +140,7 @@ This is the closest real third-party financial-data provider with an Arc option.
 
 The SEC provider resolves a ticker or CIK, fetches `companyfacts` and `submissions`, extracts annual USD facts deterministically, validates the requested fiscal year, and stores source URL, reporting period, retrieval time, content hash and limitations.
 
-From this development host, SEC returned **HTTP 403 from AkamaiGHost** for both `www.sec.gov/files/company_tickers.json` and `data.sec.gov/api/xbrl/companyfacts/CIK0000320193.json` on 20 November 2026, even with a descriptive User-Agent and contact. The adapter therefore reports `PROVIDER_UNAVAILABLE` rather than inventing data. Fixture tests exercise the parser and validation; the deployed Render host has a different egress and must be probed independently before claiming live SEC retrieval.
+From this development host, SEC returned **HTTP 403 from AkamaiGHost** for both `www.sec.gov/files/company_tickers.json` and `data.sec.gov/api/xbrl/companyfacts/CIK0000320193.json` on 20 November 2026, even with a descriptive User-Agent and contact. The deployed Render egress returned the same HTTP 403. The adapter therefore reports `PROVIDER_UNAVAILABLE` rather than inventing data. Fixture tests exercise the parser and validation; live SEC retrieval is **not claimed**.
 
 ### Circle Discovery compatibility finding
 
