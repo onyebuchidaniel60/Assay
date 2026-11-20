@@ -151,7 +151,7 @@ describe("provider compatibility", () => {
     expect(status.dataMode).toBe("X402");
   });
 
-  it("records LoneStar Oracle as Arc-mainnet x402 and policy-restricted", async () => {
+  it("records LoneStar Oracle as Arc-mainnet x402 and policy-gated", async () => {
     const url = "https://equity.lonestaroracle.xyz/equity?ticker=AAPL";
     const terms = {
       x402Version: 2,
@@ -164,6 +164,7 @@ describe("provider compatibility", () => {
           amount: "50000",
           payTo: "0xeF2a4B6756895aAf1374640dcFCD4947959442ab",
           maxTimeoutSeconds: 300,
+          extra: { name: "USDC", version: "2", assetTransferMethod: "eip3009" },
         },
       ],
     };
@@ -177,9 +178,54 @@ describe("provider compatibility", () => {
     const quote = await provider.getQuote({ kind: "EQUITY_FUNDAMENTALS", ticker: "AAPL", reason: "test" });
     expect(quote.terms?.network).toBe("eip155:5042");
     expect(quote.arcCompatible).toBe(true);
-    expect(quote.arcCompatibilityNote).toContain("current policy allows Arc Testnet only");
+    expect(quote.arcCompatibilityNote).toContain("standard x402 exact");
     const status = await provider.getStatus();
-    expect(status.available).toBe(false);
+    expect(status.available).toBe(true);
+  });
+
+  it("normalizes paid LoneStar equity data into labelled financial facts", async () => {
+    const provider = new LoneStarOracleProvider();
+    const result = await provider.interpretPaidPayload(
+      { kind: "EQUITY_FUNDAMENTALS", ticker: "AAPL", fiscalYear: 2025, reason: "test" },
+      {
+        providerId: "lonestar-oracle",
+        displayName: "LoneStar Oracle EquityScope",
+        endpoint: "https://equity.lonestaroracle.xyz/equity?ticker=AAPL",
+        method: "GET",
+        paymentRequired: true,
+        terms: {
+          network: "eip155:5042",
+          asset: "0x3600000000000000000000000000000000000000",
+          amountMinor: "50000",
+          payTo: "0xeF2a4B6756895aAf1374640dcFCD4947959442ab",
+          scheme: "exact",
+          maxTimeoutSeconds: 300,
+          resourceUrl: "https://equity.lonestaroracle.xyz/equity?ticker=AAPL",
+          paymentRequiredHeader: "",
+        },
+        arcCompatible: true,
+        arcCompatibilityNote: "",
+        unavailableReason: null,
+      },
+      {
+        ticker: "AAPL",
+        name: "Apple Inc.",
+        price: 231.45,
+        valuation: { pe_ratio: 34.2, market_cap: 3480000000000 },
+        signal: "BUY",
+        summary: "Analyst target implies upside.",
+      },
+      "2026-11-20T18:00:00.000Z",
+    );
+    expect(result.validationStatus).toBe("VALID");
+    expect(result.data.company.ticker).toBe("AAPL");
+    expect(result.data.facts).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ tag: "price", value: 231.45, unit: "USD" }),
+        expect.objectContaining({ tag: "valuation.pe_ratio", value: 34.2, unit: "ratio" }),
+        expect.objectContaining({ tag: "valuation.market_cap", value: 3480000000000, unit: "USD" }),
+      ]),
+    );
   });
 });
 
@@ -208,7 +254,7 @@ describe("deterministic evidence planner", () => {
       providerId: "lonestar-oracle",
       requiresPayment: true,
       paymentNetwork: "eip155:5042",
-      availability: "POLICY_RESTRICTED",
+      availability: "POLICY_GATED",
     });
   });
 });

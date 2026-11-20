@@ -134,7 +134,7 @@ function paymentLabel(status: string): { label: string; detail: string } {
     case "RECONCILIATION_REQUIRED":
       return { label: "Settlement unknown · reconcile", detail: "Assay will look up the original authorization. It will not create a second payment." };
     case "RECONCILED":
-      return { label: "Reconciled · settled", detail: "The original authorization was matched to a Gateway transfer." };
+      return { label: "Reconciled · settled", detail: "The original authorization was matched to a verified onchain or provider settlement record." };
     case "FAILED":
       return { label: "Failed · no payment", detail: "The provider rejected the payment or it never settled. No automatic retry was made." };
     case "CANCELLED":
@@ -312,7 +312,7 @@ export function ExternalEvidencePanel({
               <FileSearch className="size-3.5" /> Request quote and policy check
             </button>
             <p className="mt-2 text-[10px] leading-4 text-muted">
-              Current policy: {session?.allowedNetworks.join(", ") || "not configured"}; execution {executionEnabled ? "enabled" : "disabled"}. Both listed providers use mainnet rails, so the testnet policy is expected to reject them.
+              Current policy: {session?.allowedNetworks.join(", ") || "not configured"}; per payment {session ? formatUsdcMinor(session.maxPerPaymentMinor) : "—"}; execution {executionEnabled ? "enabled" : "disabled"}. The provider requirement is checked against this session, and only an explicit analyst authorization can settle a payment.
             </p>
           </form>
         </div>

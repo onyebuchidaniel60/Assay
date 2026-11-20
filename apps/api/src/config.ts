@@ -25,7 +25,7 @@ const envSchema = z.object({
   SERV_MODEL: z.string().min(1).optional(),
   PRESIDIO_MODE: z.enum(["REDUCED_PII_MODE", "FULL_PRESIDIO"]).default("REDUCED_PII_MODE"),
 
-  // Arc / Circle Gateway payments. All payment execution is opt-in and testnet-only.
+  // Arc payments. Mainnet uses standard x402 exact (USDC EIP-3009); Testnet uses Circle Gateway. Execution is opt-in and fails closed.
   ARC_PAYMENTS_ENABLED: z
     .enum(["true", "false"])
     .default("false")

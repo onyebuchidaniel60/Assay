@@ -19,7 +19,7 @@ export type EvidenceNeed = {
     displayName: string;
     requiresPayment: boolean;
     paymentNetwork: string | null;
-    availability: "AVAILABLE" | "POLICY_RESTRICTED" | "NOT_CONFIGURED";
+    availability: "AVAILABLE" | "POLICY_GATED" | "POLICY_RESTRICTED" | "NOT_CONFIGURED";
   }>;
   limitations: string[];
 };
@@ -103,11 +103,11 @@ export function planEvidenceNeeds(input: EvidencePlannerInput): EvidenceNeed[] {
           displayName: "LoneStar Oracle EquityScope",
           requiresPayment: true,
           paymentNetwork: "eip155:5042",
-          availability: "POLICY_RESTRICTED",
+          availability: "POLICY_GATED",
         },
       ],
       limitations: [
-        "This provider offers Arc mainnet USDC (eip155:5042). Assay's current policy allows Arc Testnet only; a mainnet payment requires an explicit operator change and funding.",
+        "This provider offers Arc Mainnet USDC (eip155:5042) as standard x402 exact. A payment requires an active spending session, deterministic policy approval and explicit analyst authorization.",
         "Third-party market data is not an audited financial statement and may carry its own licensing limits.",
       ],
     });
