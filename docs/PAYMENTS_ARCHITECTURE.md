@@ -162,6 +162,19 @@ This is the exact reason a live paid financial-data retrieval cannot be demonstr
 - No evidence is auto-substituted into the deterministic covenant calculation. The analyst must review and use it explicitly.
 - Duplicate content for the same run is prevented by a unique `(analysis_run_id, content_sha256)` index.
 
+## How to complete the live test later
+
+The generated unfunded Arc Testnet payer address is `0x16CCd81145AF27fB3Aba157d907611863FDc28E1`. The private key is in the local ignored `.env.local` only; it is not deployed.
+
+1. Fund the address with testnet USDC from https://faucet.circle.com (Arc Testnet). This requires the operator to complete the faucet challenge; Assay does not bypass it.
+2. Confirm the balance and facilitator with `node scripts/check-arc-config.mjs`.
+3. Deposit a small amount into Gateway with `node scripts/arc-gateway-deposit.mjs --amount 0.10 --confirm`.
+4. Run the rail smoke test against a compatible Arc Testnet merchant:
+   `node scripts/arc-rail-smoke.mjs --url https://x402.quicknode.com/arc-testnet/ --pay --confirm`
+   This is a payment-rail test, not financial evidence.
+5. For a live paid financial-data retrieval, a genuine financial-data merchant that accepts Arc Testnet must be found. On 20 November 2026, Circle Discovery had none. Do not substitute a mainnet or Base payment, and do not build a self-dealing seller to manufacture a receipt.
+6. Re-run `node scripts/check-provider-compatibility.mjs` and record the current result rather than relying on this dated note.
+
 ## Observed local verification — 20 November 2026
 
 A synthetic run (`856a437a-0449-4d2e-8cab-024fc0fa8140`, BOR-004, `TERMS_CONFIRMED`) was used to exercise the real provider quote and policy path from the local UI.

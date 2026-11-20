@@ -14,6 +14,7 @@ All values below were captured from this environment on 20 November 2026. No sec
 | `deployed-integrations.png` | Deployed Vercel UI: Arc Testnet / Circle Gateway, DRY RUN, SEC EDGAR, Financial Datasets, LoneStar Oracle, no Kite. |
 | `deployed-policy-rejection.png` | Deployed run page showing `POLICY_REJECTED` / `payment_network_forbidden`. |
 | `deployed-sec-attempt.png` | Deployed run page showing the Render-side SEC HTTP 403 and no fabricated evidence. |
+| `provider-compatibility.json` | Read-only re-check: 0 Arc-Testnet financial-analysis services, 193 Arc-mainnet listings, Financial Datasets Base-mainnet only, LoneStar Oracle Arc-mainnet option. |
 
 ## Reproduce
 

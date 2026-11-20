@@ -1,0 +1,51 @@
+{
+  "capturedAt": "2026-11-20T15:30:44.335Z",
+  "arcTestnet": {
+    "financialAnalysisCount": 0,
+    "services": []
+  },
+  "arcMainnet": {
+    "financialAnalysisCount": 193,
+    "providers": [
+      "LoneStarOracle",
+      "AIsa API",
+      "anchor-x402",
+      "BlockRun.AI",
+      "Orthogonal",
+      "SqueezeOS"
+    ]
+  },
+  "financialDatasets": {
+    "status": 402,
+    "networks": [
+      "eip155:8453"
+    ],
+    "assets": [
+      "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    ],
+    "note": "Documented x402 rail is Base mainnet; not Arc-compatible."
+  },
+  "loneStarOracle": {
+    "status": 402,
+    "networks": [
+      "eip155:8453",
+      "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+      "eip155:4663",
+      "eip155:5042"
+    ],
+    "arcMainnetOption": {
+      "scheme": "exact",
+      "network": "eip155:5042",
+      "asset": "0x3600000000000000000000000000000000000000",
+      "amount": "50000",
+      "payTo": "0xeF2a4B6756895aAf1374640dcFCD4947959442ab",
+      "maxTimeoutSeconds": 300,
+      "extra": {
+        "name": "USDC",
+        "version": "2",
+        "assetTransferMethod": "eip3009"
+      }
+    },
+    "note": "Arc mainnet only; default Assay policy rejects eip155:5042."
+  }
+}

@@ -76,6 +76,7 @@ The payment session row is created once per `PAYMENT_SESSION_ID` and is authorit
 ```bash
 # Inspect config and facilitator support without signing
 node scripts/check-arc-config.mjs
+node scripts/check-provider-compatibility.mjs
 
 # Deposit/withdraw are explicit operator actions with --confirm
 ARC_TESTNET_PRIVATE_KEY=... node scripts/arc-gateway-deposit.mjs --amount 0.50 --confirm
