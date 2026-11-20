@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-11-20T16:32:31.288Z",
+  "capturedAt": "2026-11-20T16:57:20.183Z",
   "payerAddress": "0xDff5469Ee2DD3f600ED5e216AD89705A08a85491",
   "settlementModel": "X402_EXACT_ONCHAIN",
   "network": "eip155:5042",
@@ -15,7 +15,7 @@
     "assetTransferMethod": "eip3009"
   },
   "quoteSha256": "c62e5fe2a0e7c4477653c6e470f5d5e83d2c7db6f594059210d1c28ea828047c",
-  "quoteExpiresAt": "2026-11-20T16:37:31.160Z",
+  "quoteExpiresAt": "2026-11-20T17:02:20.054Z",
   "resourceUrl": "https://equity.lonestaroracle.xyz/equity?ticker=AAPL",
   "policyDecision": {
     "allowed": true,
@@ -24,8 +24,8 @@
   },
   "balances": {
     "wallet": {
-      "balance": "0",
-      "formatted": "0"
+      "balance": "930000",
+      "formatted": "0.93"
     },
     "gateway": null
   }

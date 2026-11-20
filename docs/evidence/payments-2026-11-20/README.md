@@ -22,7 +22,9 @@ All values below were captured from this environment on 20 November 2026. No sec
 - Public address: `0xDff5469Ee2DD3f600ED5e216AD89705A08a85491`
 - Private key: stored only at `/root/assay-secrets/arc-mainnet-payer.env` (mode 600, outside Git); never printed or committed.
 - Verified locally by re-reading the key file and re-deriving the address.
-- Current wallet USDC balance: `0` (unfunded).
+- Current wallet balances (20 November 2026, read-only RPC): native `0.93` USDC (18 decimals), ERC-20 USDC `0.93` (6 decimals).
+- Funding transaction: `0xf94dac279247363b16f43fb43423bdcaf42d0f61c996f36d8ada49a69c37aad2` (block `32253496`, from `0x9948bf419e64d967aa8e13c3d86a450dac12dcd5`, status success).
+- Explorer: `https://explorer.arc.io/tx/0xf94dac279247363b16f43fb43423bdcaf42d0f61c996f36d8ada49a69c37aad2` (the explorer API is Cloudflare-protected from this host; the transaction was verified through Arc Mainnet RPC).
 - Network: `eip155:5042` (Arc Mainnet).
 - Token: USDC `0x3600000000000000000000000000000000000000` (6 decimals).
 - Settlement model: standard onchain x402 exact (`assetTransferMethod: eip3009`).

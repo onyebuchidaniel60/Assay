@@ -292,3 +292,14 @@ For every checkpoint add:
 - **Next exact task:** deploy the new commit to Render and Vercel, verify the migrated status page and the policy-rejection panel on the deployed app, and record exact deployment URLs/commit SHAs.
 
 - **Vercel redeploy caveat (final):** the source fix `b380fef` changes the homepage SEC badge from “LIVE · FREE PUBLIC DATA” to “IMPLEMENTED · HOST 403”. The Vercel CLI auth session expired and `vercel --prod` now returns `deploy_failed: This request requires a challenge to be completed`; the previous production deployment `dpl_AA3gRSVs1ggcZ5Gsku7MBbrrADCH` (`9e9f054`) still serves the older label. The integrations page, run page and API are correct. A Vercel owner login/redeploy is the remaining cosmetic action; do not cite the stale homepage badge as evidence of live SEC retrieval.
+
+## 20 November 2026 — Arc Mainnet funding verification (read-only)
+
+- **Wallet:** dedicated payer `0xDff5469Ee2DD3f600ED5e216AD89705A08a85491`; private key stored only in `/root/assay-secrets/arc-mainnet-payer.env` (mode 600, outside Git), address re-derived and matched.
+- **RPC:** `https://rpc.mainnet.arc.io` returned chain ID `5042` at block `32254483`.
+- **Balances:** native USDC `930000000000000000` atomic (18 decimals) = `0.93`; ERC-20 USDC `balanceOf` returned `930000` atomic (6 decimals) = `0.93`.
+- **Funding transaction:** `0xf94dac279247363b16f43fb43423bdcaf42d0f61c996f36d8ada49a69c37aad2`, block `32253496`, from `0x9948bf419e64d967aa8e13c3d86a450dac12dcd5`, status `success`. Explorer link: `https://explorer.arc.io/tx/0xf94dac279247363b16f43fb43423bdcaf42d0f61c996f36d8ada49a69c37aad2` (explorer API is Cloudflare-protected from this host; the transaction was verified through RPC).
+- **LoneStar live quote (16:57 UTC):** Arc Mainnet `eip155:5042`, USDC `0x3600000000000000000000000000000000000000`, `50000` atomic = `0.05 USDC`, payTo `0xeF2a4B6756895aAf1374640dcFCD4947959442ab`, `scheme: exact`, `extra: {name: "USDC", version: "2", assetTransferMethod: "eip3009"}`. Deterministic policy allowed the quote under an explicitly mainnet-scoped policy; no payment was made.
+- **Implementation:** `ArcX402ExactProvider` added for standard onchain EIP-3009 x402 on Arc Mainnet; `ArcCircleGatewayProvider` remains for Arc Testnet batching. `ARC_SETTLEMENT_MODEL` selects the rail. 100 tests pass, 1 live-payment suite skipped; CI `44778260310` passes.
+- **Safety flags:** local and Render `ARC_PAYMENTS_ENABLED=false`, `PAYMENT_EXECUTION_ENABLED=false`, `PAYMENT_DRY_RUN=true`. Production `ARC_NETWORK` remains `eip155:5042002`; no mainnet payer address or key is configured in production. No transaction was signed or broadcast.
+- **Blockers before the first authorized 0.05 USDC request:** deploy the mainnet-capable API code, set mainnet network/allowlists/payer environment (not done, per instruction), and explicitly authorize execution. The deployed API currently predates the mainnet provider.

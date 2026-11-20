@@ -1,0 +1,26 @@
+{
+  "capturedAt": "2026-11-20T16:57:33.072Z",
+  "rpc": "https://rpc.mainnet.arc.io",
+  "chainId": 5042,
+  "expectedChainId": 5042,
+  "blockNumber": "32254483",
+  "payer": "0xDff5469Ee2DD3f600ED5e216AD89705A08a85491",
+  "nativeBalanceAtomic": "930000000000000000",
+  "nativeBalanceFormatted": "0.93",
+  "nativeDecimals": 18,
+  "usdcContract": "0x3600000000000000000000000000000000000000",
+  "usdcBalanceAtomic": "930000",
+  "usdcBalanceFormatted": "0.93",
+  "usdcDecimals": 6,
+  "usdcContractCodePresent": true,
+  "funding": {
+    "hash": "0xf94dac279247363b16f43fb43423bdcaf42d0f61c996f36d8ada49a69c37aad2",
+    "blockNumber": "32253496",
+    "from": "0x9948bf419e64d967aa8e13c3d86a450dac12dcd5",
+    "to": "0xdff5469ee2dd3f600ed5e216ad89705a08a85491",
+    "valueAtomic": "930000000000000000",
+    "valueFormatted": "0.93",
+    "status": "success",
+    "explorer": "https://explorer.arc.io/tx/0xf94dac279247363b16f43fb43423bdcaf42d0f61c996f36d8ada49a69c37aad2"
+  }
+}

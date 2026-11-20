@@ -10,7 +10,7 @@
 **Public demo:** `https://github.com/onyebuchidaniel60/Assay/releases/download/demo-v1/assay-demo-final.mp4` — 131.97 s, 1080p/30 fps. It predates the Arc change and is a historical artifact.
 **Production release authority:** Exercised for the previous release; the Arc update was deployed with payment execution disabled.
 **Data boundary:** Synthetic data only; no real borrower, lender or production records.  
-**New spend authority:** `$0`; no Arc Testnet funds, no Arc mainnet funds, no paid Financial Datasets request.
+**New spend authority:** `$0`; no payment, signing or broadcast was performed. The Arc Mainnet payer `0xDff5469Ee2DD3f600ED5e216AD89705A08a85491` holds `0.93` USDC from a verified funding transaction, but execution remains disabled and production remains on Arc Testnet configuration.
 
 ## Phase 1 — complete
 
