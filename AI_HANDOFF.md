@@ -5,7 +5,7 @@
 **Status:** Phases 1–9 complete. Production frontend/API are deployed and smoke-tested; the full product regression, live Arc Mainnet payment, retrieval, audit verification and final demo are complete.
 **Repository:** `https://github.com/onyebuchidaniel60/Assay` — public, default branch `main`.
 **Production URL:** `https://assay-omega-gray.vercel.app` and stable alias `https://assay-uhhh2.vercel.app` — public, invite-only app sign-in.
-**Production commit:** Render API `720f9a1`; Vercel UI `bd42418`. Payment execution is disabled. **Render API:** `https://assay-api-7hy0.onrender.com`. **Render Presidio:** `https://assay-presidio.onrender.com`.
+**Production commit:** Render API `720f9a1`; Vercel UI `4fe696e`. Payment execution is disabled. **Render API:** `https://assay-api-7hy0.onrender.com`. **Render Presidio:** `https://assay-presidio.onrender.com`.
 **Live payment:** 0.05 USDC, Arc Mainnet `eip155:5042`, tx `0xc0a9997fae6db0049622555905b59cb2c9585ab17b8825051e3f260538a9e134`; provider receipt `success: true`; `authorizationState` true; wallet 0.93 → 0.88 USDC; audit chain `VALID:32`. Full record: `docs/evidence/payments-2026-11-20/EVIDENCE.md`.
 **Public demo:** `docs/demo/assay-demo-final.mp4` and the public release asset: https://github.com/onyebuchidaniel60/Assay/releases/download/demo-final-2026-11-21/assay-demo-final.mp4. 1080p, ~2:58, ElevenLabs `eleven_v4` narration.
 **Production release authority:** Exercised for this deployment and the single authorized payment. Execution was restored to `PAYMENT_EXECUTION_ENABLED=false` and `PAYMENT_DRY_RUN=true` immediately after settlement.
