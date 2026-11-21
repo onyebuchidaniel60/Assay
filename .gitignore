@@ -59,3 +59,13 @@ design/
 
 # Demo working audio (final MP4, script, captions and notes are committed)
 artifacts/demo/audio/
+
+# Local demo production intermediates (final outputs live in docs/demo)
+artifacts/demo/narration-cache/
+artifacts/demo/raw-v2/
+artifacts/demo/audio-v2/
+artifacts/demo/build-v2/
+artifacts/demo/raw-v3/
+artifacts/demo/audio-v3/
+artifacts/demo/build-v3/
+artifacts/demo/*.mp4.tmp

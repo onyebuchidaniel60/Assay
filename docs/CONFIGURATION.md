@@ -92,13 +92,18 @@ Use this only after explicit operator authorization and funding.
 - `ARC_MAINNET_PRIVATE_KEY=` — server-side only; never commit, log or send to the frontend.
 - `ARC_MAINNET_PAYER_ADDRESS=` — public address; must match the key.
 - `CIRCLE_GATEWAY_MAINNET_FACILITATOR_URL=https://gateway-api.circle.com` — used only if a seller offers Circle Gateway batching on Arc Mainnet.
-- `PAYMENT_SESSION_ID=assay-arc-mainnet-session-1`
+- `PAYMENT_SESSION_ID=assay-arc-mainnet-session-2026-11-20`
+- `PAYMENT_SESSION_EXPIRES_AT=2026-12-31T00:00:00Z`
+- `PAYMENT_MAX_PER_TX_MINOR=50000` — exactly one 0.05 USDC payment
+- `PAYMENT_MAX_TOTAL_MINOR=50000` — aggregate session budget equals one payment
 - `PAYMENT_ALLOWED_PROVIDERS=lonestar-oracle`
 - `PAYMENT_ALLOWED_ENDPOINTS=https://equity.lonestaroracle.xyz/equity`
 - `PAYMENT_ALLOWED_RECIPIENTS=0xeF2a4B6756895aAf1374640dcFCD4947959442ab`
 - `PAYMENT_ALLOWED_NETWORKS=eip155:5042`
 - `PAYMENT_ALLOWED_ASSETS=0x3600000000000000000000000000000000000000`
-- `PAYMENT_EXECUTION_ENABLED=false` and `PAYMENT_DRY_RUN=true` until the operator explicitly authorizes signing.
+- `PAYMENT_EXECUTION_ENABLED=false` and `PAYMENT_DRY_RUN=true` until the operator explicitly authorizes signing. After the one authorized payment, both were restored to these fail-closed values; the session is fully spent.
+
+On 20 November 2026 this configuration executed one real 0.05 USDC AAPL purchase. The transaction, receipt, retrieved facts and audit events are in [evidence/payments-2026-11-20/EVIDENCE.md](evidence/payments-2026-11-20/EVIDENCE.md). The 50,000/50,000 caps made a second payment impossible without an operator change.
 
 LoneStar’s Arc option is **standard onchain x402 exact** (`extra.name: "USDC"`, `version: "2"`, `assetTransferMethod: "eip3009"`), not Circle Gateway batching. It spends wallet USDC and does not use a Gateway deposit. The mainnet provider signs the EIP-3009 authorization against the USDC token and verifies the seller’s `PAYMENT-RESPONSE` receipt. Reconciliation reads the USDC `authorizationState(from, nonce)` view; it does not fabricate a transaction hash.
 
@@ -107,7 +112,14 @@ LoneStar’s Arc option is **standard onchain x402 exact** (`extra.name: "USDC"`
 - `SEC_EDGAR_USER_AGENT=` — descriptive operator contact. SEC fair-access rules require it. The app refuses live SEC retrieval without it. The current development host receives HTTP 403 from SEC/Akamai; probe the deployed egress before claiming live SEC evidence.
 - `FINANCIAL_DATASETS_API_KEY=` — optional; licensed API-key path only. The documented x402 path is Base mainnet and is not Arc-compatible.
 - `FINANCIAL_DATASETS_BASE_URL=https://api.financialdatasets.ai`
-- `LONESTAR_ORACLE_BASE_URL=https://equity.lonestaroracle.xyz` — real Circle Discovery financial-data provider with a standard x402 exact Arc Mainnet option. Mainnet policy is opt-in via `PAYMENT_ALLOWED_NETWORKS=eip155:5042` and an explicit merchant recipient.
+- `LONESTAR_ORACLE_BASE_URL=https://equity.lonestaroracle.xyz` — real Circle Discovery financial-data provider with a standard x402 exact Arc Mainnet option. One live 0.05 USDC AAPL retrieval was completed; mainnet remains opt-in via `PAYMENT_ALLOWED_NETWORKS=eip155:5042` and the explicit merchant recipient.
+
+### Demo narration (local only)
+
+- `ELEVENLABS_API_KEY=` — local demo-production secret; never commit or ship to the app runtime.
+- `ELEVENLABS_VOICE_ID=` — operator-approved voice ID.
+- `ELEVENLABS_MODEL_ID=eleven_v4` — high-quality expressive narration model when available.
+- The production `.env.example` contains empty placeholders only. The real key is stored outside Git at `/root/assay-secrets/elevenlabs.env` (mode 600) and is read only by `artifacts/demo/elevenlabs-narration.mjs`.
 
 ### Kite removal
 

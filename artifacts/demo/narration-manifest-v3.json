@@ -1,0 +1,89 @@
+{
+  "provider": "ElevenLabs",
+  "modelId": "eleven_v4",
+  "voiceId": "JBFqnCBsd6RMkjVDRZzb",
+  "voiceName": "George - Warm, Captivating Storyteller",
+  "outputFormat": "mp3_44100_128",
+  "voiceSettings": {
+    "stability": 0.45,
+    "similarity_boost": 0.78,
+    "style": 0.28,
+    "use_speaker_boost": true
+  },
+  "generatedAt": "2026-11-21T07:10:55.920Z",
+  "segments": [
+    {
+      "id": "seg01",
+      "text": "Credit teams still piece covenant analysis together from documents, spreadsheets, and screenshots. The numbers may be right, but the trail is hard to verify. Assay makes every figure evidence-linked and every payment bounded by policy.",
+      "file": "artifacts/demo/narration-cache/seg01-8cb84382ce2869adae5b8073.mp3",
+      "durationSeconds": 15.804,
+      "bytes": 253326,
+      "cacheHit": false
+    },
+    {
+      "id": "seg02",
+      "text": "This is the covenant operations workspace: borrowers, facilities, runs, approvals, and audit evidence in one view. The workspace is synthetic by design, with no public signup and no autonomous credit decision.",
+      "file": "artifacts/demo/narration-cache/seg02-f14d3074c94224626cd15c33.mp3",
+      "durationSeconds": 15.229,
+      "bytes": 244131,
+      "cacheHit": false
+    },
+    {
+      "id": "seg03",
+      "text": "Inside a completed run, Assay shows the confidential inference attestation, the financial snapshot, and the covenant calculation. Baseline leverage is 3.07 times against a 3.50 times threshold, with stress cases beside it. Deterministic code performs the arithmetic. A zero-knowledge proof verifies the private inputs, and a credit manager records the approval.",
+      "file": "artifacts/demo/narration-cache/seg03-43e09c24ad2cb3718f301106.mp3",
+      "durationSeconds": 26.201,
+      "bytes": 419674,
+      "cacheHit": false
+    },
+    {
+      "id": "seg04",
+      "text": "Privacy is enforced before reasoning. Documents are redacted with Presidio, encrypted in private storage under a borrower-specific key, and tokenized. Only structured, extracted data reaches the reasoning model. Audit events are hash-chained and signed.",
+      "file": "artifacts/demo/narration-cache/seg04-fda881ccd75ca8215f86b015.mp3",
+      "durationSeconds": 17.789,
+      "bytes": 285091,
+      "cacheHit": false
+    },
+    {
+      "id": "seg05",
+      "text": "For market context, Assay's planner proposed a paid provider, and the analyst selected LoneStar Oracle. LoneStar returned a real x402 requirement: 0.05 USDC on Arc Mainnet, standard exact, EIP-3009. Assay checked provider, endpoint, recipient, network, asset, amount, budget, expiry, and idempotency before signing. One payment was authorized, confirmed by a provider receipt, and the Apple fundamentals were stored as encrypted evidence.",
+      "file": "artifacts/demo/narration-cache/seg05-f7672addf7afda525d949c18.mp3",
+      "durationSeconds": 36.519,
+      "bytes": 584767,
+      "cacheHit": false
+    },
+    {
+      "id": "seg06",
+      "text": "On Arc Mainnet, the explorer shows a successful transferWithAuthorization of 0.05 USDC from Assay's payer wallet to the verified merchant. The wallet moved from 0.93 to 0.88 USDC.",
+      "file": "artifacts/demo/narration-cache/seg06-b2416d8ec9e7a8bfe5fe826e.mp3",
+      "durationSeconds": 16.509,
+      "bytes": 264611,
+      "cacheHit": false
+    },
+    {
+      "id": "seg07",
+      "text": "The evidence record carries the source URL, retrieval time, a SHA-256 hash of the raw response, validation status, and the payment intent. Price, analyst target, market cap, P/E, EPS, and the 52-week range are shown as financial facts, not model prose.",
+      "file": "artifacts/demo/narration-cache/seg07-55b76356db3609c7899ad5c9.mp3",
+      "durationSeconds": 22.909,
+      "bytes": 367011,
+      "cacheHit": false
+    },
+    {
+      "id": "seg08",
+      "text": "Assay separates policy approval, payment settlement, calculation, proof, and human approval. A timeout becomes reconciliation required, never an automatic retry. The audit chain verifies all thirty-two events for this borrower, including the payment and evidence retrieval.",
+      "file": "artifacts/demo/narration-cache/seg08-42a7532668d28654f6dc5ae3.mp3",
+      "durationSeconds": 18.991,
+      "bytes": 304317,
+      "cacheHit": false
+    },
+    {
+      "id": "seg09",
+      "text": "Assay: evidence-linked analysis, bounded agentic payments, and an audit trail you can verify. The model interprets. Code calculates. Cryptography proves. A human approves.",
+      "file": "artifacts/demo/narration-cache/seg09-80b944046b9e5460379ad2e6.mp3",
+      "durationSeconds": 14.211,
+      "bytes": 227830,
+      "cacheHit": true
+    }
+  ],
+  "totalSeconds": 184.162
+}

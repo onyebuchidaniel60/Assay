@@ -68,8 +68,8 @@ flowchart LR
   API --> S[SERV Reasoning]
   S --> O[OpenRouter\nstructured judgement]
   API --> R[Reppo Eval Router]
-  API --> F[Financial data\nSEC EDGAR · paid providers]
-  API --> A[Arc Testnet / Circle Gateway\nx402 payment rail]
+  API --> F[Financial data\nSEC EDGAR · LoneStar Oracle]
+  API --> A[Arc Mainnet x402 exact\nArc Testnet Circle Gateway]
   API --> Z[Circom / SnarkJS\nfixed leverage circuit]
   DB --> J[Postgres FOR UPDATE SKIP LOCKED worker]
   J --> API
@@ -81,13 +81,32 @@ flowchart LR
 - **Postgres is the queue.** No Redis, Kafka or Kubernetes.
 - **Provider failures are visible.** There is no fabricated verdict, receipt, transfer or proof.
 - **A policy approval is not a payment receipt.** Settlement requires a verifiable provider receipt or a reconciled Gateway transfer.
+- **Arc Mainnet uses standard onchain x402 exact.** The authorization is signed as a USDC EIP-3009 transfer and settled by the seller facilitator. Arc Testnet/Circle Gateway remains a separate adapter.
+
+## Live proof
+
+Assay's production workspace completed one real, bounded external-data purchase on **Arc Mainnet**:
+
+| Item | Value |
+|---|---|
+| Provider | LoneStar Oracle EquityScope (`AAPL`) |
+| Amount | **0.05 USDC** (50,000 atomic units) |
+| Network | Arc Mainnet, `eip155:5042` |
+| Payment scheme | x402 `exact`, USDC EIP-3009 |
+| Payer | `0xDff5469Ee2DD3f600ED5e216AD89705A08a85491` |
+| Recipient | `0xeF2a4B6756895aAf1374640dcFCD4947959442ab` |
+| Transaction | [`0xc0a9997fae6db0049622555905b59cb2c9585ab17b8825051e3f260538a9e134`](https://explorer.arc.io/tx/0xc0a9997fae6db0049622555905b59cb2c9585ab17b8825051e3f260538a9e134) |
+| Result | `CONFIRMED`; provider receipt `success: true`; retrieved Apple fundamentals stored as encrypted evidence |
+| Audit | Chain verification `VALID:32`, including proposed, authorized, confirmed and evidence-retrieved events |
+
+Full evidence: [docs/evidence/payments-2026-11-20/EVIDENCE.md](docs/evidence/payments-2026-11-20/EVIDENCE.md). The spending session cap was exactly 50,000 atomic units, so a second payment is impossible without an explicit operator change. Execution is disabled again after the single authorized payment.
 
 ## Track declaration
 
 - **PRIMARY: Open Track**
 - **SECONDARY: Reppo** — feedback evaluation is live (one real synthetic evaluation completed: score 98, decision `accept`, confidence `low`, route `review`).
-- **SECONDARY: Arc Testnet / Circle Gateway** — the official `@circle-fin/x402-batching` SDK is integrated behind a `PaymentProvider` interface. Deterministic allowlists, caps, expiry, idempotency, duplicate-nonce and reconciliation controls are implemented and tested with a local mock x402 server. **No live paid financial-data retrieval is claimed**: Circle Discovery listed zero `FINANCIAL_ANALYSIS` services on Arc Testnet on 20 November 2026, Financial Datasets x402 is Base mainnet only, and no testnet funds were supplied. See [docs/PAYMENTS_ARCHITECTURE.md](docs/PAYMENTS_ARCHITECTURE.md).
-- **SECONDARY: SEC EDGAR** — free public XBRL company facts are implemented with provenance, validation and limitations. This development host received HTTP 403 from SEC/Akamai, so live retrieval must be verified from the deployed Render egress; no live SEC result is claimed here.
+- **SECONDARY: Arc Mainnet x402 exact** — a real **0.05 USDC** payment to LoneStar Oracle settled on Arc Mainnet (`eip155:5042`) using standard onchain x402 `exact` and USDC EIP-3009. The transaction, provider receipt, retrieved data and audit events are recorded in [docs/evidence/payments-2026-11-20/EVIDENCE.md](docs/evidence/payments-2026-11-20/EVIDENCE.md). Deterministic allowlists, caps, expiry, idempotency, duplicate-nonce and reconciliation controls remain in force; the session cap was exactly one payment. The separate Arc Testnet/Circle Gateway adapter is preserved.
+- **SECONDARY: SEC EDGAR** — free public XBRL company facts are implemented with provenance, validation and limitations. This development host received HTTP 403 from SEC/Akamai; the deployed Render egress also returned 403 during the earlier probe. No SEC result is fabricated, and the external-evidence workflow now demonstrates a live paid provider instead.
 - **NOT CLAIMED: Dolphin** — evaluated and rejected because its confidentiality mechanism is unverified: no TEE, no MPC and no verified zero-retention guarantee. No Dolphin adapter, key, endpoint or model is present.
 
 ## Security and privacy summary
@@ -102,7 +121,7 @@ flowchart LR
 - The proof proves the fixed compliance predicate over the submitted witness, not the truth of the source figures.
 - The audit chain is signed and tamper-evident; it is not claimed immutable against a fully compromised signing key.
 - Reppo receives only field-level, de-identified correction traces, never agreement text, borrower identity, token maps or raw financial figures.
-- The Arc payer private key is server-side only, held in non-serialisable private fields, never stored in the database, never sent to the frontend and never logged. Payment execution is disabled by default.
+- The Arc payer private key is server-side only, held in non-serialisable private fields, never stored in the database, never sent to the frontend and never logged. Payment execution is disabled by default and was disabled again immediately after the single authorized Mainnet payment.
 - External evidence is encrypted with the borrower DEK, content-hashed and linked to the run. SEC/public-company limitations are shown explicitly.
 - Kite Passport, Kite SDKs, `PIEUSD`, `gokite.ai` and Kite credentials are removed from the active application.
 
@@ -125,7 +144,7 @@ pnpm --filter @assay/web dev
 - Presidio: see [docs/SETUP.md](docs/SETUP.md)
 - Proof artifacts: `packages/proof/artifacts/`
 
-See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for every variable and [docs/SETUP.md](docs/SETUP.md) for the exact verified setup. Payment execution is off by default; see [docs/PAYMENTS_ARCHITECTURE.md](docs/PAYMENTS_ARCHITECTURE.md) before funding an Arc Testnet wallet.
+See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for every variable and [docs/SETUP.md](docs/SETUP.md) for the exact verified setup. Payment execution is off by default; see [docs/PAYMENTS_ARCHITECTURE.md](docs/PAYMENTS_ARCHITECTURE.md) before configuring any payer wallet.
 
 ## Verified deployment
 
@@ -158,7 +177,7 @@ The production deployment is public; the workspace itself requires an invited sy
 
 ## Project status
 
-Phases 1–9 are complete and the original production deployment was verified at commit `60fac34`. The 20 November 2026 payment update (`9e9f054`) replaces Kite with Arc Testnet / Circle Gateway, adds encrypted external-evidence linkage and the financial-data providers documented in [docs/PAYMENTS_ARCHITECTURE.md](docs/PAYMENTS_ARCHITECTURE.md). The update is deployed to Render and Vercel with payment execution disabled; the deployed status and policy-rejection evidence are recorded in [AI_HANDOFF.md](AI_HANDOFF.md) and [docs/BUILD_LOG.md](docs/BUILD_LOG.md). No live paid retrieval is claimed. The earlier demo video is a historical artifact and predates the Arc change.
+Phases 1–9 are complete. The 20–21 November 2026 release replaces Kite with two Arc payment adapters, adds encrypted external-evidence linkage, and completed one real **0.05 USDC** Arc Mainnet x402 payment with a verified LoneStar Oracle retrieval. The production backend is Render; the frontend is Vercel. Payment execution is disabled after the single authorized payment. See [docs/evidence/payments-2026-11-20/EVIDENCE.md](docs/evidence/payments-2026-11-20/EVIDENCE.md), [AI_HANDOFF.md](AI_HANDOFF.md) and [docs/BUILD_LOG.md](docs/BUILD_LOG.md). The final demo video replaces the earlier historical artifact.
 
 ## License and attribution
 

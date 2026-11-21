@@ -1,0 +1,252 @@
+[
+  {
+    "start": 0,
+    "end": 4.424310344827586,
+    "text": "Credit teams still piece covenant analysis together from documents,"
+  },
+  {
+    "start": 4.424310344827586,
+    "end": 6.405344827586207,
+    "text": "spreadsheets, and screenshots."
+  },
+  {
+    "start": 6.405344827586207,
+    "end": 10.235344827586207,
+    "text": "The numbers may be right, but the trail is hard to verify."
+  },
+  {
+    "start": 10.235344827586207,
+    "end": 15.32,
+    "text": "Assay makes every figure evidence-linked and every payment bounded by policy."
+  },
+  {
+    "start": 15.32,
+    "end": 19.989271844660195,
+    "text": "This is the covenant operations workspace: borrowers, facilities,"
+  },
+  {
+    "start": 19.989271844660195,
+    "end": 23.437349514563106,
+    "text": "runs, approvals, and audit evidence in one view."
+  },
+  {
+    "start": 23.437349514563106,
+    "end": 26.095242718446602,
+    "text": "The workspace is synthetic by design,"
+  },
+  {
+    "start": 26.095242718446602,
+    "end": 30.118,
+    "text": "with no public signup and no autonomous credit decision."
+  },
+  {
+    "start": 30.118,
+    "end": 31.750610169491523,
+    "text": "Inside a completed run,"
+  },
+  {
+    "start": 31.750610169491523,
+    "end": 35.37074576271186,
+    "text": "Assay shows the confidential inference attestation,"
+  },
+  {
+    "start": 35.37074576271186,
+    "end": 39.132847457627115,
+    "text": "the financial snapshot, and the covenant calculation."
+  },
+  {
+    "start": 39.132847457627115,
+    "end": 43.60477966101695,
+    "text": "Baseline leverage is 3.07 times against a 3.50 times threshold,"
+  },
+  {
+    "start": 43.60477966101695,
+    "end": 45.59230508474576,
+    "text": "with stress cases beside it."
+  },
+  {
+    "start": 45.59230508474576,
+    "end": 48.64457627118644,
+    "text": "Deterministic code performs the arithmetic."
+  },
+  {
+    "start": 48.64457627118644,
+    "end": 52.26471186440678,
+    "text": "A zero-knowledge proof verifies the private inputs,"
+  },
+  {
+    "start": 52.26471186440678,
+    "end": 55.246,
+    "text": "and a credit manager records the approval."
+  },
+  {
+    "start": 55.246,
+    "end": 57.814665322580645,
+    "text": "Privacy is enforced before reasoning."
+  },
+  {
+    "start": 57.814665322580645,
+    "end": 60.38333064516129,
+    "text": "Documents are redacted with Presidio,"
+  },
+  {
+    "start": 60.38333064516129,
+    "end": 64.47931048387096,
+    "text": "encrypted in private storage under a borrower-specific key,"
+  },
+  {
+    "start": 64.47931048387096,
+    "end": 65.4512379032258,
+    "text": "and tokenized."
+  },
+  {
+    "start": 65.4512379032258,
+    "end": 69.61664112903226,
+    "text": "Only structured, extracted data reaches the reasoning model."
+  },
+  {
+    "start": 69.61664112903226,
+    "end": 72.463,
+    "text": "Audit events are hash-chained and signed."
+  },
+  {
+    "start": 72.463,
+    "end": 77.39961252900231,
+    "text": "For market context, Assay's planner proposed a paid provider,"
+  },
+  {
+    "start": 77.39961252900231,
+    "end": 80.71766357308584,
+    "text": "and the analyst selected LoneStar Oracle."
+  },
+  {
+    "start": 80.71766357308584,
+    "end": 86.22077262180974,
+    "text": "LoneStar returned a real x402 requirement: 0.05 USDC on Arc Mainnet,"
+  },
+  {
+    "start": 86.22077262180974,
+    "end": 88.24397447795823,
+    "text": "standard exact, EIP-3009."
+  },
+  {
+    "start": 88.24397447795823,
+    "end": 93.74708352668213,
+    "text": "Assay checked provider, endpoint, recipient, network, asset, amount,"
+  },
+  {
+    "start": 93.74708352668213,
+    "end": 97.5507030162413,
+    "text": "budget, expiry, and idempotency before signing."
+  },
+  {
+    "start": 97.5507030162413,
+    "end": 102.40638747099769,
+    "text": "One payment was authorized, confirmed by a provider receipt,"
+  },
+  {
+    "start": 102.40638747099769,
+    "end": 107.343,
+    "text": "and the Apple fundamentals were stored as encrypted evidence."
+  },
+  {
+    "start": 107.343,
+    "end": 108.70638068181819,
+    "text": "On Arc Mainnet,"
+  },
+  {
+    "start": 108.70638068181819,
+    "end": 114.61436363636365,
+    "text": "the explorer shows a successful transferWithAuthorization of 0.05"
+  },
+  {
+    "start": 114.61436363636365,
+    "end": 119.7043181818182,
+    "text": "USDC from Assay's payer wallet to the verified merchant."
+  },
+  {
+    "start": 119.7043181818182,
+    "end": 123.34,
+    "text": "The wallet moved from 0.93 to 0.88 USDC."
+  },
+  {
+    "start": 123.34,
+    "end": 128.5843387096774,
+    "text": "The evidence record carries the source URL, retrieval time,"
+  },
+  {
+    "start": 128.5843387096774,
+    "end": 133.38424193548386,
+    "text": "a SHA-256 hash of the raw response, validation status,"
+  },
+  {
+    "start": 133.38424193548386,
+    "end": 135.42864516129032,
+    "text": "and the payment intent."
+  },
+  {
+    "start": 135.42864516129032,
+    "end": 139.33967741935484,
+    "text": "Price, analyst target, market cap, P/E, EPS,"
+  },
+  {
+    "start": 139.33967741935484,
+    "end": 145.384,
+    "text": "and the 52-week range are shown as financial facts, not model prose."
+  },
+  {
+    "start": 145.384,
+    "end": 149.8160817843866,
+    "text": "Assay separates policy approval, payment settlement, calculation,"
+  },
+  {
+    "start": 149.8160817843866,
+    "end": 151.58891449814124,
+    "text": "proof, and human approval."
+  },
+  {
+    "start": 151.58891449814124,
+    "end": 156.22555390334568,
+    "text": "A timeout becomes reconciliation required, never an automatic retry."
+  },
+  {
+    "start": 156.22555390334568,
+    "end": 160.6576356877323,
+    "text": "The audit chain verifies all thirty-two events for this borrower,"
+  },
+  {
+    "start": 160.6576356877323,
+    "end": 163.726,
+    "text": "including the payment and evidence retrieval."
+  },
+  {
+    "start": 163.726,
+    "end": 168.55467469879517,
+    "text": "Assay: evidence-linked analysis, bounded agentic payments,"
+  },
+  {
+    "start": 168.55467469879517,
+    "end": 171.3852771084337,
+    "text": "and an audit trail you can verify."
+  },
+  {
+    "start": 171.3852771084337,
+    "end": 173.13359036144575,
+    "text": "The model interprets."
+  },
+  {
+    "start": 173.13359036144575,
+    "end": 174.46563855421684,
+    "text": "Code calculates."
+  },
+  {
+    "start": 174.46563855421684,
+    "end": 176.1306987951807,
+    "text": "Cryptography proves."
+  },
+  {
+    "start": 176.1306987951807,
+    "end": 177.546,
+    "text": "A human approves."
+  }
+]

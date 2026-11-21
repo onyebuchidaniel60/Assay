@@ -2,11 +2,11 @@
 
 ## Current automated suites
 
-| Suite | Command | Result (20 Nov 2026) |
+| Suite | Command | Result (21 Nov 2026) |
 |---|---|---|
 | Lint | `pnpm lint` | Passed |
 | Root typecheck | `pnpm typecheck` | Passed (10 packages + apps) |
-| Root unit tests | `pnpm test` | 100 passed, 1 skipped: domain 28, crypto 4, contracts 6, document 8, proof 3, reppo 8, AI 10, financial-data 8, payments 16, API 9 |
+| Root unit tests | `pnpm test` | 101 passed, 1 skipped: domain 28, crypto 4, contracts 6, document 8, proof 3, reppo 8, AI 10, financial-data 9, payments 16, API 9 |
 | Root build | `pnpm build` | Passed (all 10 packages + API + web) |
 | Playwright shell + authenticated workspace | `pnpm test:e2e` | 20/20 desktop + mobile (previous release); Arc evidence flows exercised separately with the demo analyst |
 | Dependency audit | `pnpm audit` | 0 critical/high; 1 moderate dev-only esbuild; 1 low elliptic |
@@ -38,7 +38,7 @@ It signs in through Neon Auth and covers:
 - Approval policy: role, maker-checker, payload/dependency invalidation, expiry and reason rules.
 - Arc spending policy: provider, endpoint, network, asset, recipient, per-tx cap, total budget, expiry, scheme, idempotency conflict, duplicate payment, duplicate nonce and invalid amount.
 - Arc provider: SDK/config verification, safe serialisation (no key), quote parsing, resource mismatch, signing/header shape against a local mock x402 server, receipt confirmation, missing receipt, timeout/no blind retry, duplicate-payment and insufficient-balance handling.
-- Financial data: SEC EDGAR annual fact selection, provenance/content hash, unknown ticker, missing fiscal period, malformed response, rate limit, unavailable provider; Financial Datasets Base-mainnet incompatibility; LoneStar Oracle Arc-mainnet policy restriction; deterministic private-company/public-company evidence planning.
+- Financial data: SEC EDGAR annual fact selection, provenance/content hash, unknown ticker, missing fiscal period, malformed response, rate limit, unavailable provider; Financial Datasets Base-mainnet incompatibility; LoneStar Oracle Arc Mainnet quote parsing and priority/unit normalization; deterministic private-company/public-company evidence planning.
 - Payment runtime config: default-disabled, complete bounded session, wrong network/token fail-closed, empty optional values.
 - Contracts: normative covenant-terms schema, minor-unit financial inputs, redaction spans, approval/terms review.
 - Crypto: DEK wrap/unwrap, AES-GCM tamper failure, Ed25519 sign/verify.
@@ -68,11 +68,11 @@ Recorded in `docs/BUILD_LOG.md`:
 - Log redaction: forced `ATTESTATION_FAILED`; grep for marker/email/account/figure/reference/borrower name/token-map was clean.
 - Dependency/secret scans: `pnpm audit` 0 high/critical (1 moderate dev-only esbuild, 1 low elliptic); Gitleaks worktree/history clean of real secrets; `scripts/check-secrets.sh` passes.
 - XSS/SQL-injection probes, audit-tamper fixture, concurrent approval, CORS denial and demo-shred tests passed in earlier phases.
-- Arc live payment and SEC live retrieval suites are **skipped** unless credentials/funding and a compatible merchant are supplied. The mock-x402 tests are explicitly mocks and do not claim settlement. No live-payment success or live SEC result is claimed from this host.
+- The automated live-payment suite remains **skipped** because it requires a funded wallet and a compatible merchant. Separately, one real Mainnet payment and retrieval was executed manually through the deployed UI: 0.05 USDC, tx `0xc0a9997fae6db0049622555905b59cb2c9585ab17b8825051e3f260538a9e134`, receipt `success: true`, `authorizationState` true, audit `VALID:32`. Full record: `docs/evidence/payments-2026-11-20/EVIDENCE.md`. No live SEC result is claimed.
 - Deployed production smoke: `/`, `/login`, logo/favicon/OG/manifest, authenticated workspace routes, `/v1/me`, `/v1/integrations/status` and API health all pass at `https://assay-omega-gray.vercel.app` / `https://assay-api-7hy0.onrender.com`.
 
 ## Gate
 
-All unit/integration tests pass (100 passed, 1 skipped live-payment suite), the production build passes, the deployed payment-update smoke test passes, no unresolved critical/high security issue remains, and no secret or real data is exposed. The payment update is deployed with execution disabled and was verified with analyst sign-in, the Arc status page and a real policy rejection. Playwright 20/20 was the previous release gate; the local and deployed Arc evidence flows were exercised with the demo analyst. The live Arc payment and live SEC suites remain skipped/blocked as documented; they are not claimed passing.
+All unit/integration tests pass (101 passed, 1 skipped live-payment suite), typecheck, lint and the production build pass, the deployed full-product regression passes, no unresolved critical/high security issue remains, and no secret or real data is exposed. One real Arc Mainnet payment and LoneStar retrieval is independently verified; execution is disabled again. The automated live-payment suite remains skipped as documented and is not claimed passing. The live SEC suite remains blocked by HTTP 403 and is not claimed passing.
 
 Do not document an unrun test as passing. Record exact commands and outcomes in this file and `docs/BUILD_LOG.md`.

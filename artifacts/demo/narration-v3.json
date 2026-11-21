@@ -1,0 +1,38 @@
+[
+  {
+    "id": "seg01",
+    "text": "Credit teams still piece covenant analysis together from documents, spreadsheets, and screenshots. The numbers may be right, but the trail is hard to verify. Assay makes every figure evidence-linked and every payment bounded by policy."
+  },
+  {
+    "id": "seg02",
+    "text": "This is the covenant operations workspace: borrowers, facilities, runs, approvals, and audit evidence in one view. The workspace is synthetic by design, with no public signup and no autonomous credit decision."
+  },
+  {
+    "id": "seg03",
+    "text": "Inside a completed run, Assay shows the confidential inference attestation, the financial snapshot, and the covenant calculation. Baseline leverage is 3.07 times against a 3.50 times threshold, with stress cases beside it. Deterministic code performs the arithmetic. A zero-knowledge proof verifies the private inputs, and a credit manager records the approval."
+  },
+  {
+    "id": "seg04",
+    "text": "Privacy is enforced before reasoning. Documents are redacted with Presidio, encrypted in private storage under a borrower-specific key, and tokenized. Only structured, extracted data reaches the reasoning model. Audit events are hash-chained and signed."
+  },
+  {
+    "id": "seg05",
+    "text": "For market context, Assay's planner proposed a paid provider, and the analyst selected LoneStar Oracle. LoneStar returned a real x402 requirement: 0.05 USDC on Arc Mainnet, standard exact, EIP-3009. Assay checked provider, endpoint, recipient, network, asset, amount, budget, expiry, and idempotency before signing. One payment was authorized, confirmed by a provider receipt, and the Apple fundamentals were stored as encrypted evidence."
+  },
+  {
+    "id": "seg06",
+    "text": "On Arc Mainnet, the explorer shows a successful transferWithAuthorization of 0.05 USDC from Assay's payer wallet to the verified merchant. The wallet moved from 0.93 to 0.88 USDC."
+  },
+  {
+    "id": "seg07",
+    "text": "The evidence record carries the source URL, retrieval time, a SHA-256 hash of the raw response, validation status, and the payment intent. Price, analyst target, market cap, P/E, EPS, and the 52-week range are shown as financial facts, not model prose."
+  },
+  {
+    "id": "seg08",
+    "text": "Assay separates policy approval, payment settlement, calculation, proof, and human approval. A timeout becomes reconciliation required, never an automatic retry. The audit chain verifies all thirty-two events for this borrower, including the payment and evidence retrieval."
+  },
+  {
+    "id": "seg09",
+    "text": "Assay: evidence-linked analysis, bounded agentic payments, and an audit trail you can verify. The model interprets. Code calculates. Cryptography proves. A human approves."
+  }
+]

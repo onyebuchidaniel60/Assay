@@ -303,3 +303,31 @@ For every checkpoint add:
 - **Implementation:** `ArcX402ExactProvider` added for standard onchain EIP-3009 x402 on Arc Mainnet; `ArcCircleGatewayProvider` remains for Arc Testnet batching. `ARC_SETTLEMENT_MODEL` selects the rail. 100 tests pass, 1 live-payment suite skipped; CI `44778260310` passes.
 - **Safety flags:** local and Render `ARC_PAYMENTS_ENABLED=false`, `PAYMENT_EXECUTION_ENABLED=false`, `PAYMENT_DRY_RUN=true`. Production `ARC_NETWORK` remains `eip155:5042002`; no mainnet payer address or key is configured in production. No transaction was signed or broadcast.
 - **Blockers before the first authorized 0.05 USDC request:** deploy the mainnet-capable API code, set mainnet network/allowlists/payer environment (not done, per instruction), and explicitly authorize execution. The deployed API currently predates the mainnet provider.
+
+## 20–21 November 2026 — Arc Mainnet x402 live payment, LoneStar retrieval and final demo
+
+- **Trigger:** operator authorized exactly one 0.05 USDC Arc Mainnet payment to LoneStar Oracle, followed by deployment, regression, documentation and a final 2–3 minute demo.
+- **Mainnet adapter:** `ArcX402ExactProvider` signs standard onchain x402 `exact` with USDC EIP-3009; `ArcCircleGatewayProvider` remains for Arc Testnet. `ARC_SETTLEMENT_MODEL` selects the rail and mismatches fail closed. `@x402/evm` plus viem are used for Mainnet; Circle Gateway batching is not used there.
+- **Preflight:** fresh 402 from `https://equity.lonestaroracle.xyz/equity?ticker=AAPL` returned `eip155:5042`, USDC `0x3600…0000`, `50000` atomic, `payTo 0xeF2a…42ab`, `scheme exact`, `assetTransferMethod eip3009`. Payer key re-derived to `0xDff5469Ee2DD3f600ED5e216AD89705A08a85491`; balance 0.93 USDC. The key was never printed.
+- **Policy:** production session `assay-arc-mainnet-session-2026-11-20`, caps `50000/50000` atomic, LoneStar provider/endpoint/recipient/network/asset allowlists. A prior quote was `POLICY_REJECTED` with `payment_network_forbidden` under the old testnet config; no funds moved.
+- **Execution:** analyst authorized exactly one intent `3a972fdf-c09f-49c7-949b-97441e24efe1`; job `payment.execute` submitted it; result `CONFIRMED`. Tx `0xc0a9997fae6db0049622555905b59cb2c9585ab17b8825051e3f260538a9e134`, block `32259804`, method `transferWithAuthorization`, 50,000 atomic USDC to the verified merchant, receipt `success: true`, `authorizationState` true. Wallet 0.93 → 0.88 USDC. Explorer: `https://explorer.arc.io/tx/0xc0a9997fae6db0049622555905b59cb2c9585ab17b8825051e3f260538a9e134`.
+- **Retrieval:** AAPL fundamentals returned and stored as evidence `7a2a8ee0-d78b-40df-9003-229181cf1576`; raw SHA-256 `7c2bd462724ad0b45210f785085cd2471ec36d0fe98e8de90746a648b1483697`; validation `VALID`. Facts include price 345.935 USD, analyst target 345.631 USD, market cap 5.027T USD, trailing/forward P/E 38.52/32.72, EPS 8.98, 52-week range 360.83/243.42.
+- **Normalization correction:** a deterministic priority/label normalizer was added. The stored raw response was reprocessed without a provider call or payment; audit events `EXTERNAL_EVIDENCE_REPROCESSED` (0031–0032) record the correction. The first reprocess attempt used a stale package build and produced zero facts; it was immediately followed by a correct reprocess (20 facts), and the audit chain remains `VALID`.
+- **Audit:** `PAYMENT_PROPOSED` 0027, `PAYMENT_AUTHORIZED` 0028, `PAYMENT_CONFIRMED` 0029, `EXTERNAL_EVIDENCE_RETRIEVED` 0030. Chain verification `VALID:32`.
+- **Shutdown:** Render `PAYMENT_EXECUTION_ENABLED=false`, `PAYMENT_DRY_RUN=true` immediately after settlement; session remaining 0. No retry or second payment.
+- **Deployment:** commits `8e4587d` and `720f9a1`; Render deploy `dep-dc0k0sss728c73ah02f0` live at `720f9a1`; Vercel `assay-8csi05jh9-uhhh2.vercel.app` ready; aliases `assay-uhhh2.vercel.app` and `assay-omega-gray.vercel.app`; health 200.
+- **Regression:** deployed route sweep covered dashboard, borrowers, facilities, analysis runs, covenants, exception cases, evaluations, approvals, audit, integrations, settings, approved run, payment run, borrower detail and 404. Approved run shows Layer 2 attestation, financial inputs, baseline 3.07x, stress 3.41x/3.37x, verified proof and manager approval. Payment run shows `CONFIRMED`, transaction hash and normalized evidence. Audit chain for BOR-004 returned `VALID:32`; the earlier approved borrower chain returned `VALID:13`.
+- **Tests:** full typecheck/build/test/lint run recorded in the final verification entry below.
+- **Docs:** README, ARCHITECTURE, PAYMENTS_ARCHITECTURE, INTEGRATIONS, CONFIGURATION, SECURITY, DEPLOYMENT, TESTING, OPERATOR_GUIDE, TROUBLESHOOTING, SUBMISSION and evidence README updated; no fake screenshot, URL, receipt or test result.
+- **Demo:** ElevenLabs narration configured outside Git; test generation succeeded with `eleven_v4` and approved voice `JBFqnCBsd6RMkjVDRZzb`. 9 segments, 53 caption cues, 177.5 s final MP4 at 1920×1080/30 fps, H.264 + AAC. Scenes are real deployed-app recordings plus the real Arc explorer transaction. Script, storyboard, captions and production notes under `docs/demo/`.
+- **Residual:** publish the MP4 as a public release asset, add that URL to the README/SUBMISSION, and leave any hackathon legal attestation/submission confirmation to the operator.
+
+## Final verification — 21 November 2026
+
+- `pnpm typecheck` — pass.
+- `pnpm test` — **101 passed, 1 skipped** (domain 28, crypto 4, contracts 6, document 8, proof 3, reppo 8, AI 10, financial-data 9, payments 16, API 9). The skipped suite is the automated live-payment fixture, not the manually verified production payment.
+- `pnpm lint` — pass.
+- `pnpm build` — pass (all packages, API, Next.js web).
+- Deployed regression route sweep — pass; audit chain `VALID:32` (payment borrower) and `VALID:13` (approved run).
+- Demo render — 1920×1080/30 fps, 177.546 s, H.264/AAC, 30.5 MB; full-frame inspection at scene boundaries; captions and audio verified.
+- All documentation links use real repository paths; no `href="#"`, fake contact URL or unverified test claim.

@@ -38,7 +38,7 @@ SERV never does arithmetic, approves a run, changes policy or writes the databas
 
 - **PRIMARY: Open Track**
 - **SECONDARY: Reppo** — LIVE. A real synthetic evaluation completed: provider eval `cmwikqtsn000f08l4y73d9a8m`, score 98/100, decision `accept`, confidence `low`, route `review`, 440 credits, 409-byte safe trace. The legacy Reppo endpoints were removed by the provider; Assay uses the live `/agents/evals` endpoints and records the deviation.
-- **SECONDARY: Arc / Circle Gateway and standard x402 exact** — **implemented, not live-paid.** The official `@circle-fin/x402-batching` SDK is integrated behind a provider interface for Arc Testnet Gateway batching, and `ArcX402ExactProvider` supports LoneStar Oracle’s Arc Mainnet standard EIP-3009 x402 option. Verified: SDK/config matches Circle’s published Arc values; deterministic provider/endpoint/network/asset/recipient/cap/budget/expiry/idempotency/duplicate-nonce policy; mock-x402 tests for signing, receipts, timeouts and duplicate handling. The dedicated Arc Mainnet payer is unfunded and execution remains disabled. The live LoneStar Arc Mainnet quote is 0.05 USDC to `0xeF2a…42ab`; no payment is claimed. See [PAYMENTS_ARCHITECTURE.md](PAYMENTS_ARCHITECTURE.md).
+- **SECONDARY: Arc Mainnet x402 exact — LIVE, ONE PAYMENT CONFIRMED.** A real **0.05 USDC** LoneStar Oracle `AAPL` purchase settled on Arc Mainnet (`eip155:5042`) using standard onchain x402 `exact` and USDC EIP-3009. Transaction: [`0xc0a9997fae6db0049622555905b59cb2c9585ab17b8825051e3f260538a9e134`](https://explorer.arc.io/tx/0xc0a9997fae6db0049622555905b59cb2c9585ab17b8825051e3f260538a9e134). Provider receipt `success: true`; `authorizationState` true; wallet 0.93 → 0.88 USDC; returned Apple fundamentals stored as encrypted, source-linked evidence; audit chain `VALID:32`. The production session caps were exactly 50,000/50,000 atomic units and execution was disabled immediately after settlement. The Arc Testnet/Circle Gateway adapter is preserved. Full evidence: [evidence/payments-2026-11-20/EVIDENCE.md](evidence/payments-2026-11-20/EVIDENCE.md).
 - **SECONDARY: SEC EDGAR** — free public-company XBRL evidence is implemented with provenance, period validation, content hash and explicit limitations. This development host received HTTP 403 from SEC/Akamai; live retrieval must be re-probed from the deployed Render egress. No live SEC result is claimed here.
 - **REMOVED: Kite** — Kite Passport is no longer an active dependency, credential, route or setup requirement. Historical provider-blocked evidence is archived at [archive/KITE_REMOVAL.md](archive/KITE_REMOVAL.md).
 - **NOT CLAIMED: Dolphin** — evaluated and rejected. Its confidentiality mechanism is unverified: no TEE, no MPC, zero-retention unverified. No Dolphin adapter, endpoint, key or flag exists in the repository.
@@ -56,8 +56,8 @@ flowchart LR
   API --> S[SERV Reasoning]
   S --> O[OpenRouter]
   API --> R[Reppo Eval Router]
-  API --> FD[Financial data\nSEC EDGAR · paid providers]
-  API --> A[Arc Testnet / Circle Gateway]
+  API --> FD[Financial data\nSEC EDGAR · LoneStar Oracle]
+  API --> A[Arc Mainnet x402 exact\nArc Testnet Circle Gateway]
   API --> Z[Circom / SnarkJS]
   DB --> WK[Postgres worker]
   WK --> A
@@ -90,7 +90,7 @@ Design reference images are used as licensed inspiration only and are not redist
 
 > Credit teams still reconcile covenants across PDFs, spreadsheets and email. Assay turns one maximum Debt/Adjusted EBITDA covenant into an evidence-linked, deterministic and proof-backed decision a manager can defend.
 >
-> Redacted extraction via NEAR AI Cloud with fresh TDX/NRAS attestation, SERV Reasoning as a core gate, a fixed Groth16 compliance proof, maker-checker approval and a signed audit trail. Synthetic feedback evaluation via Reppo. Arc Testnet / Circle Gateway x402 policy and evidence linkage are implemented; no live paid retrieval is claimed because no Arc-Testnet financial-data merchant and no testnet funds were available.
+> Redacted extraction via NEAR AI Cloud with fresh TDX/NRAS attestation, SERV Reasoning as a core gate, a fixed Groth16 compliance proof, maker-checker approval and a signed audit trail. Synthetic feedback evaluation via Reppo. Arc Mainnet x402 exact completed a real 0.05 USDC LoneStar Oracle purchase: the transaction, provider receipt, EIP-3009 authorization state, retrieved Apple fundamentals and VALID:32 audit chain are public evidence. Arc Testnet/Circle Gateway remains available as a separate adapter.
 >
 > Built for @OpenServAI #SERVHackathon.
 >
@@ -102,13 +102,13 @@ Design reference images are used as licensed inspiration only and are not redist
 
 - [x] Public GitHub repository: https://github.com/onyebuchidaniel60/Assay
 - [x] Demo video public URL — GitHub release asset (YouTube/Drive upload requires operator OAuth)
-- [x] Live production deployment verified at `9e9f054` — public URL; app-level invite-only sign-in; Arc status and policy rejection verified
+- [x] Live production deployment verified at `720f9a1` — public URL; app-level invite-only sign-in; live Arc Mainnet payment and retrieval verified
 - [x] Write-up ready (this file)
 - [x] X post drafted
 - [ ] X post will link to the submission — operator action
 - [ ] Data collection enabled in OpenServ org settings — operator to verify
 - [ ] SERV API key active and credit balance adequate — operator to verify
 - [x] Reppo real evaluation completed
-- [x] Arc/Circle Gateway integration and limitations recorded honestly
+- [x] Arc Mainnet x402 exact live payment + Arc Testnet Gateway adapter recorded honestly
 - [x] SEC EDGAR host-level 403 recorded; no live result fabricated
 - [x] No Dolphin claim

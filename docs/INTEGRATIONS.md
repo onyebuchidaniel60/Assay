@@ -1,6 +1,6 @@
 # Third-party Integrations
 
-**Provider revision:** 20 November 2026. This file supersedes the historical Dolphin and Kite integration descriptions in the blueprint and `docs/`. Kite is archived only.
+**Provider revision:** 21 November 2026. This file supersedes the historical Dolphin and Kite integration descriptions in the blueprint and `docs/`. Kite is archived only.
 
 ## OpenServ SERV Reasoning — mandatory orchestration
 
@@ -61,14 +61,22 @@ Dolphin was evaluated and rejected because its confidentiality mechanism is unve
 
 Returned verdict summary: the submission scored 98 and was accepted, but low confidence routed it to `review` for additional validation. Rubric: scope 100, safety 100, correctness 100, reversibility 88. Three evaluators were weighted (economic 98 vs equal-weight 86; score spread 16.9); the route decision was `review`. No sensitive data was sent or returned.
 
-## Arc Testnet / Circle Gateway — implemented payment rail
+## Arc Mainnet x402 exact — LIVE payment rail
+
+- **Provider:** standard onchain x402 `exact` via `@x402/evm`, USDC EIP-3009, and viem.
+- **Network:** Arc Mainnet `eip155:5042`; chain ID `5042`; USDC `0x3600000000000000000000000000000000000000`; merchant `0xeF2a4B6756895aAf1374640dcFCD4947959442ab`; seller facilitator settles `transferWithAuthorization`.
+- **Flow:** fresh 402 requirement -> deterministic policy -> explicit analyst authorisation -> Postgres `payment.execute` job -> signed EIP-3009 authorization -> provider receipt and onchain verification. A timeout becomes `RECONCILIATION_REQUIRED`; the worker looks up the original authorization by nonce and never blindly repays.
+- **Security:** server-side key only; no key in the browser or database; provider/endpoint/network/asset/recipient/allowlist/cap/expiry/idempotency checks; execution off by default.
+- **Live proof (20 November 2026):** one 0.05 USDC payment for `AAPL` from LoneStar Oracle settled in transaction `0xc0a9997fae6db0049622555905b59cb2c9585ab17b8825051e3f260538a9e134`. The provider returned `success: true`; the USDC `authorizationState` is `true`; the wallet moved from 0.93 to 0.88 USDC; the returned fundamentals were stored as `VALID`, encrypted, source-linked evidence. Full record: [evidence/payments-2026-11-20/EVIDENCE.md](evidence/payments-2026-11-20/EVIDENCE.md).
+- **Limits:** the production session cap was exactly 50,000 atomic units per payment and 50,000 in total, so a second payment could not pass the policy. Execution was disabled immediately after settlement.
+
+## Arc Testnet / Circle Gateway — preserved payment rail
 
 - **Provider:** Circle Gateway nanopayments via the official `@circle-fin/x402-batching@4.0.0` SDK and viem.
 - **Network:** Arc Testnet `eip155:5042002`; chain ID `5042002`; USDC `0x3600000000000000000000000000000000000000`; Gateway Wallet `0x0077777d7EBA4688BDeF3E311b846F25870A19B9`; Gateway domain `26`; facilitator `https://gateway-api-testnet.circle.com`.
-- **Flow:** real 402 requirement -> deterministic policy -> explicit analyst authorisation -> Postgres `payment.execute` job -> signed EIP-3009 authorization -> receipt/transfer verification. A timeout becomes `RECONCILIATION_REQUIRED`; the worker looks up the original nonce and never blindly repays.
-- **Security:** server-side key only; no key in the browser or database; network/asset/recipient/allowlist/cap checks; execution off by default.
+- **Flow:** same deterministic quote/policy/authorisation/jobs/audit pipeline, with Gateway receipt/transfer verification instead of Mainnet EIP-3009 settlement.
 - **Verified:** SDK config matches the official Circle values; facilitator reachable and supports Arc Testnet USDC; local mock x402 server tests cover signing, receipt confirmation, missing receipt, timeout, duplicate-payment and insufficient-balance handling.
-- **Not claimed:** no live paid financial-data retrieval. Circle Discovery returned zero `FINANCIAL_ANALYSIS` services on Arc Testnet on 20 November 2026, and no testnet funds were supplied. See [PAYMENTS_ARCHITECTURE.md](PAYMENTS_ARCHITECTURE.md).
+- **Not claimed:** no live Testnet financial-data retrieval. Circle Discovery returned zero `FINANCIAL_ANALYSIS` services on Arc Testnet on 20 November 2026, and no testnet funds were supplied. The adapter is preserved, not repurposed for Mainnet.
 
 ## Financial data providers
 
@@ -82,7 +90,7 @@ The live 402 terms on 20 November 2026 offered **Base mainnet** (`eip155:8453`) 
 
 ### LoneStar Oracle EquityScope — Arc Mainnet standard x402 exact
 
-Circle Discovery lists a real financial-data endpoint with an **Arc Mainnet** (`eip155:5042`) USDC option at 0.05 USDC per request. The live option is **standard onchain x402 exact** (`assetTransferMethod: eip3009`), not Circle Gateway batching. Assay implements `ArcX402ExactProvider` for this rail and verifies the live quote. The default testnet configuration rejects `eip155:5042`; mainnet is opt-in with an explicit merchant recipient and execution disabled. No mainnet payment was made.
+Circle Discovery lists a real financial-data endpoint with an **Arc Mainnet** (`eip155:5042`) USDC option at 0.05 USDC per request. The live option is **standard onchain x402 exact** (`assetTransferMethod: eip3009`), not Circle Gateway batching. Assay implements `ArcX402ExactProvider` for this rail and completed one authorized 0.05 USDC payment and AAPL retrieval on 20 November 2026. The transaction, provider receipt, authorization state, normalized facts and audit events are recorded in [evidence/payments-2026-11-20/EVIDENCE.md](evidence/payments-2026-11-20/EVIDENCE.md).
 
 ## Archived Kite evidence
 
@@ -98,7 +106,7 @@ Neon provides Postgres and managed Better Auth. Private S3-compatible storage ho
 
 ## Vercel — frontend hosting
 
-Hobby/free plan only. The production deployment is public at `https://assay-uhhh2.vercel.app` (production domain `https://assay-omega-gray.vercel.app`) at commit `9e9f054`; Vercel Authentication is disabled and the app keeps its own invite-only sign-in. Vercel Toolbar feedback is disabled for production and preview. No paid plan, domain or add-on without explicit budget authority.
+Hobby/free plan only. The production deployment is public at `https://assay-uhhh2.vercel.app` (production domain `https://assay-omega-gray.vercel.app`) at the current `main` deployment; Vercel Authentication is disabled and the app keeps its own invite-only sign-in. Vercel Toolbar feedback is disabled for production and preview. No paid plan, domain or add-on without explicit budget authority.
 
 ## Render — API and Presidio host
 
@@ -106,13 +114,14 @@ Free web services only; 512 MB RAM, no persistent local disk and possible sleep.
 
 ## Demo TTS
 
-Google Gemini TTS was not used: no Google AI/TTS credential or free-tier activation is present. The demo uses Microsoft Edge TTS (`edge-tts`, free, no account) with `en-US-AndrewNeural`; only the public narration script is sent. No billing was enabled.
+Final narration uses ElevenLabs text-to-speech with the operator-approved **George - Warm, Captivating Storyteller** voice (`JBFqnCBsd6RMkjVDRZzb`) and `eleven_v4`. The API key is stored outside Git at `/root/assay-secrets/elevenlabs.env` (mode 600); only the narration script is sent. An earlier draft used `edge-tts`; the published video is the ElevenLabs version.
 
 ## Integration state
 
 - Reppo: **LIVE** — one real synthetic evaluation completed; score 98, decision `accept`, confidence `low`, route `review`, 440 credits.
-- Arc Testnet / Circle Gateway: **IMPLEMENTED, NOT LIVE-PAID** — verified SDK/config/facilitator, deterministic policy and mock-x402 tests; no live settlement or paid evidence retrieval claimed.
+- Arc Mainnet x402 exact: **LIVE — ONE PAYMENT CONFIRMED** — 0.05 USDC to LoneStar Oracle in transaction `0xc0a9997f…a9e134`; provider receipt `success: true`; AAPL fundamentals retrieved and stored as encrypted evidence; audit chain `VALID:32`.
+- Arc Testnet / Circle Gateway: **IMPLEMENTED, PRESERVED, NOT LIVE-PAID** — verified SDK/config/facilitator, deterministic policy and mock-x402 tests; no live settlement claimed.
 - SEC EDGAR: **IMPLEMENTED, LIVE RETRIEVAL BLOCKED FROM THIS HOST** — HTTP 403 from SEC/Akamai on 20 November 2026; fixtures and validation pass. Re-probe Render before claiming live data.
 - Financial Datasets: **ADAPTER ONLY, NOT ARC-COMPATIBLE** — Base mainnet x402; no key; no payment or retrieval claimed.
-- LoneStar Oracle: **ARC MAINNET X402 EXACT IMPLEMENTED; UNFUNDED/EXECUTION DISABLED** — live 0.05 USDC quote verified; mainnet policy is opt-in; no payment claimed.
+- LoneStar Oracle: **LIVE ARC MAINNET X402 EXACT** — one 0.05 USDC AAPL purchase settled and retrieved; execution disabled again after the single authorized payment.
 - Kite: **REMOVED** — historical provider-blocked evidence is archived at [archive/KITE_REMOVAL.md](archive/KITE_REMOVAL.md); no active dependency remains.

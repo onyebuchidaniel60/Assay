@@ -432,7 +432,7 @@ export function ExternalEvidencePanel({
                       </form>
                     ) : null}
                     {intent.status === "CONFIRMED" || intent.status === "RECONCILED" ? (
-                      <span className="inline-flex items-center gap-1.5 text-[11px] text-positive"><CircleCheck className="size-3.5" /> Verified by a provider receipt or Gateway transfer</span>
+                      <span className="inline-flex items-center gap-1.5 text-[11px] text-positive"><CircleCheck className="size-3.5" /> Verified by a provider receipt or onchain settlement</span>
                     ) : null}
                     {intent.status === "POLICY_REJECTED" || intent.status === "FAILED" ? (
                       <span className="inline-flex items-center gap-1.5 text-[11px] text-warning"><CircleAlert className="size-3.5" /> No payment reached the chain</span>

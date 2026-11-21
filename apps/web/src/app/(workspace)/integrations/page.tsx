@@ -186,7 +186,7 @@ export default async function IntegrationsPage() {
             <p className="mt-1 text-sm leading-6 text-muted">
               Extraction cannot complete without confidential inference attestation, approval cannot complete without a
               server-verified proof, and a paid data purchase is not reported as settled without a provider receipt or a
-              reconciled Gateway transfer.
+              reconciled onchain/Gateway settlement.
             </p>
           </div>
         </div>
@@ -277,8 +277,13 @@ export default async function IntegrationsPage() {
               execution layer. A timeout becomes <span className="font-mono">RECONCILIATION_REQUIRED</span> and is looked up,
               not paid again.
             </p>
-            <a href="https://developers.circle.com/gateway" target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-1 text-xs font-semibold underline decoration-line underline-offset-4 hover:text-ink">
-              Circle Gateway documentation <ExternalLink className="size-3.5" />
+            <a
+              href={status.payments.settlementModel === "X402_EXACT_ONCHAIN" ? "https://x402.org" : "https://developers.circle.com/gateway"}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-3 inline-flex items-center gap-1 text-xs font-semibold underline decoration-line underline-offset-4 hover:text-ink"
+            >
+              {status.payments.settlementModel === "X402_EXACT_ONCHAIN" ? "x402 documentation" : "Circle Gateway documentation"} <ExternalLink className="size-3.5" />
             </a>
           </section>
 

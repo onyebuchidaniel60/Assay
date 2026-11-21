@@ -17,11 +17,12 @@
 | Reppo evaluation pending | Provider queue or polling window | Keep `PENDING`; poll every 60 s within the chosen 10/15/30-minute cap. A timeout is not a verdict. |
 | Reppo submission failed | Client payload/key/credits or provider failure | Read `errorCode`/`errorMessage` and the side recorded; do not retry blindly. |
 | Arc payment timed out | Unknown settlement state | Set `RECONCILIATION_REQUIRED`; the worker looks up the original nonce/transfer. Never submit a second payment. |
-| Arc facilitator unreachable | Cannot verify supported network | Check `CIRCLE_GATEWAY_FACILITATOR_URL`, network and Circle status. Payment execution fails closed. |
-| Arc signing key missing | `PAYMENT_SIGNER_NOT_CONFIGURED` | Set `ARC_TESTNET_PRIVATE_KEY` server-side; keep execution disabled unless an isolated funded test wallet is intended. |
+| Arc facilitator unreachable | Cannot verify supported network | Check the active chain config, seller 402 terms and provider status. Mainnet uses the seller facilitator; Testnet uses `CIRCLE_GATEWAY_FACILITATOR_URL`. Payment execution fails closed. |
+| Mainnet payment already spent | 50,000/50,000 session cap exhausted | Do not create another session or raise caps without explicit operator authorization. Verify the existing `CONFIRMED` intent and onchain transaction. |
+| Arc signing key missing | `PAYMENT_SIGNER_NOT_CONFIGURED` | Set `ARC_MAINNET_PRIVATE_KEY` or `ARC_TESTNET_PRIVATE_KEY` for the selected chain, server-side; keep execution disabled unless an isolated funded wallet and explicit authorization exist. |
 | SEC EDGAR HTTP 403 | Akamai blocks the egress IP | Set a descriptive `SEC_EDGAR_USER_AGENT`; probe from the deployed host. Do not scrape around the block or fabricate data. |
 | Financial Datasets rejected | Base mainnet only | Do not bridge or relabel. Use an Arc-compatible provider or a licensed API key outside the Arc flow, with explicit disclosure. |
 | Demo capture slow | Render free-service sleep or cold Presidio service | Warm preview before capture, then reload from clean browser profile. |
-| TTS quota unavailable | Free-tier rate/availability changed | Use a permitted local TTS fallback; do not enable billing without approval. |
+| ElevenLabs narration fails | Key missing permission, voice not found or quota exhausted | Check the exact API error and key permissions. Do not switch provider or voice without operator approval; the final narration uses the approved ElevenLabs voice and `eleven_v4`. |
 
 For every production-like incident, capture request/job IDs and safe error codes, not user payloads. Update `docs/BUILD_LOG.md` for build-related incidents.

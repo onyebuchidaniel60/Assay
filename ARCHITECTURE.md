@@ -17,7 +17,7 @@ Fastify API / Node.js 24 LTS (Render)
        -> NEAR AI Cloud TEE-attested gateway (tokenized text only)
        -> OpenRouter (structured SERV judgement/generation)
   -> optional Reppo Evaluation API (synthetic-only)
-  -> optional Arc Testnet / Circle Gateway x402 payment rail
+  -> Arc Mainnet x402 exact (USDC EIP-3009) / Arc Testnet Circle Gateway
        -> deterministic PaymentPolicyService before signing
        -> Postgres worker for execution/reconciliation
   -> SEC EDGAR free public data + optional paid financial-data providers
@@ -45,8 +45,8 @@ Worker loop inside API deployment
 - PDF: `pdfjs-dist`, text layer only; scanned PDFs rejected.
 - Crypto: Node crypto AES-256-GCM, SHA-256, Ed25519.
 - Proof: Circom 2.x + SnarkJS fixed circuit.
-- Payments: `@circle-fin/x402-batching` 4.0.0, viem, Arc Testnet (`eip155:5042002`), Circle Gateway testnet facilitator.
-- Financial data: SEC EDGAR XBRL (free), Financial Datasets adapter (Base mainnet x402 / API key), LoneStar Oracle adapter (Arc mainnet x402).
+- Payments: `@x402/evm` (Arc Mainnet standard exact, USDC EIP-3009), `@circle-fin/x402-batching` 4.0.0 (Arc Testnet Circle Gateway), viem. Mainnet chain `eip155:5042`; Testnet chain `eip155:5042002`.
+- Financial data: SEC EDGAR XBRL (free), Financial Datasets adapter (Base mainnet x402 / API key), LoneStar Oracle adapter (live Arc Mainnet x402 exact; one 0.05 USDC AAPL purchase verified on 20 November 2026).
 - Hosting: Vercel web preview; Render API and Presidio; Neon Postgres/Auth and private S3-compatible storage. Railway is prohibited.
 - Tests: Vitest, API integration tests, Playwright E2E, static/dependency/security scans.
 
@@ -68,7 +68,7 @@ Current OpenServ public materials identify `https://inference-api.openserv.ai/v1
 - **OpenRouter (general):** receives only structured, already-extracted data for SERV judgement and generation nodes. Never send raw documents or tokenized agreement text.
 - **SERV:** receives structured, non-identifying inputs and orchestrates the graph; it does not itself perform inference.
 - **Reppo:** receives synthetic/de-identified correction records only; the live adapter submits field-level traces after a 50 KB preflight and displays the real provider verdict.
-- **Arc / Circle Gateway:** receives payment amounts, recipient, network, asset and x402 metadata. It never receives borrower documents, token maps, raw financial statements or analyst notes. The payer private key stays server-side.
+- **Arc Mainnet / Circle Gateway:** receives payment amounts, recipient, network, asset and x402 metadata. It never receives borrower documents, token maps, raw financial statements or analyst notes. The payer private key stays server-side. Mainnet uses standard EIP-3009 exact settlement; Testnet uses Circle Gateway batching.
 - **SEC EDGAR / financial-data providers:** receive only the public ticker/CIK, requested public period and endpoint parameters. A private borrower is never sent to a public-company data provider as a lookup. Evidence limitations are stored with the data.
 - **Token-to-identity maps** never leave backend storage.
 - **Dolphin:** removed and rejected; no adapter or endpoint is part of the architecture.
@@ -103,7 +103,7 @@ Private witness: total debt and adjusted EBITDA minor units. Public input: coven
 - Vercel: frontend routes and static assets; preview deployment first.
 - Render: Fastify API and a `REDUCED_PII_MODE` Presidio-equivalent service; use free services only. The API worker runs in the same API service to avoid a separate paid worker tier for the MVP; Postgres is the durable queue. Full `en_core_web_lg` Presidio is not deployed on the 512 MB free tier.
 - Neon: Postgres and Auth; private S3-compatible storage holds encrypted objects. Free plan only for demo and subject to pause/size limits. Render free Postgres is not used because free DBs expire after 30 days.
-- No production release or paid-plan activation without explicit operator authorization.
+- Production frontend, API and Presidio are deployed for the synthetic-data demo. No paid-plan activation without explicit operator authorization.
 
 ## Failure handling
 

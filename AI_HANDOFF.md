@@ -1,16 +1,16 @@
 # Assay — AI Handoff / Build State
 
-> **PAYMENT UPDATE — 20 November 2026.** Kite Passport/x402 was removed and replaced by Arc Testnet / Circle Gateway plus external financial-evidence linkage. Historical Kite entries below are development history, not active instructions. See `docs/PAYMENTS_ARCHITECTURE.md` and the latest `docs/BUILD_LOG.md` entry.
+> **FINAL ARC MAINNET UPDATE — 21 November 2026.** Kite Passport/x402 is removed. The product now supports Arc Mainnet standard x402 exact (USDC EIP-3009) and Arc Testnet Circle Gateway. One real **0.05 USDC** LoneStar Oracle payment settled on Arc Mainnet; execution is disabled again. Historical entries below are development history, not active instructions. See `docs/PAYMENTS_ARCHITECTURE.md`, `docs/evidence/payments-2026-11-20/EVIDENCE.md` and the latest `docs/BUILD_LOG.md` entry.
 
-
-**Status:** Phases 1–9 complete. Public production deployed and smoke-tested after the full regression and security matrix passed; post-submission access and branding fixes applied. The 20 November 2026 payment update removes Kite, adds Arc Testnet / Circle Gateway and external financial-evidence linkage.
-**Repository:** `https://github.com/onyebuchidaniel60/Assay` — public, default branch `main`.  
-**Production URL:** `https://assay-uhhh2.vercel.app` — public (Vercel Authentication disabled) and explicitly aliased to the 20 November 2026 build. `https://assay-omega-gray.vercel.app` is the production domain.
-**Production commit:** Vercel UI `9e9f054` (`dpl_AA3gRSVs1ggcZ5Gsku7MBbrrADCH` / `https://assay-px4d9i5ih-uhhh2.vercel.app`); Render API `7d80665` (`dep-dc06dd97lnhs739qd280`). Source head is `b380fef` (SEC badge honesty fix). The Vercel CLI session expired and its deploy endpoint returned a security challenge, so the source `b380fef` homepage label is not yet on Vercel; the deployed integrations/run pages are correct and the stale homepage badge must not be read as a live-SEC claim. **Render API:** `https://assay-api-7hy0.onrender.com`. **Render Presidio:** `https://assay-presidio.onrender.com`.
-**Public demo:** `https://github.com/onyebuchidaniel60/Assay/releases/download/demo-v1/assay-demo-final.mp4` — 131.97 s, 1080p/30 fps. It predates the Arc change and is a historical artifact.
-**Production release authority:** Exercised for the previous release; the Arc update was deployed with payment execution disabled.
-**Data boundary:** Synthetic data only; no real borrower, lender or production records.  
-**New spend authority:** `$0`; no payment, signing or broadcast was performed. The Arc Mainnet payer `0xDff5469Ee2DD3f600ED5e216AD89705A08a85491` holds `0.93` USDC from a verified funding transaction, but execution remains disabled and production remains on Arc Testnet configuration.
+**Status:** Phases 1–9 complete. Production frontend/API are deployed and smoke-tested; the full product regression, live Arc Mainnet payment, retrieval, audit verification and final demo are complete.
+**Repository:** `https://github.com/onyebuchidaniel60/Assay` — public, default branch `main`.
+**Production URL:** `https://assay-omega-gray.vercel.app` and stable alias `https://assay-uhhh2.vercel.app` — public, invite-only app sign-in.
+**Production commit:** `720f9a1` on Render API and Vercel, with payment execution disabled. **Render API:** `https://assay-api-7hy0.onrender.com`. **Render Presidio:** `https://assay-presidio.onrender.com`.
+**Live payment:** 0.05 USDC, Arc Mainnet `eip155:5042`, tx `0xc0a9997fae6db0049622555905b59cb2c9585ab17b8825051e3f260538a9e134`; provider receipt `success: true`; `authorizationState` true; wallet 0.93 → 0.88 USDC; audit chain `VALID:32`. Full record: `docs/evidence/payments-2026-11-20/EVIDENCE.md`.
+**Public demo:** `docs/demo/assay-demo-final.mp4` and the public release asset (link recorded after publish). 1080p, ~2:58, ElevenLabs `eleven_v4` narration.
+**Production release authority:** Exercised for this deployment and the single authorized payment. Execution was restored to `PAYMENT_EXECUTION_ENABLED=false` and `PAYMENT_DRY_RUN=true` immediately after settlement.
+**Data boundary:** Synthetic data only; no real borrower, lender or production records.
+**New spend authority:** None remaining. The 50,000/50,000 atomic session cap is fully spent; no second payment is possible without an explicit operator change.
 
 ## Phase 1 — complete
 
@@ -170,3 +170,30 @@
 - Production was deployed only after the full gate passed; no critical/high finding remains.
 - Never fabricate provider output, receipts, attestation or verification results.
 - Do not expose secrets. `.env.local`, `.kite-passport/` and `/root/assay-secrets/` are outside Git.
+
+## 20–21 November 2026 — Arc Mainnet live payment, retrieval, regression and demo
+
+- **Implementation:** added `ArcX402ExactProvider` for standard onchain x402 `exact` with USDC EIP-3009 on Arc Mainnet (`eip155:5042`); preserved `ArcCircleGatewayProvider` for Arc Testnet (`eip155:5042002`). `ARC_SETTLEMENT_MODEL=x402-exact` selects Mainnet; `circle-gateway` selects Testnet. Config and policy fail closed on a chain/settlement mismatch.
+- **Mainnet preflight:** dedicated payer `0xDff5469Ee2DD3f600ED5e216AD89705A08a85491`; key outside Git at `/root/assay-secrets/arc-mainnet-payer.env` (mode 600); derived address matched; balance 0.93 USDC; fresh LoneStar 402 revalidated `eip155:5042`, USDC `0x3600…0000`, 50,000 atomic (0.05 USDC), recipient `0xeF2a…42ab`, scheme `exact`, `assetTransferMethod: eip3009`.
+- **Authorization:** production Render session `assay-arc-mainnet-session-2026-11-20` with per-payment and aggregate caps exactly 50,000 atomic units. Provider/endpoint/recipient/network/asset allowlists set. Execution enabled only for the authorized window.
+- **Settlement:** one payment, status `CONFIRMED`, tx `0xc0a9997fae6db0049622555905b59cb2c9585ab17b8825051e3f260538a9e134`, block 32,259,804, method `transferWithAuthorization`, 50,000 atomic USDC to the verified merchant, provider receipt `success: true`, `authorizationState(from, nonce)` true, wallet 0.93 → 0.88 USDC. Explorer: https://explorer.arc.io/tx/0xc0a9997fae6db0049622555905b59cb2c9585ab17b8825051e3f260538a9e134
+- **Retrieval:** AAPL fundamentals from LoneStar; raw SHA-256 `7c2bd462724ad0b45210f785085cd2471ec36d0fe98e8de90746a648b1483697`; evidence `VALID`; facts include price 345.935 USD, analyst target 345.631 USD, upside -0.1%, market cap 5.027T USD, trailing P/E 38.52, forward P/E 32.72, EPS 8.98, 52-week high/low 360.83/243.42, volume 25,839,059. Stored encrypted and linked to run `856a437a-0449-4d2e-8cab-024fc0fa8140`.
+- **Normalization:** LoneStar facts are prioritized deterministically and labelled as USD/percent/ratio/score/shares. The evidence was reprocessed from the stored raw response (no provider call, no payment); audit events 0031–0032 record the correction.
+- **Audit:** `PAYMENT_PROPOSED` (0027), `PAYMENT_AUTHORIZED` (0028), `PAYMENT_CONFIRMED` (0029), `EXTERNAL_EVIDENCE_RETRIEVED` (0030). Server-side chain verification `VALID:32`.
+- **Execution shutdown:** immediately after settlement, Render `PAYMENT_EXECUTION_ENABLED=false` and `PAYMENT_DRY_RUN=true`; session spent 50,000, remaining 0. No retry was made.
+- **Deployment:** Render deploy `dep-dc0k0sss728c73ah02f0` live at `720f9a1`; Vercel production `assay-8csi05jh9-uhhh2.vercel.app` ready, aliases `assay-uhhh2.vercel.app` and `assay-omega-gray.vercel.app`. Health `/health/ready` 200.
+- **Regression:** production route sweep logged in on analyst and covered dashboard, borrowers, facilities, analysis runs, covenant register, exception cases (`/cases`), evaluations, approvals, audit, integrations, settings, approved run, payment run, borrower detail and 404. Approved run shows attestation, financial snapshot, baseline 3.07x, stress cases, verified proof and manager approval. Payment run shows `CONFIRMED`, tx hash and retrieved evidence.
+- **Docs:** README, ARCHITECTURE, PAYMENTS_ARCHITECTURE, INTEGRATIONS, CONFIGURATION, SECURITY, DEPLOYMENT, TESTING, OPERATOR_GUIDE, TROUBLESHOOTING, SUBMISSION, BUILD_LOG and evidence README updated to the live state. No fabricated screenshot, URL or test result.
+- **Demo:** 1080p H.264/AAC, 177.5 s, real deployed footage and Arc explorer transaction crop. ElevenLabs `eleven_v4` voice **George - Warm, Captivating Storyteller** (`JBFqnCBsd6RMkjVDRZzb`); key outside Git at `/root/assay-secrets/elevenlabs.env` (mode 600); segments cached; audio loudness-normalized and inspected; captions generated as short cues. Script/storyboard under `docs/demo/`.
+- **Residual actions:** publish the final MP4 as the public release asset and put that URL in README/SUBMISSION; confirm the hackathon submission portal and legal attestations (operator-only); no further payment or execution change is authorized.
+
+## Final verification — 21 November 2026
+
+- `pnpm typecheck` — pass (all packages + API + web).
+- `pnpm test` — **101 passed, 1 skipped** (domain 28, crypto 4, contracts 6, document 8, proof 3, reppo 8, AI 10, financial-data 9, payments 16, API 9). The skipped suite is the automated live Arc payment fixture.
+- `pnpm lint` — pass.
+- `pnpm build` — pass (all packages, API, Next.js web).
+- Deployed regression — pass: dashboard, borrowers, facilities, analysis runs, covenants, `/cases`, evaluations, approvals, audit, integrations, settings, approved run, payment run, borrower detail, 404; no route error.
+- Audit verification — `VALID:32` for the payment borrower and `VALID:13` for the approved-run borrower.
+- Demo — 1920×1080, 30 fps, 177.546 s, H.264/AAC, 30.5 MB; real deployed footage and real Arc explorer transaction; ElevenLabs `eleven_v4` George; captions/cached segments; script/storyboard/production notes in `docs/demo/`.
+- Remaining operator actions: publish the final MP4 release asset and add its URL; complete any hackathon portal attestations/submission. No further payment authority.

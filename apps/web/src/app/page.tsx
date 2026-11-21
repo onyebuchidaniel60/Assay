@@ -271,10 +271,10 @@ const stackItems = [
     role: "Independent evaluation of corrections — scores de-identified field-level feedback traces without raw borrower data.",
   },
   {
-    name: "Arc · Circle Gateway",
-    badge: "INTEGRATED · TESTNET POLICY",
-    tone: "warning" as const,
-    role: "x402 agent payments on Arc Testnet — official Circle Gateway SDK, deterministic provider/endpoint/network/USDC/recipient/cap/expiry/idempotency policy and no blind retry.",
+    name: "Arc Mainnet x402",
+    badge: "LIVE · 0.05 USDC",
+    tone: "positive" as const,
+    role: "One verified LoneStar Oracle payment on Arc Mainnet — standard x402 exact, USDC EIP-3009, deterministic policy, provider receipt and onchain authorizationState. The separate Arc Testnet/Circle Gateway adapter is preserved.",
   },
   {
     name: "SEC EDGAR",
@@ -319,7 +319,7 @@ const faqs = [
   {
     question: "How does the Arc payment integration work?",
     answer:
-      "Assay uses Circle Gateway's official x402 batching SDK on Arc Testnet. The provider's actual 402 requirement is evaluated by a deterministic policy that checks the approved provider, exact endpoint, network (eip155:5042002), Arc USDC contract, recipient, per-payment cap, aggregate budget, expiry, idempotency and duplicate nonce. A rejection never reaches execution. A timeout becomes RECONCILIATION_REQUIRED and is looked up, not paid again. The code and mock-server tests are implemented; no live paid financial-data retrieval is claimed because no Arc-Testnet financial-data merchant was available and no testnet funds were supplied. SEC EDGAR is implemented but returned HTTP 403 from both tested egresses, so no live SEC result is claimed.",
+      "Assay completed one real 0.05 USDC LoneStar Oracle purchase on Arc Mainnet using standard x402 exact and USDC EIP-3009. The transaction, provider receipt, authorization state, retrieved Apple fundamentals and VALID audit chain are recorded in the repository. The provider's actual 402 requirement is still evaluated by a deterministic policy that checks provider, exact endpoint, network, asset, recipient, per-payment cap, aggregate budget, expiry, idempotency and duplicate nonce. A rejection never reaches execution. A timeout becomes RECONCILIATION_REQUIRED and is looked up, not paid again. A separate Arc Testnet/Circle Gateway adapter is preserved; no live Testnet financial-data retrieval is claimed. SEC EDGAR is implemented but returned HTTP 403 from both tested egresses, so no live SEC result is claimed.",
   },
   {
     question: "Why is Presidio labeled REDUCED_PII_MODE?",

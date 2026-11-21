@@ -1,0 +1,229 @@
+1
+00:00:00,000 --> 00:00:04,424
+Credit teams still piece covenant analysis
+together from documents,
+
+2
+00:00:04,424 --> 00:00:06,405
+spreadsheets, and screenshots.
+
+3
+00:00:06,405 --> 00:00:10,235
+The numbers may be right, but the trail is
+hard to verify.
+
+4
+00:00:10,235 --> 00:00:15,320
+Assay makes every figure evidence-linked
+and every payment bounded by policy.
+
+5
+00:00:15,320 --> 00:00:19,989
+This is the covenant operations workspace:
+borrowers, facilities,
+
+6
+00:00:19,989 --> 00:00:23,437
+runs, approvals, and audit evidence in one
+view.
+
+7
+00:00:23,437 --> 00:00:26,095
+The workspace is synthetic by design,
+
+8
+00:00:26,095 --> 00:00:30,118
+with no public signup and no autonomous
+credit decision.
+
+9
+00:00:30,118 --> 00:00:31,751
+Inside a completed run,
+
+10
+00:00:31,751 --> 00:00:35,371
+Assay shows the confidential inference
+attestation,
+
+11
+00:00:35,371 --> 00:00:39,133
+the financial snapshot, and the covenant
+calculation.
+
+12
+00:00:39,133 --> 00:00:43,605
+Baseline leverage is 3.07 times against a
+3.50 times threshold,
+
+13
+00:00:43,605 --> 00:00:45,592
+with stress cases beside it.
+
+14
+00:00:45,592 --> 00:00:48,645
+Deterministic code performs the
+arithmetic.
+
+15
+00:00:48,645 --> 00:00:52,265
+A zero-knowledge proof verifies the
+private inputs,
+
+16
+00:00:52,265 --> 00:00:55,246
+and a credit manager records the approval.
+
+17
+00:00:55,246 --> 00:00:57,815
+Privacy is enforced before reasoning.
+
+18
+00:00:57,815 --> 00:01:00,383
+Documents are redacted with Presidio,
+
+19
+00:01:00,383 --> 00:01:04,479
+encrypted in private storage under a
+borrower-specific key,
+
+20
+00:01:04,479 --> 00:01:05,451
+and tokenized.
+
+21
+00:01:05,451 --> 00:01:09,617
+Only structured, extracted data reaches
+the reasoning model.
+
+22
+00:01:09,617 --> 00:01:12,463
+Audit events are hash-chained and signed.
+
+23
+00:01:12,463 --> 00:01:17,400
+For market context, Assay's planner
+proposed a paid provider,
+
+24
+00:01:17,400 --> 00:01:20,718
+and the analyst selected LoneStar Oracle.
+
+25
+00:01:20,718 --> 00:01:26,221
+LoneStar returned a real x402 requirement:
+0.05 USDC on Arc Mainnet,
+
+26
+00:01:26,221 --> 00:01:28,244
+standard exact, EIP-3009.
+
+27
+00:01:28,244 --> 00:01:33,747
+Assay checked provider, endpoint,
+recipient, network, asset, amount,
+
+28
+00:01:33,747 --> 00:01:37,551
+budget, expiry, and idempotency before
+signing.
+
+29
+00:01:37,551 --> 00:01:42,406
+One payment was authorized, confirmed by a
+provider receipt,
+
+30
+00:01:42,406 --> 00:01:47,343
+and the Apple fundamentals were stored as
+encrypted evidence.
+
+31
+00:01:47,343 --> 00:01:48,706
+On Arc Mainnet,
+
+32
+00:01:48,706 --> 00:01:54,614
+the explorer shows a successful
+transferWithAuthorization of 0.05
+
+33
+00:01:54,614 --> 00:01:59,704
+USDC from Assay's payer wallet to the
+verified merchant.
+
+34
+00:01:59,704 --> 00:02:03,340
+The wallet moved from 0.93 to 0.88 USDC.
+
+35
+00:02:03,340 --> 00:02:08,584
+The evidence record carries the source
+URL, retrieval time,
+
+36
+00:02:08,584 --> 00:02:13,384
+a SHA-256 hash of the raw response,
+validation status,
+
+37
+00:02:13,384 --> 00:02:15,429
+and the payment intent.
+
+38
+00:02:15,429 --> 00:02:19,340
+Price, analyst target, market cap, P/E,
+EPS,
+
+39
+00:02:19,340 --> 00:02:25,384
+and the 52-week range are shown as
+financial facts, not model prose.
+
+40
+00:02:25,384 --> 00:02:29,816
+Assay separates policy approval, payment
+settlement, calculation,
+
+41
+00:02:29,816 --> 00:02:31,589
+proof, and human approval.
+
+42
+00:02:31,589 --> 00:02:36,226
+A timeout becomes reconciliation required,
+never an automatic retry.
+
+43
+00:02:36,226 --> 00:02:40,658
+The audit chain verifies all thirty-two
+events for this borrower,
+
+44
+00:02:40,658 --> 00:02:43,726
+including the payment and evidence
+retrieval.
+
+45
+00:02:43,726 --> 00:02:48,555
+Assay: evidence-linked analysis, bounded
+agentic payments,
+
+46
+00:02:48,555 --> 00:02:51,385
+and an audit trail you can verify.
+
+47
+00:02:51,385 --> 00:02:53,134
+The model interprets.
+
+48
+00:02:53,134 --> 00:02:54,466
+Code calculates.
+
+49
+00:02:54,466 --> 00:02:56,131
+Cryptography proves.
+
+50
+00:02:56,131 --> 00:02:57,546
+A human approves.

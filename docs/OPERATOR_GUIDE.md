@@ -45,7 +45,7 @@ Open the audit timeline, inspect event metadata and run chain verification. Audi
 - ZK proof verifies the defined inequality for a private witness; it does not prove agreement authenticity or input-source truth.
 - Hash chain is tamper-evident; it is not an immutable public ledger.
 - Demo crypto-shred removes the application-wrapped key for synthetic data; it is not a legal erasure certification.
-- Reppo is live for synthetic feedback evaluation. Arc Testnet / Circle Gateway is implemented with deterministic policy and mock-x402 tests; no live paid financial-data retrieval is claimed. SEC EDGAR is implemented but returned HTTP 403 from this host. Never present a policy approval, an HTTP 200 or a blocked provider as a settled payment.
+- Reppo is live for synthetic feedback evaluation. Arc Mainnet standard x402 exact completed one real 0.05 USDC LoneStar Oracle purchase and AAPL retrieval on 20 November 2026; the transaction, provider receipt, `authorizationState`, evidence hash and `VALID:32` audit chain are recorded in `docs/evidence/payments-2026-11-20/EVIDENCE.md`. Execution is disabled again and the session budget is spent. The Arc Testnet/Circle Gateway adapter is preserved with deterministic policy and mock-x402 tests; no live Testnet financial-data retrieval is claimed. SEC EDGAR is implemented but returned HTTP 403 from this host and the earlier Render probe. Never present a policy approval, an HTTP 200 or a blocked provider as a settled payment.
 
 ## Support
 
