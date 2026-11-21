@@ -329,5 +329,5 @@ For every checkpoint add:
 - `pnpm lint` — pass.
 - `pnpm build` — pass (all packages, API, Next.js web).
 - Deployed regression route sweep — pass; audit chain `VALID:32` (payment borrower) and `VALID:13` (approved run).
-- Demo render — 1920×1080/30 fps, 177.546 s, H.264/AAC, 30.5 MB; full-frame inspection at scene boundaries; captions and audio verified.
+- Demo render — 1920×1080/30 fps, 177.546 s, H.264/AAC, 30.5 MB; full-frame inspection at scene boundaries; captions and audio verified. ElevenLabs `scribe_v1` transcription matched the full narration script, including the 0.05 USDC amount, 0.93 → 0.88 balance and thirty-two audit events.
 - All documentation links use real repository paths; no `href="#"`, fake contact URL or unverified test claim.

@@ -64,6 +64,10 @@ and the onchain transaction are shown as they exist.
   USDC` explorer row were checked for legibility.
 - Captions were rebuilt after an initial decimal-splitting bug so `0.05 USDC`
   is never broken across cues.
+- Full narration was independently transcribed with ElevenLabs `scribe_v1`;
+  the returned text matches the script verbatim, including the 0.05 USDC amount,
+  0.93 → 0.88 balance, thirty-two audit events and closing lines. Transcript:
+  `docs/demo/assay-demo-transcript.txt`.
 
 ## Honest limitations
 

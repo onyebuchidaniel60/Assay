@@ -195,5 +195,5 @@
 - `pnpm build` — pass (all packages, API, Next.js web).
 - Deployed regression — pass: dashboard, borrowers, facilities, analysis runs, covenants, `/cases`, evaluations, approvals, audit, integrations, settings, approved run, payment run, borrower detail, 404; no route error.
 - Audit verification — `VALID:32` for the payment borrower and `VALID:13` for the approved-run borrower.
-- Demo — 1920×1080, 30 fps, 177.546 s, H.264/AAC, 30.5 MB; real deployed footage and real Arc explorer transaction; ElevenLabs `eleven_v4` George; captions/cached segments; script/storyboard/production notes in `docs/demo/`.
+- Demo — 1920×1080, 30 fps, 177.546 s, H.264/AAC, 30.5 MB; real deployed footage and real Arc explorer transaction; ElevenLabs `eleven_v4` George; captions/cached segments; `scribe_v1` transcript matched the script; script/storyboard/production notes/transcript in `docs/demo/`.
 - Remaining operator actions: publish the final MP4 release asset and add its URL; complete any hackathon portal attestations/submission. No further payment authority.
