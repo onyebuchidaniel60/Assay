@@ -83,7 +83,7 @@ function paymentState(payments: PaymentStatus): { state: string; tone: "positive
   if (payments.configError) return { state: "CONFIG ERROR", tone: "danger" };
   if (!payments.enabled) return { state: "DISABLED", tone: "neutral" };
   if (payments.dryRun) return { state: "DRY RUN", tone: "warning" };
-  if (payments.executionEnabled && payments.signingKeyConfigured && payments.ready) return { state: "TESTNET EXECUTION ENABLED", tone: "positive" };
+  if (payments.executionEnabled && payments.signingKeyConfigured && payments.ready) return { state: "EXECUTION ENABLED", tone: "positive" };
   return { state: "QUOTES ONLY", tone: "warning" };
 }
 
