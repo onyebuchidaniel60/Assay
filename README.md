@@ -149,7 +149,7 @@ See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for every variable and [docs/
 ## Verified deployment
 
 - **Production:** `https://assay-omega-gray.vercel.app` and stable alias `https://assay-uhhh2.vercel.app` (public; invite-only app sign-in)
-- **Deployed commits:** frontend UI `b8853e9`; Render API `720f9a1`
+- **Deployed commits:** frontend UI `bd42418`; Render API `720f9a1`
 - **API health:** `https://assay-api-7hy0.onrender.com/health/live`
 - **Presidio:** `https://assay-presidio.onrender.com/health`
 - **Demo video:** [public release asset](https://github.com/onyebuchidaniel60/Assay/releases/download/demo-final-2026-11-21/assay-demo-final.mp4) · [local copy](docs/demo/assay-demo-final.mp4)

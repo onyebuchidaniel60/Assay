@@ -4,7 +4,7 @@
 
 - **Local:** Neon development branch/project, synthetic fixtures, live providers only through verified server-side adapters.
 - **Preview:** Vercel frontend, Render API/Presidio, Neon demo project. Synthetic fixtures only. Sandbox integrations. No production secrets/data/payments.
-- **Production:** Vercel frontend `https://assay-omega-gray.vercel.app`, Render API/Presidio, Neon demo project. Render API deployed at `720f9a1` and Vercel UI at `b8853e9` for the 21 November 2026 Arc Mainnet release; the earlier payment update was `9e9f054`. Synthetic data only; Vercel Authentication is disabled and the app keeps its own invite-only sign-in.
+- **Production:** Vercel frontend `https://assay-omega-gray.vercel.app`, Render API/Presidio, Neon demo project. Render API deployed at `720f9a1` and Vercel UI at `bd42418` for the 21 November 2026 Arc Mainnet release; the earlier payment update was `9e9f054`. Synthetic data only; Vercel Authentication is disabled and the app keeps its own invite-only sign-in.
 
 ## Platform allocation
 
@@ -20,7 +20,7 @@
 ## Current production deployment
 
 - **Frontend:** `https://assay-uhhh2.vercel.app` (public; deployment `assay-o65mwq19k-uhhh2.vercel.app`; production domain `https://assay-omega-gray.vercel.app`).
-- **Commits:** Render API `720f9a1`; Vercel UI `b8853e9`. Previous payment update `9e9f054`.
+- **Commits:** Render API `720f9a1`; Vercel UI `bd42418`. Previous payment update `9e9f054`.
 - **Protection:** Vercel Authentication disabled; the app enforces invite-only Neon Auth sign-in. Vercel Toolbar feedback is off for production and preview.
 - **API:** `https://assay-api-7hy0.onrender.com` (Render free web service, live at `720f9a1`, health `/health/ready`; worker enabled, Reppo live, Arc execution disabled).
 - **Presidio:** `https://assay-presidio.onrender.com` (Render free Python service, `REDUCED_PII_MODE`).
@@ -40,7 +40,7 @@
 5. Add only synthetic test data and sandbox secrets.
 6. Redeploy and smoke-test after verified checkpoints.
 
-A production build was auto-triggered by the GitHub connection during Phase 1; the Git integration was disconnected and production remained gated until the final Phase 9 matrix passed. Production has since been deployed manually (Render `720f9a1`, Vercel `b8853e9`) and smoke-tested with execution disabled after the authorized payment.
+A production build was auto-triggered by the GitHub connection during Phase 1; the Git integration was disconnected and production remained gated until the final Phase 9 matrix passed. Production has since been deployed manually (Render `720f9a1`, Vercel `bd42418`) and smoke-tested with execution disabled after the authorized payment.
 
 ## Secrets
 

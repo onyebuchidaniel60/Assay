@@ -102,7 +102,7 @@ Design reference images are used as licensed inspiration only and are not redist
 
 - [x] Public GitHub repository: https://github.com/onyebuchidaniel60/Assay
 - [x] Demo video public URL — GitHub release `demo-final-2026-11-21` asset (verified HTTP 200, 30.5 MB; YouTube/Drive upload would require operator OAuth)
-- [x] Live production deployment verified — frontend `b8853e9`, Render API `720f9a1`; public URL; app-level invite-only sign-in; live Arc Mainnet payment and retrieval verified
+- [x] Live production deployment verified — frontend `bd42418`, Render API `720f9a1`; public URL; app-level invite-only sign-in; live Arc Mainnet payment and retrieval verified
 - [x] Write-up ready (this file)
 - [x] X post drafted
 - [ ] X post will link to the submission — operator action
@@ -115,7 +115,7 @@ Design reference images are used as licensed inspiration only and are not redist
 
 ## Submission readiness — 21 November 2026
 
-- Final code: `main` at the documentation commit; deployed frontend `b8853e9`, Render API `720f9a1`.
+- Final code: `main` at the documentation commit; deployed frontend `bd42418`, Render API `720f9a1`.
 - Demo video: published and verified at the GitHub release asset linked above (HTTP 200, 30,549,015 bytes, 2:57.5, 1080p).
 - Live app: `https://assay-omega-gray.vercel.app` / `https://assay-uhhh2.vercel.app`, public landing and invite-only synthetic workspace.
 - Live payment: 0.05 USDC Arc Mainnet transaction, provider receipt, `authorizationState`, retrieved evidence and `VALID:32` audit chain are public in `docs/evidence/payments-2026-11-20/EVIDENCE.md`.
