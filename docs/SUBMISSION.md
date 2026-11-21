@@ -43,6 +43,20 @@ SERV never does arithmetic, approves a run, changes policy or writes the databas
 - **REMOVED: Kite** — Kite Passport is no longer an active dependency, credential, route or setup requirement. Historical provider-blocked evidence is archived at [archive/KITE_REMOVAL.md](archive/KITE_REMOVAL.md).
 - **NOT CLAIMED: Dolphin** — evaluated and rejected. Its confidentiality mechanism is unverified: no TEE, no MPC, zero-retention unverified. No Dolphin adapter, endpoint, key or flag exists in the repository.
 
+## How the agentic payment flow works
+
+1. The deterministic evidence planner proposes a genuine data need; the analyst selects the provider.
+2. Assay requests the endpoint without payment and parses the real HTTP 402 requirement.
+3. The deterministic policy checks provider, endpoint, network, USDC asset, recipient, per-payment cap, aggregate budget, session expiry, idempotency and duplicate nonce.
+4. A policy rejection is persisted and audited and never reaches the execution layer.
+5. The analyst explicitly authorizes an approved quote; the session row is locked, budget is reserved and a Postgres `payment.execute` job is queued transactionally.
+6. The worker rechecks the full policy, signs the x402 payload, submits it, and accepts only a verifiable provider receipt. A timeout becomes `RECONCILIATION_REQUIRED`; the original authorization is looked up by nonce and is never repaid automatically.
+7. The returned data is validated, normalized, encrypted under the borrower DEK, content-hashed, linked to the analysis run and audited.
+
+## Why Arc Mainnet
+
+LoneStar Oracle's real financial-data endpoint offered an Arc Mainnet USDC option with standard onchain x402 `exact` and EIP-3009; Circle Discovery had **no** `FINANCIAL_ANALYSIS` service on Arc Testnet on 20 November 2026. Arc Mainnet therefore provided a genuine merchant, a real 0.05 USDC price, USDC settlement and a public explorer for independent verification. The Arc Testnet/Circle Gateway adapter remains available for testnet-compatible merchants but is not relabeled as a Mainnet proof.
+
 ## Architecture
 
 ```mermaid
