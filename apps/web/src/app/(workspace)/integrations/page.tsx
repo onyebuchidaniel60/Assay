@@ -82,8 +82,9 @@ type IntegrationStatus = {
 function paymentState(payments: PaymentStatus): { state: string; tone: "positive" | "warning" | "danger" | "neutral" } {
   if (payments.configError) return { state: "CONFIG ERROR", tone: "danger" };
   if (!payments.enabled) return { state: "DISABLED", tone: "neutral" };
+  if (!payments.executionEnabled) return { state: "EXECUTION OFF", tone: "neutral" };
   if (payments.dryRun) return { state: "DRY RUN", tone: "warning" };
-  if (payments.executionEnabled && payments.signingKeyConfigured && payments.ready) return { state: "EXECUTION ENABLED", tone: "positive" };
+  if (payments.signingKeyConfigured && payments.ready) return { state: "EXECUTION ENABLED", tone: "positive" };
   return { state: "QUOTES ONLY", tone: "warning" };
 }
 
