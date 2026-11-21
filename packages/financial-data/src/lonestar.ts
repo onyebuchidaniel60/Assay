@@ -43,52 +43,102 @@ export type LoneStarOracleProviderOptions = {
 };
 
 
+const LONESTAR_FACT_ORDER = [
+  "price",
+  "analyst_target",
+  "upside_pct",
+  "market_cap",
+  "pe_trailing",
+  "pe_forward",
+  "eps",
+  "week52_high",
+  "week52_low",
+  "pct_from_52w_high",
+  "day_change_pct",
+  "health_score",
+  "concern_score",
+  "profit_margin_pct",
+  "debt_to_equity",
+  "current_ratio",
+  "roe_pct",
+  "dividend_yield_pct",
+  "beta",
+  "volume",
+  "avg_volume",
+] as const;
+
+function loneStarUnit(key: string): string {
+  const k = key.toLowerCase();
+  if (k.endsWith("_pct") || k.includes("percent") || k.includes("upside") || k.includes("yield") || k.includes("margin")) return "percent";
+  if (k.includes("volume")) return "shares";
+  if (k.endsWith("_score")) return "score";
+  if (k.includes("ratio") || /(^|[._])pe([._]|$)/.test(k) || /(^|[._])beta([._]|$)/.test(k)) return "ratio";
+  return "USD";
+}
+
+function numericValue(value: unknown): number | null {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string" && /^-?\d+(?:\.\d+)?$/.test(value.trim())) {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+}
+
 function normalizeLoneStarFacts(raw: unknown, fiscalYear: number): FinancialFact[] {
-  const facts: FinancialFact[] = [];
-  const unitFor = (key: string): string => {
-    const k = key.toLowerCase();
-    if (/(^|[._])(pe|p_e|pe_ratio|ratio|score)([._]|$)/.test(k) || k.includes("ratio")) return "ratio";
-    if (k.includes("yield") || k.includes("upside") || k.includes("percent") || k.includes("change") || k.includes("margin")) return "percent";
-    if (k.includes("volume")) return "shares";
-    return "USD";
+  const periodEnd = new Date().toISOString().slice(0, 10);
+  const seen = new Set<string>();
+  const collected: FinancialFact[] = [];
+  const add = (path: string, key: string, value: number): void => {
+    if (seen.has(path)) return;
+    seen.add(path);
+    collected.push({
+      tag: path,
+      label: key.replaceAll("_", " ").replaceAll(".", " · "),
+      value,
+      unit: loneStarUnit(key),
+      periodStart: null,
+      periodEnd,
+      fiscalYear,
+      fiscalPeriod: "FY",
+      form: null,
+      accession: null,
+      filed: null,
+      frame: null,
+    });
   };
+
+  const root = raw && typeof raw === "object" && !Array.isArray(raw) ? (raw as Record<string, unknown>) : {};
+  for (const key of LONESTAR_FACT_ORDER) {
+    const value = numericValue(root[key]);
+    if (value !== null) add(key, key, value);
+  }
+
   const visit = (value: unknown, path: string): void => {
-    if (facts.length >= 12) return;
+    if (collected.length >= 24) return;
     if (Array.isArray(value)) {
       value.slice(0, 3).forEach((item, index) => visit(item, `${path}[${index}]`));
       return;
     }
     if (!value || typeof value !== "object") return;
     for (const [key, item] of Object.entries(value as Record<string, unknown>)) {
-      if (facts.length >= 12) break;
+      if (collected.length >= 24) break;
       const nextPath = path ? `${path}.${key}` : key;
-      const numeric = typeof item === "number"
-        ? item
-        : typeof item === "string" && /^-?\d+(?:\.\d+)?$/.test(item.trim())
-          ? Number(item)
-          : null;
-      if (numeric !== null && Number.isFinite(numeric) && /price|pe|p\/e|eps|revenue|market|cap|target|dividend|volume|high|low|ratio|debt|equity|score|upside|yield/i.test(key)) {
-        facts.push({
-          tag: nextPath,
-          label: key.replaceAll("_", " ").replaceAll(".", " · "),
-          value: numeric,
-          unit: unitFor(key),
-          periodStart: null,
-          periodEnd: new Date().toISOString().slice(0, 10),
-          fiscalYear,
-          fiscalPeriod: "FY",
-          form: null,
-          accession: null,
-          filed: null,
-          frame: null,
-        });
+      if (!path && (LONESTAR_FACT_ORDER as readonly string[]).includes(key)) continue;
+      const numeric = numericValue(item);
+      if (numeric !== null && /price|pe|p\/e|eps|revenue|market|cap|target|dividend|volume|high|low|ratio|debt|equity|score|upside|yield|margin|beta/i.test(key)) {
+        add(nextPath, key, numeric);
         continue;
       }
       if (item && typeof item === "object") visit(item, nextPath);
     }
   };
   visit(raw, "");
-  return facts;
+
+  const priority = new Map<string, number>(LONESTAR_FACT_ORDER.map((key, index) => [key, index]));
+  return collected
+    .sort((left, right) => (priority.get(left.tag) ?? 1000) - (priority.get(right.tag) ?? 1000))
+    .slice(0, 20);
 }
 
 function sha256Json(value: unknown): string {
