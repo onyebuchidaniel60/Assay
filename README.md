@@ -4,7 +4,7 @@
 
 **AI-assisted covenant monitoring for credit teams.** The model interprets, deterministic code calculates, ZK proofs verify compliance without exposing figures, and a human approves.
 
-[Live app](https://assay-uhhh2.vercel.app) · [Demo video](https://github.com/onyebuchidaniel60/Assay/releases) · [Docs](docs/)
+[Live app](https://assay-uhhh2.vercel.app) · [Demo video](https://github.com/onyebuchidaniel60/Assay/releases/download/demo-final-2026-11-21/assay-demo-final.mp4) · [Docs](docs/)
 
 ---
 
@@ -148,13 +148,15 @@ See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for every variable and [docs/
 
 ## Verified deployment
 
-- **Production:** `https://assay-uhhh2.vercel.app` (public; stable alias of `https://assay-omega-gray.vercel.app`)
+- **Production:** `https://assay-omega-gray.vercel.app` and stable alias `https://assay-uhhh2.vercel.app` (public; invite-only app sign-in)
+- **Deployed commits:** frontend UI `b8853e9`; Render API `720f9a1`
 - **API health:** `https://assay-api-7hy0.onrender.com/health/live`
 - **Presidio:** `https://assay-presidio.onrender.com/health`
-- **Demo video:** [public release asset](https://github.com/onyebuchidaniel60/Assay/releases/download/demo-v1/assay-demo-final.mp4) · [local copy](artifacts/demo/assay-demo-final.mp4)
+- **Demo video:** [public release asset](https://github.com/onyebuchidaniel60/Assay/releases/download/demo-final-2026-11-21/assay-demo-final.mp4) · [local copy](docs/demo/assay-demo-final.mp4)
 - **Repository:** `https://github.com/onyebuchidaniel60/Assay`
+- **Live payment evidence:** [docs/evidence/payments-2026-11-20/EVIDENCE.md](docs/evidence/payments-2026-11-20/EVIDENCE.md)
 
-The production deployment is public; the workspace itself requires an invited synthetic account. The public API health endpoint is available for availability checks; the demo video is the primary public walkthrough.
+The production deployment is public; the workspace itself requires an invited synthetic account. Payment execution is disabled and the one authorized session is fully spent. The public API health endpoint is available for availability checks; the demo video is the primary public walkthrough.
 
 ## Documentation
 
@@ -173,6 +175,8 @@ The production deployment is public; the workspace itself requires an invited sy
 - [Research notes](docs/RESEARCH_NOTES.md)
 - [Build log](docs/BUILD_LOG.md)
 - [Submission write-up](docs/SUBMISSION.md)
+- [Live payment evidence](docs/evidence/payments-2026-11-20/EVIDENCE.md)
+- [Final demo script](docs/demo/assay-demo-script.md) · [storyboard](docs/demo/assay-demo-storyboard.md) · [production notes](docs/demo/assay-demo-production-notes.md)
 - [Complete implementation blueprint](MASTER_BLUEPRINT.md)
 
 ## Project status

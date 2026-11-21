@@ -15,6 +15,7 @@ credential is stored here.
 - `authorized-queued.png` — deployed UI: authorized and queued for the worker.
 - `live-payment-result.png` — deployed UI: `CONFIRMED`, transaction hash, retrieved evidence.
 - `final-run-verified.png` — deployed run after the final redeploy.
+- `final-deployed-payment.png` — final deployed UI after the last redeploy: `CONFIRMED`, tx hash and normalized facts.
 - `audit-chain-verified.png` — server-side chain verification: `VALID:32`.
 - `deployed-mainnet-status.png` — deployed integration configuration before execution.
 - `provider-compatibility.json` — read-only provider/network compatibility.

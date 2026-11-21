@@ -81,7 +81,7 @@ Design reference images are used as licensed inspiration only and are not redist
 ## Links
 
 - **Repository:** https://github.com/onyebuchidaniel60/Assay
-- **Demo video:** https://github.com/onyebuchidaniel60/Assay/releases/download/demo-v1/assay-demo-final.mp4 (public GitHub release asset; YouTube/Drive upload requires operator OAuth)
+- **Demo video:** https://github.com/onyebuchidaniel60/Assay/releases/download/demo-final-2026-11-21/assay-demo-final.mp4 (public GitHub release asset; YouTube/Drive upload requires operator OAuth)
 - **Public API health:** https://assay-api-7hy0.onrender.com/health/live
 - **Production:** https://assay-uhhh2.vercel.app — public landing and login; the workspace requires an invited synthetic account. Production domain: https://assay-omega-gray.vercel.app. Demo credentials are supplied separately through the operator channel.
 - **Documentation:** https://github.com/onyebuchidaniel60/Assay/tree/main/docs
@@ -95,14 +95,14 @@ Design reference images are used as licensed inspiration only and are not redist
 > Built for @OpenServAI #SERVHackathon.
 >
 > Repo: https://github.com/onyebuchidaniel60/Assay
-> Demo: https://github.com/onyebuchidaniel60/Assay/releases/download/demo-v1/assay-demo-final.mp4
+> Demo: https://github.com/onyebuchidaniel60/Assay/releases/download/demo-final-2026-11-21/assay-demo-final.mp4
 > Docs: https://github.com/onyebuchidaniel60/Assay/tree/main/docs
 
 ## Submission checklist
 
 - [x] Public GitHub repository: https://github.com/onyebuchidaniel60/Assay
-- [x] Demo video public URL — GitHub release asset (YouTube/Drive upload requires operator OAuth)
-- [x] Live production deployment verified at `720f9a1` — public URL; app-level invite-only sign-in; live Arc Mainnet payment and retrieval verified
+- [x] Demo video public URL — GitHub release `demo-final-2026-11-21` asset (verified HTTP 200, 30.5 MB; YouTube/Drive upload would require operator OAuth)
+- [x] Live production deployment verified — frontend `b8853e9`, Render API `720f9a1`; public URL; app-level invite-only sign-in; live Arc Mainnet payment and retrieval verified
 - [x] Write-up ready (this file)
 - [x] X post drafted
 - [ ] X post will link to the submission — operator action
@@ -112,3 +112,12 @@ Design reference images are used as licensed inspiration only and are not redist
 - [x] Arc Mainnet x402 exact live payment + Arc Testnet Gateway adapter recorded honestly
 - [x] SEC EDGAR host-level 403 recorded; no live result fabricated
 - [x] No Dolphin claim
+
+## Submission readiness — 21 November 2026
+
+- Final code: `main` at the documentation commit; deployed frontend `b8853e9`, Render API `720f9a1`.
+- Demo video: published and verified at the GitHub release asset linked above (HTTP 200, 30,549,015 bytes, 2:57.5, 1080p).
+- Live app: `https://assay-omega-gray.vercel.app` / `https://assay-uhhh2.vercel.app`, public landing and invite-only synthetic workspace.
+- Live payment: 0.05 USDC Arc Mainnet transaction, provider receipt, `authorizationState`, retrieved evidence and `VALID:32` audit chain are public in `docs/evidence/payments-2026-11-20/EVIDENCE.md`.
+- Regression: 101 tests passed, 1 skipped; typecheck, lint and production build passed; deployed route sweep and audit verification passed.
+- No hackathon submission portal URL or legal attestation text was present in the repository or supplied context. The submission has **not** been filed, and no terms/attestations were accepted on the operator's behalf. The remaining actions are the operator's final review, any portal questions, and pressing submit.

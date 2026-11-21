@@ -3,6 +3,7 @@
 ## Output
 
 - `docs/demo/assay-demo-final.mp4`
+- Public release asset: https://github.com/onyebuchidaniel60/Assay/releases/download/demo-final-2026-11-21/assay-demo-final.mp4 (verified HTTP 200, 30,549,015 bytes)
 - 1920×1080, 30 fps, H.264 High/yuv420p, AAC mono 48 kHz
 - 177.546 s (2:57.5), 30.5 MB
 - `docs/demo/assay-demo-captions.srt` — 50 short caption cues

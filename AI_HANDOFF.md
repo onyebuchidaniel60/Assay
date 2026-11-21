@@ -5,9 +5,9 @@
 **Status:** Phases 1–9 complete. Production frontend/API are deployed and smoke-tested; the full product regression, live Arc Mainnet payment, retrieval, audit verification and final demo are complete.
 **Repository:** `https://github.com/onyebuchidaniel60/Assay` — public, default branch `main`.
 **Production URL:** `https://assay-omega-gray.vercel.app` and stable alias `https://assay-uhhh2.vercel.app` — public, invite-only app sign-in.
-**Production commit:** `720f9a1` on Render API and Vercel, with payment execution disabled. **Render API:** `https://assay-api-7hy0.onrender.com`. **Render Presidio:** `https://assay-presidio.onrender.com`.
+**Production commit:** Render API `720f9a1`; Vercel UI `b8853e9`. Payment execution is disabled. **Render API:** `https://assay-api-7hy0.onrender.com`. **Render Presidio:** `https://assay-presidio.onrender.com`.
 **Live payment:** 0.05 USDC, Arc Mainnet `eip155:5042`, tx `0xc0a9997fae6db0049622555905b59cb2c9585ab17b8825051e3f260538a9e134`; provider receipt `success: true`; `authorizationState` true; wallet 0.93 → 0.88 USDC; audit chain `VALID:32`. Full record: `docs/evidence/payments-2026-11-20/EVIDENCE.md`.
-**Public demo:** `docs/demo/assay-demo-final.mp4` and the public release asset (link recorded after publish). 1080p, ~2:58, ElevenLabs `eleven_v4` narration.
+**Public demo:** `docs/demo/assay-demo-final.mp4` and the public release asset: https://github.com/onyebuchidaniel60/Assay/releases/download/demo-final-2026-11-21/assay-demo-final.mp4. 1080p, ~2:58, ElevenLabs `eleven_v4` narration.
 **Production release authority:** Exercised for this deployment and the single authorized payment. Execution was restored to `PAYMENT_EXECUTION_ENABLED=false` and `PAYMENT_DRY_RUN=true` immediately after settlement.
 **Data boundary:** Synthetic data only; no real borrower, lender or production records.
 **New spend authority:** None remaining. The 50,000/50,000 atomic session cap is fully spent; no second payment is possible without an explicit operator change.
@@ -106,13 +106,13 @@
 - `docs/INTEGRATIONS.md` records the Reppo endpoint migration and live verdict, and the Kite provider block with timestamps.
 - Footer/docs links resolve to real pages; no `href="#"`, fake contact URL or private repository link.
 
-## Phase 8 — complete
+## Phase 8 — complete (historical, pre-Arc)
 
 - Final demo `artifacts/demo/assay-demo-final.mp4`: 131.97 s, 1920×1080, 30 fps, H.264 High/yuv420p + AAC mono, 7.34 MB.
 - Microsoft Edge TTS `en-US-AndrewNeural` (free, no account, no billing) replaced the robotic espeak-ng render. Gemini TTS was not used because no Google AI credential/free-tier activation was present.
 - Opening title and app header show the operator logo. Scenes cover dashboard, facility/redaction, extraction/attestation/scenarios/proof, real manager approval of BOR-018, the real Reppo verdict (`cmwikqtsn000f08l4y73d9a8m`), auditor chain verification and honest integration status.
 - Script `assay-demo-script-final.md`, captions `assay-demo-final.srt`, production notes `production-notes-final.md` and rebuild script `build-video-final.sh` are committed beside the MP4.
-- Complete render inspected with extracted frames; no secrets, private URLs or real data. Public URL: `https://github.com/onyebuchidaniel60/Assay/releases/download/demo-v1/assay-demo-final.mp4` (YouTube/Drive upload requires operator OAuth).
+- Complete render inspected with extracted frames; no secrets, private URLs or real data. Public URL at the time: `https://github.com/onyebuchidaniel60/Assay/releases/download/demo-v1/assay-demo-final.mp4` (historical; superseded by the Arc Mainnet final demo at the top of this file).
 
 ## Phase 9 — complete
 

@@ -1,6 +1,8 @@
-# Final UI evidence
+# UI evidence
 
-These screenshots were captured on 16 November 2026 from the public production deployment `https://assay-uhhh2.vercel.app` at commit `c27a02a`, using a headed Chromium session (Xvfb) and the invited synthetic accounts. Public pages were captured anonymously.
+**Current payment/product evidence:** [payments-2026-11-20/EVIDENCE.md](payments-2026-11-20/EVIDENCE.md) and [regression-2026-11-21/](regression-2026-11-21/).
+
+These screenshots are a historical 16 November 2026 UI snapshot from `https://assay-uhhh2.vercel.app` at commit `c27a02a`, using a headed Chromium session (Xvfb) and the invited synthetic accounts. They predate the Arc Mainnet payment and are retained for design history only. Public pages were captured anonymously.
 
 | File | Group | Route |
 |---|---|---|
